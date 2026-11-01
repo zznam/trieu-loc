@@ -6,6 +6,8 @@ import {
 } from "@tanstack/react-router";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import { useEffect } from "react";
+import { registerServiceWorker } from "#/lib/pwa";
 import { themeInitScript } from "#/lib/theme";
 import appCss from "../styles.css?url";
 
@@ -16,6 +18,9 @@ export const Route = createRootRoute({
 			{ name: "viewport", content: "width=device-width, initial-scale=1" },
 			{ name: "theme-color", content: "#3f5f23" },
 			{ name: "color-scheme", content: "light dark" },
+			{ name: "apple-mobile-web-app-capable", content: "yes" },
+			{ name: "apple-mobile-web-app-title", content: "Triệu Lộc" },
+			{ name: "apple-mobile-web-app-status-bar-style", content: "default" },
 			{ title: "Triệu Lộc — Quê hương Bà Triệu" },
 		],
 		links: [
@@ -31,12 +36,15 @@ export const Route = createRootRoute({
 			},
 			{ rel: "stylesheet", href: appCss },
 			{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+			{ rel: "manifest", href: "/manifest.webmanifest" },
+			{ rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
 		],
 	}),
 	shellComponent: RootDocument,
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+	useEffect(() => registerServiceWorker(), []);
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const lang = pathname.startsWith("/en") ? "en" : "vi";
 	return (
