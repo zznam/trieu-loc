@@ -1,8 +1,21 @@
 // Fails the build if server-only code (database driver, Node crypto, secrets) leaks into
 // the browser bundle — e.g. after importing a plain value from a src/server/* module.
+import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 
-const DIR = ".output/public/assets";
+// Nitro emits to .vercel/output/static/assets on Vercel, and to .output/public/assets locally.
+const candidateDirs = [
+	".vercel/output/static/assets",
+	".output/public/assets",
+];
+const DIR = candidateDirs.find((d) => existsSync(d));
+if (!DIR) {
+	console.error(
+		`✗ Client asset directory not found. Checked: ${candidateDirs.join(", ")}`,
+	);
+	process.exit(1);
+}
+
 const FORBIDDEN = [
 	["postgres driver", /allocUnsafe|\bbytea\b/],
 	["drizzle-orm", /drizzle-orm|PgDialect/],
@@ -14,10 +27,15 @@ const files = (await readdir(DIR)).filter((f) => f.endsWith(".js"));
 const problems = [];
 for (const f of files) {
 	const src = await readFile(`${DIR}/${f}`, "utf8");
-	for (const [name, re] of FORBIDDEN) if (re.test(src)) problems.push(`${f}: contains ${name}`);
+	for (const [name, re] of FORBIDDEN) {
+		if (re.test(src)) problems.push(`${f}: contains ${name}`);
+	}
 }
 if (problems.length) {
-	console.error("✗ Server-only code found in the client bundle:\n  " + problems.join("\n  "));
+	console.error(
+		"✗ Server-only code found in the client bundle:\n  " +
+			problems.join("\n  "),
+	);
 	process.exit(1);
 }
-console.log(`✓ Client bundle clean (${files.length} files checked)`);
+console.log(`✓ Client bundle clean (${files.length} files checked in ${DIR})`);
