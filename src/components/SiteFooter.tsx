@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { site } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
+import { InstallButton } from "./InstallButton";
 
 export function SiteFooter({ lang }: { lang: Lang }) {
 	return (
@@ -16,6 +17,7 @@ export function SiteFooter({ lang }: { lang: Lang }) {
 					<p className="mt-4 max-w-md text-sm leading-relaxed text-rice-100/80">
 						{t(lang, "footer.about")}
 					</p>
+					<InstallButton lang={lang} />
 				</div>
 				<div className="sm:text-right">
 					<p className="text-sm font-semibold uppercase tracking-widest text-earth-300">
