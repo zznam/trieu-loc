@@ -91,3 +91,6 @@ export async function resizeImage(
 		height,
 	};
 }
+
+/** Slug prefix for published community stories in /news URLs, e.g. "cong-dong-12". */
+export const STORY_PREFIX = "cong-dong-";

@@ -2,10 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ContributeCta } from "#/components/ContributeCta";
 import { PageHeader, SampleNote } from "#/components/PageHeader";
-import { businesses, specialties } from "#/lib/content";
+import {
+	type Business,
+	businesses as fileBusinesses,
+	specialties,
+} from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
 import { fold } from "#/lib/text";
+import { getVillage } from "#/lib/villages";
+import { getPublishedBusinesses } from "#/server/published";
 
 export const Route = createFileRoute("/$lang/food")({
 	head: ({ params }) => {
@@ -18,17 +24,39 @@ export const Route = createFileRoute("/$lang/food")({
 			"food",
 		);
 	},
+	loader: () => getPublishedBusinesses(),
 	component: FoodPage,
 });
 
 function FoodPage() {
+	const published = Route.useLoaderData();
+	// Directory = businesses from the content file + ones published from community submissions.
+	const businesses: (Business & { community?: boolean })[] = useMemo(
+		() => [
+			...fileBusinesses,
+			...published.map((b) => {
+				const village = b.villageId ? getVillage(b.villageId)?.name : undefined;
+				const text = (s: string) => ({ vi: s, en: s });
+				return {
+					id: `cong-dong-${b.id}`,
+					name: b.title,
+					category: text(b.businessCategory || "—"),
+					village: village ?? text(b.village ?? ""),
+					phone: b.businessPhone ?? "",
+					body: text(b.message),
+					community: true,
+				};
+			}),
+		],
+		[published],
+	);
 	const lang = Route.useParams().lang as Lang;
 	const [query, setQuery] = useState("");
 	const [category, setCategory] = useState<string>("all");
 
 	const categories = useMemo(
 		() => [...new Set(businesses.map((b) => pick(lang, b.category)))],
-		[lang],
+		[lang, businesses],
 	);
 	const filtered = businesses.filter((b) => {
 		const inCat = category === "all" || pick(lang, b.category) === category;
@@ -134,16 +162,23 @@ function FoodPage() {
 								</div>
 								<p className="mt-1 text-sm text-earth-700">
 									{pick(lang, b.village)}
+									{b.community && (
+										<span className="ml-2 rounded-full bg-earth-300/30 px-2 py-0.5 text-xs text-earth-700">
+											✍️ {t(lang, "food.community")}
+										</span>
+									)}
 								</p>
 								<p className="mt-2 text-sm text-ink-soft">
 									{pick(lang, b.body)}
 								</p>
-								<a
-									href={`tel:${b.phone.replace(/\s/g, "")}`}
-									className="mt-3 inline-block text-sm font-semibold text-rice-700 hover:underline"
-								>
-									☎ {b.phone}
-								</a>
+								{b.phone && (
+									<a
+										href={`tel:${b.phone.replace(/\s/g, "")}`}
+										className="mt-3 inline-block text-sm font-semibold text-rice-700 hover:underline"
+									>
+										☎ {b.phone}
+									</a>
+								)}
 							</article>
 						))}
 						{filtered.length === 0 && (

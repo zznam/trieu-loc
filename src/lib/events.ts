@@ -75,11 +75,15 @@ function occurrence(event: EventDef, year: number): Occurrence | null {
 }
 
 /** Every occurrence that hasn't ended yet, within the next `months` months, soonest first. */
-export function upcomingEvents(now = new Date(), months = 12): Occurrence[] {
+export function upcomingEvents(
+	now = new Date(),
+	months = 12,
+	extra: EventDef[] = [],
+): Occurrence[] {
 	const today = todayInVietnam(now);
 	const limit = vnMidnight(addDays(today, Math.round(months * 30.5)));
 	const out: Occurrence[] = [];
-	for (const event of events) {
+	for (const event of [...events, ...extra]) {
 		const years = event.date.year
 			? [event.date.year]
 			: [today.year - 1, today.year, today.year + 1];
@@ -111,4 +115,29 @@ export function googleCalendarUrl(
 		details,
 	});
 	return `https://calendar.google.com/calendar/render?${params}`;
+}
+
+/** Turns a published community event (one-off, solar date) into an EventDef. */
+export function communityEvent(e: {
+	id: number;
+	title: string;
+	message: string;
+	eventDate: string | null;
+	eventDays: number;
+	eventLocation: string | null;
+	village: string | null;
+	villageId: string | null;
+}): EventDef | null {
+	if (!e.eventDate) return null;
+	const [year, month, day] = e.eventDate.split("-").map(Number);
+	const same = (s: string): L => ({ vi: s, en: s });
+	return {
+		id: `cong-dong-${e.id}`,
+		category: "community",
+		title: same(e.title),
+		body: same(e.message),
+		location: same(e.eventLocation || e.village || ""),
+		date: { calendar: "solar", day, month, year, days: e.eventDays },
+		villageId: e.villageId ?? undefined,
+	};
 }

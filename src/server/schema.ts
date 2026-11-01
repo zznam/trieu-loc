@@ -1,6 +1,8 @@
 import {
 	boolean,
+	date,
 	index,
+	integer,
 	jsonb,
 	pgEnum,
 	pgTable,
@@ -59,10 +61,24 @@ export const contributions = pgTable(
 			.notNull()
 			.defaultNow(),
 		reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+		/** Set when an editor publishes the item to the public site; null = not live. */
+		publishedAt: timestamp("published_at", { withTimezone: true }),
+		/** What the sender originally wrote, saved the first time an editor changes the text. */
+		original: jsonb("original").$type<{ title: string; message: string }>(),
+		/** Optional link to a village page (src/content/villages.json id). */
+		villageId: varchar("village_id", { length: 60 }),
+		// Event details (kind = "event")
+		eventDate: date("event_date", { mode: "string" }),
+		eventDays: integer("event_days").notNull().default(1),
+		eventLocation: varchar("event_location", { length: 200 }),
+		// Business details (kind = "business"); the phone is public, unlike `contact`.
+		businessCategory: varchar("business_category", { length: 80 }),
+		businessPhone: varchar("business_phone", { length: 40 }),
 	},
 	(t) => [
 		index("contributions_status_created_idx").on(t.status, t.createdAt),
 		index("contributions_ip_created_idx").on(t.ipHash, t.createdAt),
+		index("contributions_kind_published_idx").on(t.kind, t.publishedAt),
 	],
 );
 

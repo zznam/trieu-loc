@@ -343,6 +343,9 @@ const dict = {
 	"villages.all": { vi: "Tất cả các thôn", en: "All villages" },
 	"villages.byVillage": { vi: "Xem theo thôn", en: "Browse by village" },
 	"pwa.install": { vi: "Cài ứng dụng lên máy", en: "Install the app" },
+	"news.community": { vi: "Bà con kể", en: "Community story" },
+	"news.by": { vi: "Người gửi:", en: "By" },
+	"food.community": { vi: "Bà con giới thiệu", en: "Community listing" },
 	"notFound.title": { vi: "Không tìm thấy trang", en: "Page not found" },
 	"notFound.body": {
 		vi: "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",
