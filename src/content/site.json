@@ -1,0 +1,45 @@
+{
+	"name": { "vi": "Xã Triệu Lộc", "en": "Triệu Lộc Commune" },
+	"province": { "vi": "Tỉnh Thanh Hoá", "en": "Thanh Hóa Province" },
+	"center": [19.9421, 105.8195],
+	"stats": {
+		"area": "29,27 km²",
+		"population": "26.386",
+		"villages": "17",
+		"distance": "~18 km"
+	},
+	"contact": {
+		"email": "lienhe@trieuloc.example",
+		"facebook": "https://facebook.com/",
+		"address": {
+			"vi": "Xã Triệu Lộc, tỉnh Thanh Hoá, Việt Nam",
+			"en": "Triệu Lộc Commune, Thanh Hóa Province, Vietnam"
+		}
+	},
+	"highlights": [
+		{
+			"title": { "vi": "Khu di tích Bà Triệu", "en": "Bà Triệu Relic Site" },
+			"body": {
+				"vi": "Di tích quốc gia đặc biệt gồm đền thờ dưới chân núi Gai và lăng mộ trên núi Tùng.",
+				"en": "A special national monument: the temple at the foot of Mount Gai and the tomb on Mount Tùng."
+			},
+			"to": "places"
+		},
+		{
+			"title": { "vi": "Đồng bằng sông Lèn", "en": "The Lèn River plain" },
+			"body": {
+				"vi": "Nằm ở rìa đông bắc đồng bằng Thanh Hoá, bên bờ phải sông Lèn, có Quốc lộ 1 đi qua.",
+				"en": "On the northeastern edge of the Thanh Hóa delta, on the right bank of the Lèn, with National Highway 1 running through."
+			},
+			"to": "history"
+		},
+		{
+			"title": { "vi": "Hương vị xứ Thanh", "en": "Flavours of Thanh Hóa" },
+			"body": {
+				"vi": "Từ nem chua, bánh gai đến mắm tép — những món quà quê mang theo khi đi xa.",
+				"en": "From nem chua to bánh gai and shrimp paste — the gifts from home people carry when they travel."
+			},
+			"to": "food"
+		}
+	]
+}

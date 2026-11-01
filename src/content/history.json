@@ -1,0 +1,106 @@
+{
+	"intro": {
+		"vi": "Triệu Lộc nằm ở rìa đông bắc đồng bằng Thanh Hoá, bên bờ phải sông Lèn, cách thành phố Thanh Hoá khoảng 18 km về phía bắc và cách Hà Nội khoảng 137 km về phía nam. Vùng đất này gắn liền với tên tuổi Bà Triệu — vị nữ anh hùng dân tộc đã lãnh đạo cuộc khởi nghĩa chống quân Đông Ngô năm 248.",
+		"en": "Triệu Lộc lies on the northeastern edge of the Thanh Hóa delta, on the right bank of the Lèn River, about 18 km north of Thanh Hóa city and 137 km south of Hanoi. The land is bound to the name of Lady Triệu, the national heroine who led an uprising against the Eastern Wu in 248 AD."
+	},
+	"timeline": [
+		{
+			"year": "248",
+			"title": { "vi": "Khởi nghĩa Bà Triệu", "en": "Lady Triệu's uprising" },
+			"body": {
+				"vi": "Bà Triệu lãnh đạo nghĩa quân chống ách đô hộ của nhà Đông Ngô và tuẫn tiết trên núi Tùng, thuộc xã Triệu Lộc ngày nay.",
+				"en": "Lady Triệu led an uprising against Eastern Wu rule and died on Mount Tùng, in today's Triệu Lộc."
+			}
+		},
+		{
+			"year": { "vi": "Thế kỷ VI", "en": "6th century" },
+			"title": { "vi": "Lập đền thờ", "en": "The temple is founded" },
+			"body": {
+				"vi": "Theo sử liệu, vua Lý Nam Đế cho lập đền thờ Bà Triệu tại vùng đất này.",
+				"en": "According to records, Emperor Lý Nam Đế had a temple to Lady Triệu built here."
+			}
+		},
+		{
+			"year": { "vi": "Trước 1945", "en": "Before 1945" },
+			"title": { "vi": "Bồ Điền – Phú Điền", "en": "Bồ Điền – Phú Điền" },
+			"body": {
+				"vi": "Vùng đất có tên Bồ Điền, sau đổi thành Phú Điền, thuộc huyện Mỹ Hoá.",
+				"en": "The area was known as Bồ Điền, later Phú Điền, in Mỹ Hóa district."
+			}
+		},
+		{
+			"year": "1945",
+			"title": { "vi": "Mang tên Triệu Lộc", "en": "Named Triệu Lộc" },
+			"body": {
+				"vi": "Sau Cách mạng Tháng Tám, xã được đặt tên là Triệu Lộc, thuộc huyện Hậu Lộc.",
+				"en": "After the August Revolution the commune was named Triệu Lộc, in Hậu Lộc district."
+			}
+		},
+		{
+			"year": "2014",
+			"title": {
+				"vi": "Di tích quốc gia đặc biệt",
+				"en": "Special national monument"
+			},
+			"body": {
+				"vi": "Khu di tích Bà Triệu được Thủ tướng Chính phủ xếp hạng di tích quốc gia đặc biệt.",
+				"en": "The Bà Triệu Relic Site was ranked a special national monument by the Prime Minister."
+			}
+		},
+		{
+			"year": "2019",
+			"title": { "vi": "Sáp nhập xã Châu Lộc", "en": "Châu Lộc merged in" },
+			"body": {
+				"vi": "Từ ngày 1/12/2019, xã Châu Lộc được sáp nhập vào xã Triệu Lộc.",
+				"en": "From 1 December 2019, Châu Lộc commune was merged into Triệu Lộc."
+			}
+		},
+		{
+			"year": "2025",
+			"title": { "vi": "Xã Triệu Lộc mới", "en": "The new Triệu Lộc commune" },
+			"body": {
+				"vi": "Theo Nghị quyết 1686/NQ-UBTVQH15, các xã Đại Lộc, Tiến Lộc và Triệu Lộc được hợp nhất thành xã Triệu Lộc, trực thuộc tỉnh Thanh Hoá từ 1/7/2025 khi cấp huyện được bỏ.",
+				"en": "Under Resolution 1686/NQ-UBTVQH15, Đại Lộc, Tiến Lộc and Triệu Lộc were combined into the new Triệu Lộc commune, directly under Thanh Hóa province from 1 July 2025 after district level was abolished."
+			}
+		}
+	],
+	"figure": {
+		"quote": {
+			"vi": "“Tôi muốn cưỡi cơn gió mạnh, đạp luồng sóng dữ, chém cá kình ở biển Đông, đánh đuổi quân Ngô, giành lại giang sơn, cởi ách nô lệ, chứ không chịu khom lưng làm tì thiếp người ta.”",
+			"en": "“I want to ride the strong wind, tread the fierce waves, slay the great whale of the Eastern Sea, drive out the Wu army, reclaim our land and throw off the yoke of slavery — I will not bow my back to be anyone's concubine.”"
+		},
+		"body": {
+			"vi": "Triệu Thị Trinh (226 – 248), người được nhân dân tôn kính gọi là Bà Triệu hay Vua Bà, cùng anh trai Triệu Quốc Đạt dựng cờ khởi nghĩa ở vùng núi Nưa rồi đem quân về đánh quân Ngô. Sau nhiều trận chiến, nghĩa quân bị đàn áp, Bà tuẫn tiết trên núi Tùng khi mới 23 tuổi. Nhân dân Phú Điền thờ Bà làm Thành hoàng làng.",
+			"en": "Triệu Thị Trinh (226 – 248), revered as Lady Triệu or the Lady King, raised the banner of revolt with her brother Triệu Quốc Đạt in the Nưa mountains and fought the Wu army. After many battles the uprising was crushed, and she died on Mount Tùng at just 23. The people of Phú Điền worship her as their village guardian spirit."
+		}
+	},
+	"traditions": [
+		{
+			"title": {
+				"vi": "Lễ hội đền Bà Triệu",
+				"en": "Bà Triệu Temple Festival"
+			},
+			"body": {
+				"vi": "Diễn ra từ 21 đến 24 tháng 2 âm lịch, kỷ niệm ngày mất của Bà (22/2). Có tế Nữ quan, tế Cung đình, rước kiệu từ đền về đình Phú Điền, dâng hương tại lăng mộ trên núi Tùng, đền Đệ Tứ và miếu Bàn Thề. Lễ hội được công nhận là Di sản văn hoá phi vật thể quốc gia.",
+				"en": "Held from the 21st to 24th of the 2nd lunar month, marking her death (the 22nd). Rites by female officiants and court-style rites, a palanquin procession from the temple to Phú Điền communal house, and offerings at the tomb on Mount Tùng, Đệ Tứ temple and Bàn Thề shrine. It is a recognised national intangible cultural heritage."
+			}
+		},
+		{
+			"title": {
+				"vi": "Huyền tích “kiệu bay”",
+				"en": "The legend of the “flying palanquin”"
+			},
+			"body": {
+				"vi": "Người Phú Điền truyền rằng trong lễ rước, kiệu Bà có lúc như bay, đưa người khiêng đi nhanh như gió — một nét riêng làm nên sức hút của lễ hội.",
+				"en": "Locals say that during the procession Lady Triệu's palanquin sometimes seems to fly, sweeping its bearers along like the wind — part of what makes the festival so compelling."
+			}
+		},
+		{
+			"title": { "vi": "Nhịp sống làng quê", "en": "Village life" },
+			"body": {
+				"vi": "Cấy lúa vụ chiêm, vụ mùa; chợ quê họp phiên; những buổi chiều thả diều trên đê sông Lèn. (Nội dung mẫu — mời bà con bổ sung.)",
+				"en": "Planting the spring and summer rice crops, market days, kite-flying on the Lèn River dyke in the evening. (Sample — locals are invited to add more.)"
+			}
+		}
+	]
+}

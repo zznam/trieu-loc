@@ -1,0 +1,92 @@
+[
+	{
+		"id": "den-ba-trieu",
+		"category": "relic",
+		"name": { "vi": "Đền Bà Triệu", "en": "Bà Triệu Temple" },
+		"village": { "vi": "Thôn Phú Điền", "en": "Phú Điền village" },
+		"coords": [19.9293, 105.8195],
+		"approx": false,
+		"body": {
+			"vi": "Ngôi đền dưới chân núi Gai thờ nữ anh hùng Triệu Thị Trinh, trung tâm của Khu di tích quốc gia đặc biệt Bà Triệu và nơi diễn ra lễ hội hằng năm.",
+			"en": "The temple at the foot of Mount Gai honouring heroine Triệu Thị Trinh — the heart of the Bà Triệu special national monument and home of the annual festival."
+		}
+	},
+	{
+		"id": "lang-ba-trieu",
+		"category": "relic",
+		"name": {
+			"vi": "Lăng Bà Triệu (núi Tùng)",
+			"en": "Bà Triệu Tomb (Mount Tùng)"
+		},
+		"village": { "vi": "Thôn Phú Điền", "en": "Phú Điền village" },
+		"coords": [19.9318, 105.8232],
+		"approx": true,
+		"body": {
+			"vi": "Lăng mộ trên núi Tùng, nơi Bà tuẫn tiết năm 248. Từ đỉnh núi có thể ngắm nhìn cánh đồng và dòng sông Lèn.",
+			"en": "The tomb on Mount Tùng, where she died in 248. The hilltop looks out over the fields and the Lèn River."
+		}
+	},
+	{
+		"id": "dinh-phu-dien",
+		"category": "relic",
+		"name": { "vi": "Đình Bồ Điền (Phú Điền)", "en": "Bồ Điền Communal House" },
+		"village": { "vi": "Thôn Phú Điền", "en": "Phú Điền village" },
+		"coords": [19.9305, 105.8178],
+		"approx": true,
+		"body": {
+			"vi": "Ngôi đình làng thờ Bà Triệu làm Thành hoàng, điểm đến của lễ rước kiệu trong dịp lễ hội.",
+			"en": "The village communal house, which worships Lady Triệu as guardian spirit — the destination of the festival palanquin procession."
+		}
+	},
+	{
+		"id": "lang-tuong-ho-ly",
+		"category": "relic",
+		"name": {
+			"vi": "Lăng ba vị tướng họ Lý",
+			"en": "Tomb of the Three Lý Generals"
+		},
+		"village": { "vi": "Khu di tích Bà Triệu", "en": "Bà Triệu Relic Site" },
+		"coords": [19.9284, 105.8212],
+		"approx": true,
+		"body": {
+			"vi": "Một phần của Khu di tích quốc gia đặc biệt Bà Triệu.",
+			"en": "Part of the Bà Triệu special national monument."
+		}
+	},
+	{
+		"id": "song-len",
+		"category": "nature",
+		"name": { "vi": "Sông Lèn", "en": "Lèn River" },
+		"village": { "vi": "Phía bắc xã", "en": "Northern edge of the commune" },
+		"coords": [19.9655, 105.815],
+		"approx": true,
+		"body": {
+			"vi": "Dòng sông bồi đắp phù sa cho đồng ruộng Triệu Lộc; con đê ven sông là nơi lý tưởng để ngắm hoàng hôn.",
+			"en": "The river whose silt feeds Triệu Lộc's fields; its dyke is a lovely spot to watch the sunset."
+		}
+	},
+	{
+		"id": "canh-dong",
+		"category": "nature",
+		"name": { "vi": "Cánh đồng lúa Triệu Lộc", "en": "Triệu Lộc rice fields" },
+		"village": { "vi": "Khắp xã", "en": "Across the commune" },
+		"coords": [19.945, 105.8],
+		"approx": true,
+		"body": {
+			"vi": "Mùa lúa chín (tháng 5–6 và tháng 9–10) nhuộm vàng cả vùng đồng bằng. (Nội dung mẫu.)",
+			"en": "At harvest time (May–June and Sept–Oct) the whole plain turns gold. (Sample.)"
+		}
+	},
+	{
+		"id": "ubnd-xa",
+		"category": "public",
+		"name": { "vi": "UBND xã Triệu Lộc", "en": "Triệu Lộc People's Committee" },
+		"village": { "vi": "Trung tâm xã", "en": "Commune centre" },
+		"coords": [19.9421, 105.8195],
+		"approx": true,
+		"body": {
+			"vi": "Trụ sở hành chính của xã. (Vị trí cần cập nhật chính xác.)",
+			"en": "The commune's administrative office. (Exact location to be updated.)"
+		}
+	}
+]

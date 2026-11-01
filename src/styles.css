@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+	--font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+	--font-serif: "Lora", ui-serif, Georgia, serif;
+
+	--color-paper: #faf6ec;
+	--color-paper-2: #f2ead7;
+	--color-ink: #2b2a22;
+	--color-ink-soft: #5b5747;
+	--color-rice-50: #f1f6e8;
+	--color-rice-100: #e1ecc9;
+	--color-rice-300: #a9c77a;
+	--color-rice-500: #6d9440;
+	--color-rice-700: #3f5f23;
+	--color-rice-900: #23361a;
+	--color-earth-300: #d9b77f;
+	--color-earth-500: #b5813f;
+	--color-earth-700: #7a4f22;
+	--color-lotus: #c2543f;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	background: var(--color-paper);
+	color: var(--color-ink);
+	font-family: var(--font-sans);
+	-webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+	font-family: var(--font-serif);
+	text-wrap: balance;
+}
+
+.prose-news p {
+	margin: 1rem 0;
+	line-height: 1.8;
+}
+.prose-news ul {
+	list-style: disc;
+	padding-left: 1.5rem;
+	margin: 1rem 0;
+}
+.prose-news li {
+	margin: 0.35rem 0;
+}
+.prose-news strong {
+	color: var(--color-rice-900);
+}
+.prose-news em {
+	color: var(--color-ink-soft);
+}
+
+/* Subtle paper grain using a repeating gradient — no image request needed */
+.grain {
+	background-image:
+		radial-gradient(circle at 1px 1px, rgb(122 79 34 / 0.06) 1px, transparent 0);
+	background-size: 14px 14px;
+}
+
+.leaflet-container {
+	font-family: var(--font-sans);
+	border-radius: 1rem;
+}

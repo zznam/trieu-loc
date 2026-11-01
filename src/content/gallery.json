@@ -1,0 +1,62 @@
+[
+	{
+		"id": "g1",
+		"caption": {
+			"vi": "Cổng tam quan đền Bà Triệu",
+			"en": "Gate of Bà Triệu Temple"
+		},
+		"season": "spring",
+		"src": ""
+	},
+	{
+		"id": "g2",
+		"caption": {
+			"vi": "Lễ rước kiệu ngày khai hội",
+			"en": "Palanquin procession on the opening day"
+		},
+		"season": "spring",
+		"src": ""
+	},
+	{
+		"id": "g3",
+		"caption": { "vi": "Lúa chín vụ chiêm", "en": "Spring rice crop ripening" },
+		"season": "summer",
+		"src": ""
+	},
+	{
+		"id": "g4",
+		"caption": {
+			"vi": "Hoàng hôn trên đê sông Lèn",
+			"en": "Sunset on the Lèn River dyke"
+		},
+		"season": "summer",
+		"src": ""
+	},
+	{
+		"id": "g5",
+		"caption": {
+			"vi": "Núi Tùng nhìn từ cánh đồng",
+			"en": "Mount Tùng seen from the fields"
+		},
+		"season": "autumn",
+		"src": ""
+	},
+	{
+		"id": "g6",
+		"caption": { "vi": "Chợ quê ngày phiên", "en": "Village market day" },
+		"season": "autumn",
+		"src": ""
+	},
+	{
+		"id": "g7",
+		"caption": { "vi": "Mâm cỗ ngày Tết", "en": "Tết feast tray" },
+		"season": "winter",
+		"src": ""
+	},
+	{
+		"id": "g8",
+		"caption": { "vi": "Đình Phú Điền", "en": "Phú Điền communal house" },
+		"season": "winter",
+		"src": ""
+	}
+]

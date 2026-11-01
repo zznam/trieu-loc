@@ -1,0 +1,38 @@
+[
+	{
+		"id": "nem-chua",
+		"name": { "vi": "Nem chua Thanh Hoá", "en": "Thanh Hóa nem chua" },
+		"tag": { "vi": "Đặc sản xứ Thanh", "en": "Provincial specialty" },
+		"body": {
+			"vi": "Thịt lợn lên men gói lá chuối, vị chua nhẹ, cay của ớt và thơm lá đinh lăng — món quà không thể thiếu khi về Thanh.",
+			"en": "Fermented pork wrapped in banana leaf — gently sour, with chilli and a hint of đinh lăng leaf. The classic gift from Thanh Hóa."
+		}
+	},
+	{
+		"id": "mam-tep",
+		"name": { "vi": "Mắm tép Hậu Lộc", "en": "Hậu Lộc shrimp paste" },
+		"tag": { "vi": "Vùng Hậu Lộc", "en": "Hậu Lộc area" },
+		"body": {
+			"vi": "Tép biển ủ muối theo cách truyền thống của vùng ven biển Hậu Lộc, đậm đà khi ăn cùng thịt luộc, rau sống.",
+			"en": "Tiny shrimp salt-cured the traditional way of the Hậu Lộc coast — rich with boiled pork and fresh herbs."
+		}
+	},
+	{
+		"id": "banh-gai",
+		"name": { "vi": "Bánh gai", "en": "Bánh gai (ramie leaf cake)" },
+		"tag": { "vi": "Đặc sản xứ Thanh", "en": "Provincial specialty" },
+		"body": {
+			"vi": "Bánh làm từ lá gai, nhân đậu xanh, dừa, thơm mùi vừng — thường có trong mâm cỗ ngày lễ.",
+			"en": "A dark, sticky cake of ramie leaf filled with mung bean and coconut, scented with sesame — a festival favourite."
+		}
+	},
+	{
+		"id": "gao",
+		"name": { "vi": "Gạo đồng sông Lèn", "en": "Lèn River rice" },
+		"tag": { "vi": "Sản vật địa phương", "en": "Local produce" },
+		"body": {
+			"vi": "Lúa trồng trên đất phù sa ven sông Lèn cho hạt gạo dẻo thơm. (Nội dung mẫu — cần bổ sung giống lúa, hợp tác xã.)",
+			"en": "Rice grown on the Lèn's alluvial soil — soft and fragrant. (Sample — add rice varieties and cooperatives.)"
+		}
+	}
+]

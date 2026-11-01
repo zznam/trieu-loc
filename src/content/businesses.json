@@ -1,0 +1,46 @@
+[
+	{
+		"id": "htx-nong-nghiep",
+		"name": "HTX Nông nghiệp (mẫu)",
+		"category": { "vi": "Nông sản", "en": "Farm produce" },
+		"village": { "vi": "Thôn mẫu A", "en": "Sample village A" },
+		"phone": "0900 000 001",
+		"body": {
+			"vi": "Gạo, rau màu theo mùa. Thông tin mẫu — thay bằng cơ sở thật.",
+			"en": "Rice and seasonal vegetables. Sample listing — replace with a real business."
+		}
+	},
+	{
+		"id": "nem-chua-gia-dinh",
+		"name": "Nem chua gia truyền (mẫu)",
+		"category": { "vi": "Ẩm thực", "en": "Food" },
+		"village": { "vi": "Thôn mẫu B", "en": "Sample village B" },
+		"phone": "0900 000 002",
+		"body": {
+			"vi": "Nem chua, nem nắm làm thủ công. Thông tin mẫu.",
+			"en": "Hand-made nem chua. Sample listing."
+		}
+	},
+	{
+		"id": "nha-nghi",
+		"name": "Nhà nghỉ gần đền (mẫu)",
+		"category": { "vi": "Lưu trú", "en": "Accommodation" },
+		"village": { "vi": "Thôn Phú Điền", "en": "Phú Điền village" },
+		"phone": "0900 000 003",
+		"body": {
+			"vi": "Phòng nghỉ cho khách thập phương dịp lễ hội. Thông tin mẫu.",
+			"en": "Rooms for festival visitors. Sample listing."
+		}
+	},
+	{
+		"id": "xuong-moc",
+		"name": "Xưởng mộc dân dụng (mẫu)",
+		"category": { "vi": "Thủ công", "en": "Crafts" },
+		"village": { "vi": "Thôn mẫu C", "en": "Sample village C" },
+		"phone": "0900 000 004",
+		"body": {
+			"vi": "Đồ gỗ gia dụng, bàn thờ. Thông tin mẫu.",
+			"en": "Household furniture and altars. Sample listing."
+		}
+	}
+]
