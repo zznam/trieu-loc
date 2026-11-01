@@ -64,6 +64,15 @@ const dict = {
 		vi: "Di sản văn hoá phi vật thể quốc gia với nghi thức rước kiệu, tế lễ và tái hiện cuộc khởi nghĩa năm 248.",
 		en: "A national intangible cultural heritage, with palanquin processions, rites and a re-enactment of the uprising of 248 AD.",
 	},
+	"countdown.days": { vi: "Ngày", en: "Days" },
+	"countdown.hours": { vi: "Giờ", en: "Hours" },
+	"countdown.minutes": { vi: "Phút", en: "Min" },
+	"countdown.year": { vi: "Năm", en: "Year of" },
+	"countdown.ongoing": {
+		vi: "Lễ hội đang diễn ra",
+		en: "The festival is on now",
+	},
+	"countdown.addToCalendar": { vi: "Thêm vào lịch", en: "Add to calendar" },
 	"common.readMore": { vi: "Đọc tiếp", en: "Read more" },
 	"common.back": { vi: "Quay lại", en: "Back" },
 	"common.sample": {
