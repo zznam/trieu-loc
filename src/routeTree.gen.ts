@@ -14,6 +14,7 @@ import { Route as LangRouteImport } from './routes/$lang'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LangIndexRouteImport } from './routes/$lang/index'
+import { Route as LangEventsRouteImport } from './routes/$lang/events'
 import { Route as LangFoodRouteImport } from './routes/$lang/food'
 import { Route as LangGalleryRouteImport } from './routes/$lang/gallery'
 import { Route as LangHistoryRouteImport } from './routes/$lang/history'
@@ -46,6 +47,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const LangIndexRoute = LangIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangEventsRoute = LangEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => LangRoute,
 } as any)
 const LangFoodRoute = LangFoodRouteImport.update({
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/$lang': typeof LangRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$lang/events': typeof LangEventsRoute
   '/$lang/food': typeof LangFoodRoute
   '/$lang/gallery': typeof LangGalleryRoute
   '/$lang/history': typeof LangHistoryRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$lang/events': typeof LangEventsRoute
   '/$lang/food': typeof LangFoodRoute
   '/$lang/gallery': typeof LangGalleryRoute
   '/$lang/history': typeof LangHistoryRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/$lang': typeof LangRouteWithChildren
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$lang/events': typeof LangEventsRoute
   '/$lang/food': typeof LangFoodRoute
   '/$lang/gallery': typeof LangGalleryRoute
   '/$lang/history': typeof LangHistoryRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/$lang/events'
     | '/$lang/food'
     | '/$lang/gallery'
     | '/$lang/history'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/$lang/events'
     | '/$lang/food'
     | '/$lang/gallery'
     | '/$lang/history'
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/$lang/events'
     | '/$lang/food'
     | '/$lang/gallery'
     | '/$lang/history'
@@ -223,6 +235,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/$lang/'
       preLoaderRoute: typeof LangIndexRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/events': {
+      id: '/$lang/events'
+      path: '/events'
+      fullPath: '/$lang/events'
+      preLoaderRoute: typeof LangEventsRouteImport
       parentRoute: typeof LangRoute
     }
     '/$lang/food': {
@@ -285,6 +304,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface LangRouteChildren {
+  LangEventsRoute: typeof LangEventsRoute
   LangFoodRoute: typeof LangFoodRoute
   LangGalleryRoute: typeof LangGalleryRoute
   LangHistoryRoute: typeof LangHistoryRoute
@@ -297,6 +317,7 @@ interface LangRouteChildren {
 }
 
 const LangRouteChildren: LangRouteChildren = {
+  LangEventsRoute: LangEventsRoute,
   LangFoodRoute: LangFoodRoute,
   LangGalleryRoute: LangGalleryRoute,
   LangHistoryRoute: LangHistoryRoute,

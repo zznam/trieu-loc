@@ -19,6 +19,7 @@ const dict = {
 	"nav.places": { vi: "Địa danh", en: "Places" },
 	"nav.food": { vi: "Đặc sản & Cơ sở", en: "Food & Local Business" },
 	"nav.people": { vi: "Con người", en: "People" },
+	"nav.events": { vi: "Sự kiện", en: "Events" },
 	"nav.news": { vi: "Tin tức", en: "News" },
 	"nav.gallery": { vi: "Thư viện ảnh", en: "Gallery" },
 	"nav.menu": { vi: "Menu", en: "Menu" },
@@ -149,6 +150,27 @@ const dict = {
 	"people.share": {
 		vi: "Bạn là người con Triệu Lộc? Hãy chia sẻ câu chuyện của bạn hoặc giới thiệu một người đáng nhớ.",
 		en: "From Triệu Lộc? Share your story, or tell us about someone worth remembering.",
+	},
+	"events.title": { vi: "Lịch sự kiện", en: "Events calendar" },
+	"events.lead": {
+		vi: "Lễ hội, ngày lễ Tết và hoạt động cộng đồng trong 12 tháng tới — theo cả dương lịch và âm lịch.",
+		en: "Festivals, holidays and community events for the next 12 months — in both solar and lunar dates.",
+	},
+	"events.today": { vi: "Hôm nay", en: "Today" },
+	"events.lunarDate": { vi: "âm lịch", en: "lunar" },
+	"events.leap": { vi: "nhuận", en: "leap" },
+	"events.month": { vi: "tháng", en: "month" },
+	"events.year": { vi: "năm", en: "year of" },
+	"events.ongoing": { vi: "Đang diễn ra", en: "Happening now" },
+	"events.repeatsLunar": {
+		vi: "Hằng năm theo âm lịch",
+		en: "Yearly, lunar calendar",
+	},
+	"events.repeatsSolar": { vi: "Hằng năm", en: "Yearly" },
+	"events.add": { vi: "Thêm vào lịch", en: "Add to calendar" },
+	"events.suggest": {
+		vi: "Thôn bạn có sự kiện sắp tới? Gửi cho chúng tôi để đưa lên lịch.",
+		en: "Got an upcoming village event? Send it to us to be listed.",
 	},
 	"notFound.title": { vi: "Không tìm thấy trang", en: "Page not found" },
 	"notFound.body": {

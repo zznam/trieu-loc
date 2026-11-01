@@ -9,6 +9,7 @@ const NAV: { to: string; key: DictKey }[] = [
 	{ to: "/$lang/places", key: "nav.places" },
 	{ to: "/$lang/food", key: "nav.food" },
 	{ to: "/$lang/people", key: "nav.people" },
+	{ to: "/$lang/events", key: "nav.events" },
 	{ to: "/$lang/news", key: "nav.news" },
 	{ to: "/$lang/gallery", key: "nav.gallery" },
 ];

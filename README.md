@@ -11,6 +11,7 @@ A bilingual (Vietnamese / English) community website for **Xã Triệu Lộc, t�
 | `/:lang/places` | Interactive map (Leaflet + OpenStreetMap, commune boundary) and place list |
 | `/:lang/food` | Specialties and a searchable local business directory |
 | `/:lang/people` | Historical figures, notable locals and diaspora stories (Markdown) |
+| `/:lang/events` | Upcoming festivals, holidays and community events (lunar + solar dates) |
 | `/:lang/news` | News & announcements (Markdown) |
 | `/:lang/gallery` | Photo gallery by season |
 
@@ -24,6 +25,7 @@ All content lives in `src/content/`:
 - `history.json` — intro, timeline, Lady Triệu, traditions
 - `places.json` — places on the map (`coords: [lat, lng]`, set `approx: false` once verified)
 - `food.json` — specialties
+- `events.json` — events calendar. `date.calendar` is `lunar` or `solar`; omit `date.year` for an event that repeats every year, set `date.days` for multi-day events
 - `businesses.json` — business directory (**currently sample entries — replace them**)
 - `gallery.json` — photos: put image files in `public/images/` and set `"src": "/images/your-photo.jpg"`
 - `news/<slug>.vi.md` and `news/<slug>.en.md` — one Markdown file per language with frontmatter:
