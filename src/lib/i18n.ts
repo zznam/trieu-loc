@@ -388,6 +388,15 @@ const dict = {
 		vi: "Lời nhắn có quá nhiều đường dẫn. Vui lòng bớt lại.",
 		en: "Too many links in the message. Please remove some.",
 	},
+	"comments.title": { vi: "Bình luận", en: "Comments" },
+	"comments.empty": { vi: "Chưa có bình luận nào.", en: "No comments yet." },
+	"comments.placeholder": {
+		vi: "Chia sẻ suy nghĩ hoặc kỷ niệm của bạn…",
+		en: "Share your thoughts or a memory…",
+	},
+	"comments.like": { vi: "Thả tim", en: "Like" },
+	"comments.unlike": { vi: "Bỏ tim", en: "Unlike" },
+	"comments.likeLabel": { vi: "Yêu thích", en: "Like" },
 	"notFound.title": { vi: "Không tìm thấy trang", en: "Page not found" },
 	"notFound.body": {
 		vi: "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",

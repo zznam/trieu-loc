@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Avatar } from "#/components/Avatar";
+import { Comments } from "#/components/Comments";
 import { ContributeCta } from "#/components/ContributeCta";
 import { SampleNote } from "#/components/PageHeader";
 import { placeCategoryLabel, site } from "#/lib/content";
@@ -203,6 +204,9 @@ function VillagePage() {
 						)}
 					</div>
 				)}
+			</section>
+			<section className="mx-auto max-w-3xl px-4">
+				<Comments lang={lang} target={`villages:${village.id}`} />
 			</section>
 			<section className="mx-auto max-w-6xl px-4">
 				<ContributeCta

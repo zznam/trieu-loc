@@ -1,22 +1,44 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, count, desc, eq, gte } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte } from "drizzle-orm";
 import { z } from "zod";
+import { getPerson, getPost } from "#/lib/content";
+import { STORY_PREFIX } from "#/lib/contribute";
+import { getVillage } from "#/lib/villages";
 import { looksLikeBot, requestIpHash, tooManyLinks } from "./abuse";
 import { isAdminConfigured, isAdminRequest, requireAdmin } from "./auth";
 import { getDb, isDbConfigured } from "./db";
 import { notifyNewSubmission } from "./notify";
+import { findPublishedStory } from "./published-queries";
 import {
 	CONTRIBUTION_STATUSES,
 	type ContributionStatus,
 	MESSAGE_KINDS,
 	type MessageKind,
 	messages,
+	reactions,
 } from "./schema";
 
 const PER_HOUR = 5;
 
 /** Comment targets look like "news:<slug>", "people:<slug>" or "villages:<id>". */
 const TARGET_RE = /^(news|people|villages):[a-z0-9-]{1,140}$/;
+
+/** True if the commented / reacted-to page really exists (stops junk targets filling the tables). */
+async function targetExists(target: string) {
+	const [type, slug] = target.split(":");
+	if (type === "people") return Boolean(getPerson("vi", slug));
+	if (type === "villages") return Boolean(getVillage(slug));
+	if (type === "news") {
+		if (!slug.startsWith(STORY_PREFIX)) return Boolean(getPost("vi", slug));
+		const id = Number(slug.slice(STORY_PREFIX.length));
+		return (
+			Number.isInteger(id) && id > 0 && (await findPublishedStory(id)) !== null
+		);
+	}
+	return false;
+}
+
+const targetSchema = z.object({ target: z.string().regex(TARGET_RE) });
 
 export type PostError =
 	| "not_configured"
@@ -51,6 +73,12 @@ export const postMessage = createServerFn({ method: "POST" })
 		if (tooManyLinks(data.message)) return { ok: false, error: "links" };
 		if (!isDbConfigured()) return { ok: false, error: "not_configured" };
 		try {
+			if (
+				data.kind === "comment" &&
+				!(data.target && (await targetExists(data.target)))
+			) {
+				return { ok: false, error: "invalid" };
+			}
 			const db = getDb();
 			const ipHash = requestIpHash();
 			const [{ recent }] = await db
@@ -127,6 +155,86 @@ export const getGuestbook = createServerFn({ method: "GET" }).handler(
 		}
 	},
 );
+
+export const getComments = createServerFn({ method: "GET" })
+	.validator((input: unknown) => targetSchema.parse(input))
+	.handler(async ({ data }): Promise<PublicMessage[]> => {
+		if (!isDbConfigured()) return [];
+		try {
+			const rows = await getDb()
+				.select({
+					id: messages.id,
+					name: messages.name,
+					place: messages.place,
+					message: messages.message,
+					createdAt: messages.createdAt,
+				})
+				.from(messages)
+				.where(and(approved("comment"), eq(messages.target, data.target)))
+				.orderBy(asc(messages.createdAt))
+				.limit(200);
+			return rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }));
+		} catch (err) {
+			console.error("getComments failed", err);
+			return [];
+		}
+	});
+
+// ---------- Reactions ----------
+
+export type ReactionState = { count: number; mine: boolean; enabled: boolean };
+
+async function reactionState(
+	target: string,
+	ipHash: string,
+): Promise<ReactionState> {
+	const db = getDb();
+	const [{ n }] = await db
+		.select({ n: count() })
+		.from(reactions)
+		.where(eq(reactions.target, target));
+	const [mine] = await db
+		.select({ t: reactions.target })
+		.from(reactions)
+		.where(and(eq(reactions.target, target), eq(reactions.ipHash, ipHash)));
+	return { count: n, mine: Boolean(mine), enabled: true };
+}
+
+export const getReactions = createServerFn({ method: "GET" })
+	.validator((input: unknown) => targetSchema.parse(input))
+	.handler(async ({ data }): Promise<ReactionState> => {
+		if (!isDbConfigured()) return { count: 0, mine: false, enabled: false };
+		try {
+			return await reactionState(data.target, requestIpHash());
+		} catch (err) {
+			console.error("getReactions failed", err);
+			return { count: 0, mine: false, enabled: false };
+		}
+	});
+
+/** Adds or removes this visitor's ❤️ on a page. */
+export const toggleReaction = createServerFn({ method: "POST" })
+	.validator((input: unknown) => targetSchema.parse(input))
+	.handler(async ({ data }): Promise<ReactionState> => {
+		if (!isDbConfigured()) return { count: 0, mine: false, enabled: false };
+		const ipHash = requestIpHash();
+		const db = getDb();
+		const current = await reactionState(data.target, ipHash);
+		if (current.mine) {
+			await db
+				.delete(reactions)
+				.where(
+					and(eq(reactions.target, data.target), eq(reactions.ipHash, ipHash)),
+				);
+		} else {
+			if (!(await targetExists(data.target))) return current;
+			await db
+				.insert(reactions)
+				.values({ target: data.target, ipHash })
+				.onConflictDoNothing();
+		}
+		return reactionState(data.target, ipHash);
+	});
 
 // ---------- Admin ----------
 

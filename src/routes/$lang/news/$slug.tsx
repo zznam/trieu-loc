@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { Comments } from "#/components/Comments";
 import { getPost } from "#/lib/content";
 import { STORY_PREFIX } from "#/lib/contribute";
 import { formatDate, type Lang, pick, t } from "#/lib/i18n";
@@ -65,7 +66,8 @@ export const Route = createFileRoute("/$lang/news/$slug")({
 });
 
 function NewsPostPage() {
-	const lang = Route.useParams().lang as Lang;
+	const params = Route.useParams();
+	const lang = params.lang as Lang;
 	const { article } = Route.useLoaderData();
 	const village =
 		article.kind === "story" && article.villageId
@@ -131,6 +133,7 @@ function NewsPostPage() {
 					</div>
 				</>
 			)}
+			<Comments lang={lang} target={`news:${params.slug}`} />
 		</article>
 	);
 }
