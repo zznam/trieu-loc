@@ -346,6 +346,48 @@ const dict = {
 	"news.community": { vi: "Bà con kể", en: "Community story" },
 	"news.by": { vi: "Người gửi:", en: "By" },
 	"food.community": { vi: "Bà con giới thiệu", en: "Community listing" },
+	"nav.guestbook": { vi: "Sổ lưu bút", en: "Guestbook" },
+	"guestbook.title": { vi: "Sổ lưu bút quê hương", en: "Hometown guestbook" },
+	"guestbook.lead": {
+		vi: "Dù ở đâu, hãy để lại đôi lời gửi về Triệu Lộc — lời chào, nỗi nhớ, hay một kỷ niệm.",
+		en: "Wherever you are, leave a few words for Triệu Lộc — a greeting, a memory, or how much you miss home.",
+	},
+	"guestbook.placeholder": {
+		vi: "Con ở Sài Gòn đã 10 năm, Tết này nhất định về thăm đền Bà…",
+		en: "I've lived abroad for ten years, but every spring I think of the festival…",
+	},
+	"guestbook.empty": {
+		vi: "Chưa có lời nhắn nào. Hãy là người đầu tiên!",
+		en: "No messages yet. Be the first!",
+	},
+	"guestbook.count": { vi: "lời nhắn", en: "messages" },
+	"guestbook.cta": {
+		vi: "Xa quê? Gửi một lời nhắn về Triệu Lộc trong sổ lưu bút.",
+		en: "Far from home? Leave a message for Triệu Lộc in the guestbook.",
+	},
+	"guestbook.write": { vi: "Viết lời nhắn", en: "Write a message" },
+	"message.place": { vi: "Bạn đang ở đâu?", en: "Where are you?" },
+	"message.thanks": {
+		vi: "Cảm ơn bạn đã gửi lời nhắn!",
+		en: "Thanks for your message!",
+	},
+	"message.pending": {
+		vi: "Lời nhắn sẽ hiện lên sau khi ban biên tập duyệt.",
+		en: "It will appear once an editor has approved it.",
+	},
+	"message.another": { vi: "Viết thêm", en: "Write another" },
+	"message.moderated": {
+		vi: "Lời nhắn được duyệt trước khi hiển thị.",
+		en: "Messages are reviewed before they appear.",
+	},
+	"message.err.invalid": {
+		vi: "Vui lòng nhập tên và nội dung.",
+		en: "Please add your name and a message.",
+	},
+	"message.err.links": {
+		vi: "Lời nhắn có quá nhiều đường dẫn. Vui lòng bớt lại.",
+		en: "Too many links in the message. Please remove some.",
+	},
 	"notFound.title": { vi: "Không tìm thấy trang", en: "Page not found" },
 	"notFound.body": {
 		vi: "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",

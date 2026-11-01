@@ -12,6 +12,8 @@ const KIND_VI: Record<string, string> = {
 	event: "Sự kiện sắp tới",
 	correction: "Góp ý, sửa thông tin",
 	other: "Khác",
+	guestbook: "Sổ lưu bút",
+	comment: "Bình luận",
 };
 
 const escapeHtml = (s: string) =>

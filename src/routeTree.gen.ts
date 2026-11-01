@@ -19,6 +19,7 @@ import { Route as LangContributeRouteImport } from './routes/$lang/contribute'
 import { Route as LangEventsRouteImport } from './routes/$lang/events'
 import { Route as LangFoodRouteImport } from './routes/$lang/food'
 import { Route as LangGalleryRouteImport } from './routes/$lang/gallery'
+import { Route as LangGuestbookRouteImport } from './routes/$lang/guestbook'
 import { Route as LangHistoryRouteImport } from './routes/$lang/history'
 import { Route as LangInfoRouteImport } from './routes/$lang/info'
 import { Route as LangPlacesRouteImport } from './routes/$lang/places'
@@ -78,6 +79,11 @@ const LangFoodRoute = LangFoodRouteImport.update({
 const LangGalleryRoute = LangGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangGuestbookRoute = LangGuestbookRouteImport.update({
+  id: '/guestbook',
+  path: '/guestbook',
   getParentRoute: () => LangRoute,
 } as any)
 const LangHistoryRoute = LangHistoryRouteImport.update({
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/$lang/events': typeof LangEventsRoute
   '/$lang/food': typeof LangFoodRoute
   '/$lang/gallery': typeof LangGalleryRoute
+  '/$lang/guestbook': typeof LangGuestbookRoute
   '/$lang/history': typeof LangHistoryRoute
   '/$lang/info': typeof LangInfoRoute
   '/$lang/places': typeof LangPlacesRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/$lang/events': typeof LangEventsRoute
   '/$lang/food': typeof LangFoodRoute
   '/$lang/gallery': typeof LangGalleryRoute
+  '/$lang/guestbook': typeof LangGuestbookRoute
   '/$lang/history': typeof LangHistoryRoute
   '/$lang/info': typeof LangInfoRoute
   '/$lang/places': typeof LangPlacesRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/$lang/events': typeof LangEventsRoute
   '/$lang/food': typeof LangFoodRoute
   '/$lang/gallery': typeof LangGalleryRoute
+  '/$lang/guestbook': typeof LangGuestbookRoute
   '/$lang/history': typeof LangHistoryRoute
   '/$lang/info': typeof LangInfoRoute
   '/$lang/places': typeof LangPlacesRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/$lang/events'
     | '/$lang/food'
     | '/$lang/gallery'
+    | '/$lang/guestbook'
     | '/$lang/history'
     | '/$lang/info'
     | '/$lang/places'
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/$lang/events'
     | '/$lang/food'
     | '/$lang/gallery'
+    | '/$lang/guestbook'
     | '/$lang/history'
     | '/$lang/info'
     | '/$lang/places'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/$lang/events'
     | '/$lang/food'
     | '/$lang/gallery'
+    | '/$lang/guestbook'
     | '/$lang/history'
     | '/$lang/info'
     | '/$lang/places'
@@ -345,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangGalleryRouteImport
       parentRoute: typeof LangRoute
     }
+    '/$lang/guestbook': {
+      id: '/$lang/guestbook'
+      path: '/guestbook'
+      fullPath: '/$lang/guestbook'
+      preLoaderRoute: typeof LangGuestbookRouteImport
+      parentRoute: typeof LangRoute
+    }
     '/$lang/history': {
       id: '/$lang/history'
       path: '/history'
@@ -423,6 +442,7 @@ interface LangRouteChildren {
   LangEventsRoute: typeof LangEventsRoute
   LangFoodRoute: typeof LangFoodRoute
   LangGalleryRoute: typeof LangGalleryRoute
+  LangGuestbookRoute: typeof LangGuestbookRoute
   LangHistoryRoute: typeof LangHistoryRoute
   LangInfoRoute: typeof LangInfoRoute
   LangPlacesRoute: typeof LangPlacesRoute
@@ -441,6 +461,7 @@ const LangRouteChildren: LangRouteChildren = {
   LangEventsRoute: LangEventsRoute,
   LangFoodRoute: LangFoodRoute,
   LangGalleryRoute: LangGalleryRoute,
+  LangGuestbookRoute: LangGuestbookRoute,
   LangHistoryRoute: LangHistoryRoute,
   LangInfoRoute: LangInfoRoute,
   LangPlacesRoute: LangPlacesRoute,

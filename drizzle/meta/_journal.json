@@ -15,6 +15,13 @@
       "when": 1793546456808,
       "tag": "0001_publishing",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793549429828,
+      "tag": "0002_messages",
+      "breakpoints": true
     }
   ]
 }
