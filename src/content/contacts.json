@@ -1,0 +1,96 @@
+[
+	{
+		"group": "emergency",
+		"items": [
+			{
+				"name": { "vi": "Công an (khẩn cấp)", "en": "Police (emergency)" },
+				"phone": "113"
+			},
+			{
+				"name": { "vi": "Cứu hoả, cứu nạn", "en": "Fire & rescue" },
+				"phone": "114"
+			},
+			{ "name": { "vi": "Cấp cứu y tế", "en": "Ambulance" }, "phone": "115" },
+			{
+				"name": {
+					"vi": "Tổng đài bảo vệ trẻ em",
+					"en": "Child protection hotline"
+				},
+				"phone": "111"
+			}
+		]
+	},
+	{
+		"group": "commune",
+		"items": [
+			{
+				"name": {
+					"vi": "UBND xã Triệu Lộc",
+					"en": "Triệu Lộc People's Committee"
+				},
+				"phone": "",
+				"address": { "vi": "Trung tâm xã", "en": "Commune centre" },
+				"hours": {
+					"vi": "Thứ 2 – Thứ 6, 7:00 – 17:00",
+					"en": "Mon – Fri, 7:00 – 17:00"
+				},
+				"sample": true
+			},
+			{
+				"name": { "vi": "Công an xã", "en": "Commune police" },
+				"phone": "",
+				"sample": true
+			},
+			{
+				"name": { "vi": "Trạm y tế xã", "en": "Commune health station" },
+				"phone": "",
+				"sample": true
+			},
+			{
+				"name": { "vi": "Bưu điện văn hoá xã", "en": "Commune post office" },
+				"phone": "",
+				"sample": true
+			}
+		]
+	},
+	{
+		"group": "schools",
+		"items": [
+			{
+				"name": { "vi": "Trường Mầm non (mẫu)", "en": "Kindergarten (sample)" },
+				"phone": "",
+				"sample": true
+			},
+			{
+				"name": {
+					"vi": "Trường Tiểu học (mẫu)",
+					"en": "Primary school (sample)"
+				},
+				"phone": "",
+				"sample": true
+			},
+			{
+				"name": {
+					"vi": "Trường THCS (mẫu)",
+					"en": "Secondary school (sample)"
+				},
+				"phone": "",
+				"sample": true
+			}
+		]
+	},
+	{
+		"group": "heritage",
+		"items": [
+			{
+				"name": {
+					"vi": "Ban quản lý Khu di tích Bà Triệu",
+					"en": "Bà Triệu Relic Site management board"
+				},
+				"phone": "",
+				"address": { "vi": "Thôn Phú Điền", "en": "Phú Điền village" },
+				"sample": true
+			}
+		]
+	}
+]
