@@ -10,6 +10,7 @@ A bilingual (Vietnamese / English) community website for **Xã Triệu Lộc, t�
 | `/:lang/history` | History, Lady Triệu, timeline, festivals & traditions |
 | `/:lang/places` | Interactive map (Leaflet + OpenStreetMap, commune boundary) and place list |
 | `/:lang/food` | Specialties and a searchable local business directory |
+| `/:lang/people` | Historical figures, notable locals and diaspora stories (Markdown) |
 | `/:lang/news` | News & announcements (Markdown) |
 | `/:lang/gallery` | Photo gallery by season |
 
@@ -37,6 +38,7 @@ All content lives in `src/content/`:
   ```
 
   If the `.en.md` version is missing, the Vietnamese one is shown.
+- `people/<slug>.vi.md` / `.en.md` — profiles on the People page. Frontmatter: `name`, `category` (`history` | `notable` | `diaspora`), `years`, `role`, `village`, `summary`, `photo` (optional, e.g. `/images/people/ten.jpg`), `order` (lower shows first).
 
 Bilingual fields use `{ "vi": "...", "en": "..." }`. UI labels live in `src/lib/i18n.ts`.
 
