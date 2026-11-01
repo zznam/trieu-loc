@@ -6,7 +6,13 @@ import { seo } from "#/lib/seo";
 
 export const Route = createFileRoute("/$lang/")({
 	head: ({ params }) =>
-		seo(params.lang as Lang, null, t(params.lang as Lang, "home.lead")),
+		seo(
+			params.lang as Lang,
+			null,
+			t(params.lang as Lang, "home.lead"),
+			"",
+			"home",
+		),
 	component: Home,
 });
 

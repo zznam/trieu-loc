@@ -8,7 +8,13 @@ import { seo } from "#/lib/seo";
 export const Route = createFileRoute("/$lang/food")({
 	head: ({ params }) => {
 		const lang = params.lang as Lang;
-		return seo(lang, t(lang, "food.title"), t(lang, "food.lead"));
+		return seo(
+			lang,
+			t(lang, "food.title"),
+			t(lang, "food.lead"),
+			"/food",
+			"food",
+		);
 	},
 	component: FoodPage,
 });

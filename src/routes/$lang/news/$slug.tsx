@@ -11,7 +11,13 @@ export const Route = createFileRoute("/$lang/news/$slug")({
 	},
 	head: ({ params, loaderData }) =>
 		loaderData
-			? seo(params.lang as Lang, loaderData.post.title, loaderData.post.summary)
+			? seo(
+					params.lang as Lang,
+					loaderData.post.title,
+					loaderData.post.summary,
+					`/news/${params.slug}`,
+					"news",
+				)
 			: {},
 	component: NewsPostPage,
 });
