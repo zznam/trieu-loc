@@ -12,13 +12,19 @@ async function login(page: Page, url: string) {
 test.describe("content editor", () => {
 	test.skip(!process.env.DATABASE_URL, "needs DATABASE_URL");
 
-	// Other specs expect the original file content, so empty the content table afterwards.
-	test.afterAll(async () => {
+	async function db<T>(fn: (sql: import("postgres").Sql) => Promise<T>) {
 		const { default: postgres } = await import("postgres");
 		const sql = postgres(process.env.DATABASE_URL as string, { max: 1 });
-		await sql`TRUNCATE content_items`;
-		await sql.end();
-	});
+		try {
+			return await fn(sql);
+		} finally {
+			await sql.end();
+		}
+	}
+
+	// Each test starts from the files; other specs expect the original file content too.
+	test.beforeEach(() => db((sql) => sql`TRUNCATE content_items`));
+	test.afterAll(() => db((sql) => sql`TRUNCATE content_items`));
 
 	test("import, edit a place, publish and delete a news post", async ({
 		page,
@@ -115,5 +121,106 @@ test.describe("content editor", () => {
 		expect(
 			(await page.request.get("/vi/news/2026-12-01-hoi-thi-nau-com")).status(),
 		).toBe(404);
+	});
+
+	test("an earlier partial import is completed without touching edited collections", async ({
+		page,
+	}) => {
+		// State of a site imported before this release: places only, no marker rows.
+		await db(
+			(sql) =>
+				sql`INSERT INTO content_items (collection, id, data) VALUES ('places', 'legacy-place', ${sql.json(
+					{
+						id: "legacy-place",
+						category: "relic",
+						name: { vi: "Địa danh cũ", en: "Old place" },
+						village: { vi: "Thôn", en: "Village" },
+						coords: [19.94, 105.82],
+						approx: true,
+						body: { vi: "x", en: "x" },
+					},
+				)})`,
+		);
+		await login(page, "/admin?section=content&collection=places");
+		await expect(
+			page.getByText("Một số loại nội dung vẫn đang lấy từ file."),
+		).toBeVisible();
+		await expect(
+			page.getByText(/Chưa nhập: .*Đặc sản.*Thông tin chung.*Lịch sử/),
+		).toBeVisible();
+		page.once("dialog", (d) => d.accept());
+		await page
+			.getByRole("button", { name: "Nhập phần còn thiếu từ file" })
+			.click();
+		await expect(page.getByRole("status")).toContainText(/Đã nhập \d+ mục/);
+		await expect(page.getByText("Một số loại nội dung")).toHaveCount(0);
+		// Places were left exactly as they were
+		await expect(page.locator("main li")).toHaveCount(1);
+		await expect(page.locator("main li")).toContainText("Địa danh cũ");
+	});
+
+	test("site texts, history timeline and contacts are editable", async ({
+		page,
+	}) => {
+		await login(page, "/admin?section=content&collection=site");
+		page.once("dialog", (d) => d.accept());
+		await page.getByRole("button", { name: "Nhập nội dung từ file" }).click();
+		await expect(page.getByRole("status")).toContainText(/Đã nhập/);
+
+		// Singleton: one row, no add / delete
+		await expect(
+			page.getByRole("button", { name: "＋ Thêm mới" }),
+		).toBeHidden();
+		await page.getByRole("button", { name: "✎ Sửa" }).click();
+		await page
+			.getByRole("textbox", { name: "Diện tích (trang chủ)" })
+			.fill("30,00 km²");
+		await page.getByRole("button", { name: "Lưu", exact: true }).click();
+		await expect(page.getByRole("status")).toContainText("Đã lưu");
+		await page.goto("/vi");
+		await expect(page.locator("dl")).toContainText("30,00 km²");
+
+		// History: add a timeline entry with the list editor
+		await page.goto("/admin?section=content&collection=history");
+		await page.getByRole("button", { name: "✎ Sửa" }).click();
+		await page.getByRole("button", { name: "＋ Thêm mốc" }).click();
+		const last = page
+			.locator("fieldset", { hasText: "Dòng thời gian" })
+			.locator("> div")
+			.last();
+		await last
+			.getByRole("textbox", { name: "Năm / thời kỳ (vi)" })
+			.fill("2030");
+		await last
+			.getByRole("textbox", { name: "Năm / thời kỳ (en)" })
+			.fill("2030");
+		await last
+			.getByRole("textbox", { name: "Tiêu đề (vi)" })
+			.fill("Mốc thử nghiệm");
+		await last
+			.getByRole("textbox", { name: "Tiêu đề (en)" })
+			.fill("Test milestone");
+		await last.getByRole("textbox", { name: "Nội dung (vi)" }).fill("Nội dung");
+		await last.getByRole("textbox", { name: "Nội dung (en)" }).fill("Body");
+		await page.getByRole("button", { name: "Lưu", exact: true }).click();
+		await expect(page.getByRole("status")).toContainText("Đã lưu");
+		await page.goto("/en/history");
+		await expect(page.getByText("Test milestone")).toBeVisible();
+
+		// Contacts: give the commune office a phone number
+		await page.goto("/admin?section=content&collection=contacts");
+		await page
+			.locator("li", { hasText: "UBND xã Triệu Lộc" })
+			.getByRole("button", { name: "✎ Sửa" })
+			.click();
+		await page
+			.getByRole("textbox", {
+				name: "Số điện thoại (để trống = đang cập nhật)",
+			})
+			.fill("0237 000 000");
+		await page.getByRole("button", { name: "Lưu", exact: true }).click();
+		await expect(page.getByRole("status")).toContainText("Đã lưu");
+		await page.goto("/vi/info");
+		await expect(page.locator('a[href="tel:0237000000"]')).toBeVisible();
 	});
 });

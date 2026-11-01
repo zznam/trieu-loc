@@ -1,5 +1,6 @@
 import { marked } from "marked";
 import businessesData from "#/content/businesses.json";
+import contactsData from "#/content/contacts.json";
 import foodData from "#/content/food.json";
 import galleryData from "#/content/gallery.json";
 import historyData from "#/content/history.json";
@@ -21,7 +22,13 @@ export type Place = {
 	villageId?: string;
 };
 
-export type Specialty = { id: string; name: L; tag: L; body: L };
+export type Specialty = {
+	id: string;
+	name: L;
+	tag: L;
+	body: L;
+	photo?: string;
+};
 export type Business = {
 	id: string;
 	name: string;
@@ -37,17 +44,78 @@ export type GalleryItem = {
 	src: string;
 };
 
-export const site = siteData as typeof siteData & { center: [number, number] };
-export const history = historyData as {
+export type Site = {
+	name: L;
+	province: L;
+	center: [number, number];
+	stats: {
+		area: string;
+		population: string;
+		villages: string;
+		distance: string;
+	};
+	contact: { email: string; facebook: string; address: L };
+	highlights: { title: L; body: L; to: "places" | "history" | "food" }[];
+};
+
+export type History = {
 	intro: L;
 	timeline: { year: string | L; title: L; body: L }[];
 	figure: { quote: L; body: L };
 	traditions: { title: L; body: L }[];
 };
+
+// Mutable: the content store replaces these in place when the database has content.
+export const site = siteData as Site;
+export const history = historyData as History;
 export const places = placesData as Place[];
 export const specialties = foodData as Specialty[];
 export const businesses = businessesData as Business[];
 export const gallery = galleryData as GalleryItem[];
+
+// ---------- Contacts (Useful info page) ----------
+
+export type ContactGroup = "emergency" | "commune" | "schools" | "heritage";
+export const CONTACT_GROUPS: ContactGroup[] = [
+	"emergency",
+	"commune",
+	"schools",
+	"heritage",
+];
+
+export type Contact = {
+	id: string;
+	group: ContactGroup;
+	order: number;
+	name: L;
+	phone: string;
+	address?: L;
+	hours?: L;
+	sample?: boolean;
+};
+
+type ContactFile = {
+	group: ContactGroup;
+	items: Omit<Contact, "id" | "group" | "order">[];
+}[];
+
+/** contacts.json is grouped; flatten it into items with stable ids ("commune-2"). */
+export const contacts: Contact[] = (contactsData as ContactFile).flatMap((g) =>
+	g.items.map((item, i) => ({
+		id: `${g.group}-${i + 1}`,
+		group: g.group,
+		order: (i + 1) * 10,
+		...item,
+	})),
+);
+
+export const contactsByGroup = () =>
+	CONTACT_GROUPS.map((group) => ({
+		group,
+		items: contacts
+			.filter((c) => c.group === group)
+			.sort((a, b) => a.order - b.order),
+	})).filter((g) => g.items.length > 0);
 
 export const placeCategoryLabel: Record<PlaceCategory, L> = {
 	relic: { vi: "Di tích", en: "Heritage" },

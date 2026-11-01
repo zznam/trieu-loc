@@ -10,7 +10,22 @@ export type Field =
 			hint?: string;
 			optional?: boolean;
 	  }
-	| { kind: "bilingual"; path: string; label: string; rows?: number }
+	| {
+			kind: "bilingual";
+			path: string;
+			label: string;
+			rows?: number;
+			optional?: boolean;
+	  }
+	| {
+			kind: "list";
+			path: string;
+			label: string;
+			itemLabel: string;
+			/** Sub-fields with paths relative to one list entry. */
+			fields: Field[];
+			empty: Record<string, unknown>;
+	  }
 	| {
 			kind: "select";
 			path: string;
@@ -176,6 +191,143 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 			}),
 		),
 	],
+	specialties: [
+		{ kind: "text", path: "id", label: "Mã (id)", hint: ID_HINT },
+		{ kind: "bilingual", path: "name", label: "Tên món / sản vật" },
+		{ kind: "bilingual", path: "tag", label: "Nhãn (vd: Đặc sản xứ Thanh)" },
+		{ kind: "bilingual", path: "body", label: "Mô tả", rows: 3 },
+	],
+	businesses: [
+		{ kind: "text", path: "id", label: "Mã (id)", hint: ID_HINT },
+		{ kind: "text", path: "name", label: "Tên cơ sở" },
+		{ kind: "bilingual", path: "category", label: "Ngành hàng" },
+		{ kind: "bilingual", path: "village", label: "Thôn / địa chỉ" },
+		{ kind: "text", path: "phone", label: "Số điện thoại" },
+		{ kind: "bilingual", path: "body", label: "Giới thiệu", rows: 3 },
+	],
+	gallery: [
+		{ kind: "text", path: "id", label: "Mã (id)", hint: ID_HINT },
+		{ kind: "bilingual", path: "caption", label: "Chú thích" },
+		{
+			kind: "select",
+			path: "season",
+			label: "Mùa",
+			options: [
+				["spring", "Xuân"],
+				["summer", "Hạ"],
+				["autumn", "Thu"],
+				["winter", "Đông"],
+			],
+		},
+		{
+			kind: "text",
+			path: "src",
+			label: "Ảnh (đường dẫn; để trống = ảnh minh hoạ)",
+		},
+	],
+	contacts: [
+		{ kind: "text", path: "id", label: "Mã (id)", hint: ID_HINT },
+		{
+			kind: "select",
+			path: "group",
+			label: "Nhóm",
+			options: [
+				["emergency", "Khẩn cấp"],
+				["commune", "Cơ quan xã"],
+				["schools", "Trường học"],
+				["heritage", "Di tích"],
+			],
+		},
+		{
+			kind: "number",
+			path: "order",
+			label: "Thứ tự trong nhóm (nhỏ trước)",
+			min: 0,
+		},
+		{ kind: "bilingual", path: "name", label: "Tên" },
+		{
+			kind: "text",
+			path: "phone",
+			label: "Số điện thoại (để trống = đang cập nhật)",
+		},
+		{ kind: "bilingual", path: "address", label: "Địa chỉ", optional: true },
+		{ kind: "bilingual", path: "hours", label: "Giờ làm việc", optional: true },
+		{ kind: "checkbox", path: "sample", label: "Thông tin mẫu" },
+	],
+	site: [
+		{ kind: "bilingual", path: "name", label: "Tên trang" },
+		{ kind: "bilingual", path: "province", label: "Tỉnh" },
+		{ kind: "coords", path: "center", label: "Tâm bản đồ (vĩ độ, kinh độ)" },
+		{ kind: "text", path: "stats.area", label: "Diện tích (trang chủ)" },
+		{ kind: "text", path: "stats.population", label: "Dân số" },
+		{ kind: "text", path: "stats.villages", label: "Số thôn" },
+		{ kind: "text", path: "stats.distance", label: "Cách TP Thanh Hoá" },
+		{ kind: "text", path: "contact.email", label: "Email liên hệ" },
+		{ kind: "text", path: "contact.facebook", label: "Trang Facebook" },
+		{ kind: "bilingual", path: "contact.address", label: "Địa chỉ" },
+		{
+			kind: "list",
+			path: "highlights",
+			label: "Điểm nhấn trên trang chủ",
+			itemLabel: "Điểm nhấn",
+			empty: {
+				title: { vi: "", en: "" },
+				body: { vi: "", en: "" },
+				to: "places",
+			},
+			fields: [
+				{ kind: "bilingual", path: "title", label: "Tiêu đề" },
+				{ kind: "bilingual", path: "body", label: "Mô tả", rows: 2 },
+				{
+					kind: "select",
+					path: "to",
+					label: "Dẫn tới trang",
+					options: [
+						["places", "Địa danh"],
+						["history", "Lịch sử"],
+						["food", "Đặc sản"],
+					],
+				},
+			],
+		},
+	],
+	history: [
+		{ kind: "bilingual", path: "intro", label: "Giới thiệu", rows: 4 },
+		{
+			kind: "bilingual",
+			path: "figure.quote",
+			label: "Câu nói của Bà Triệu",
+			rows: 3,
+		},
+		{ kind: "bilingual", path: "figure.body", label: "Về Bà Triệu", rows: 5 },
+		{
+			kind: "list",
+			path: "timeline",
+			label: "Dòng thời gian",
+			itemLabel: "Mốc",
+			empty: {
+				year: { vi: "", en: "" },
+				title: { vi: "", en: "" },
+				body: { vi: "", en: "" },
+			},
+			fields: [
+				{ kind: "bilingual", path: "year", label: "Năm / thời kỳ" },
+				{ kind: "bilingual", path: "title", label: "Tiêu đề" },
+				{ kind: "bilingual", path: "body", label: "Nội dung", rows: 2 },
+			],
+		},
+		{
+			kind: "list",
+			path: "traditions",
+			label: "Lễ hội & phong tục",
+			itemLabel: "Mục",
+			empty: { title: { vi: "", en: "" }, body: { vi: "", en: "" } },
+			fields: [
+				{ kind: "bilingual", path: "title", label: "Tiêu đề" },
+				{ kind: "bilingual", path: "body", label: "Nội dung", rows: 3 },
+			],
+		},
+	],
 	news: [
 		{
 			kind: "text",
@@ -252,6 +404,30 @@ export function newItem(collection: CollectionName): Record<string, unknown> {
 				date: today,
 				vi: { title: "", summary: "", body: "" },
 			};
+		case "specialties":
+			return { id: "", name: { ...L }, tag: { ...L }, body: { ...L } };
+		case "businesses":
+			return {
+				id: "",
+				name: "",
+				category: { ...L },
+				village: { ...L },
+				phone: "",
+				body: { ...L },
+			};
+		case "gallery":
+			return { id: "", caption: { ...L }, season: "spring", src: "" };
+		case "contacts":
+			return {
+				id: "",
+				group: "commune",
+				order: 100,
+				name: { ...L },
+				phone: "",
+			};
+		case "site":
+		case "history":
+			return { id: "main" }; // singletons are never created from the editor
 	}
 }
 
@@ -264,6 +440,11 @@ export function itemTitle(
 		(o as Record<string, unknown> | undefined)?.[k];
 	if (collection === "people") return String(get(item.vi, "name") ?? item.slug);
 	if (collection === "news") return String(get(item.vi, "title") ?? item.slug);
+	if (collection === "site") return "Thông tin chung của trang";
+	if (collection === "history") return "Trang Lịch sử & Văn hoá";
+	if (collection === "businesses") return String(item.name || item.id);
+	if (collection === "gallery")
+		return String(get(item.caption, "vi") || item.id);
 	const l = (item.name ?? item.title) as { vi?: string } | undefined;
 	return l?.vi || String(item.id);
 }

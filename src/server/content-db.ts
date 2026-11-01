@@ -1,7 +1,11 @@
 // Server-only content queries. Import from server-function handlers or lazily from server
 // routes — never at the top of a route module (it would pull the DB driver into the browser).
 import { count, max } from "drizzle-orm";
-import { COLLECTION_NAMES, type ContentSnapshot } from "#/lib/content-schemas";
+import {
+	COLLECTION_NAMES,
+	type CollectionName,
+	type ContentSnapshot,
+} from "#/lib/content-schemas";
 import { applySnapshot } from "#/lib/content-store";
 import { getDb, isDbConfigured } from "./db";
 import { contentItems } from "./schema";
@@ -13,28 +17,43 @@ export function invalidateContentCache() {
 	cache = null;
 }
 
+/** Marker rows (collection "_meta", id = collection name) record which collections were imported. */
+export const META = "_meta";
+
+/** Collections that live in the database: imported ones, plus legacy imports that only have rows. */
+export async function importedCollections(): Promise<CollectionName[]> {
+	const rows = await getDb()
+		.selectDistinct({
+			collection: contentItems.collection,
+			id: contentItems.id,
+		})
+		.from(contentItems);
+	const set = new Set<string>();
+	for (const r of rows) set.add(r.collection === META ? r.id : r.collection);
+	return COLLECTION_NAMES.filter((c) => set.has(c));
+}
+
 async function loadSnapshot(): Promise<ContentSnapshot | null> {
 	const db = getDb();
 	const [{ n, latest }] = await db
 		.select({ n: count(), latest: max(contentItems.updatedAt) })
 		.from(contentItems);
-	if (n === 0) return null; // not imported yet → the site keeps using the files
+	if (n === 0) return null; // nothing imported yet → the site keeps using the files
 	const rows = await db.select().from(contentItems);
-	const snap = {
+	const imported = await importedCollections();
+	const snap: ContentSnapshot = {
 		version: `${n}-${latest?.toISOString() ?? ""}`,
-		places: [],
-		villages: [],
-		events: [],
-		people: [],
-		news: [],
-	} as ContentSnapshot;
+		imported,
+	};
+	for (const c of imported) (snap as Record<string, unknown>)[c] = [];
 	for (const r of rows) {
-		if ((COLLECTION_NAMES as string[]).includes(r.collection)) {
-			(
-				snap[
-					r.collection as keyof Omit<ContentSnapshot, "version">
-				] as unknown[]
-			).push(r.data);
+		if (
+			r.collection !== META &&
+			(imported as string[]).includes(r.collection)
+		) {
+			((snap as Record<string, unknown>)[r.collection] as unknown[]).push(
+				r.data,
+			);
 		}
 	}
 	return snap;

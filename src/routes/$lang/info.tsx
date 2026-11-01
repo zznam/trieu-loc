@@ -1,22 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader, SampleNote } from "#/components/PageHeader";
 import { WeatherCard } from "#/components/Weather";
-import contactsData from "#/content/contacts.json";
-import { type DictKey, type L, type Lang, pick, t } from "#/lib/i18n";
+import { contactsByGroup } from "#/lib/content";
+import { type DictKey, type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
-
-type Contact = {
-	name: L;
-	phone: string;
-	address?: L;
-	hours?: L;
-	sample?: boolean;
-};
-type Group = {
-	group: "emergency" | "commune" | "schools" | "heritage";
-	items: Contact[];
-};
-const groups = contactsData as Group[];
 
 export const Route = createFileRoute("/$lang/info")({
 	head: ({ params }) => {
@@ -34,6 +21,7 @@ export const Route = createFileRoute("/$lang/info")({
 
 function InfoPage() {
 	const lang = Route.useParams().lang as Lang;
+	const groups = contactsByGroup();
 	const hasSamples = groups.some((g) => g.items.some((i) => i.sample));
 	return (
 		<>
@@ -67,7 +55,7 @@ function InfoPage() {
 							<ul className="mt-3 divide-y divide-earth-300/40">
 								{g.items.map((c) => (
 									<li
-										key={c.name.vi}
+										key={c.id}
 										className="flex items-center justify-between gap-4 py-3"
 									>
 										<div className="min-w-0">

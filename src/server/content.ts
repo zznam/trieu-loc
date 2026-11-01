@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import {
 	COLLECTION_NAMES,
@@ -14,7 +14,9 @@ import { isAdminConfigured, isAdminRequest, requireAdmin } from "./auth";
 import {
 	ensureContentFresh,
 	getSnapshotCached,
+	importedCollections,
 	invalidateContentCache,
+	META,
 } from "./content-db";
 import { getDb, isDbConfigured } from "./db";
 import { contentItems } from "./schema";
@@ -37,8 +39,10 @@ const collectionInput = z.object({
 export type ContentAdminState = {
 	authed: boolean;
 	configured: { db: boolean; admin: boolean };
-	/** False until the files have been imported into the database. */
+	/** Whether this collection lives in the database (false = still the bundled files, read-only). */
 	imported: boolean;
+	/** Collections still waiting for their one-time import. */
+	missing: CollectionName[];
 	items: JsonObject[];
 };
 
@@ -48,21 +52,20 @@ export const getContentAdmin = createServerFn({ method: "GET" })
 		const configured = { db: isDbConfigured(), admin: isAdminConfigured() };
 		const authed = isAdminRequest();
 		if (!authed || !configured.db)
-			return { authed, configured, imported: false, items: [] };
-		const db = getDb();
-		const [{ n }] = await db
-			.select({ n: sql<number>`count(*)::int` })
-			.from(contentItems);
-		if (n === 0) {
+			return { authed, configured, imported: false, missing: [], items: [] };
+		const imported = await importedCollections();
+		const missing = COLLECTION_NAMES.filter((c) => !imported.includes(c));
+		if (!imported.includes(data.collection)) {
 			// Not imported yet: show what the files contain (read-only until imported).
 			return {
 				authed,
 				configured,
 				imported: false,
+				missing,
 				items: fileContent()[data.collection] as unknown as JsonObject[],
 			};
 		}
-		const rows = await db
+		const rows = await getDb()
 			.select({ data: contentItems.data })
 			.from(contentItems)
 			.where(eq(contentItems.collection, data.collection));
@@ -70,32 +73,54 @@ export const getContentAdmin = createServerFn({ method: "GET" })
 			authed,
 			configured,
 			imported: true,
+			missing,
 			items: rows.map((r) => r.data as JsonObject),
 		};
 	});
 
-/** One-time import of the bundled JSON/Markdown files into the database. */
+/**
+ * One-time import of the bundled files into the database, for every collection that isn't
+ * there yet. Collections already imported (and edited) are never touched.
+ */
 export const importContent = createServerFn({ method: "POST" }).handler(
 	async () => {
 		requireAdmin();
 		const db = getDb();
-		const [{ n }] = await db
-			.select({ n: sql<number>`count(*)::int` })
-			.from(contentItems);
-		if (n > 0)
+		const imported = await importedCollections();
+		const todo = COLLECTION_NAMES.filter((c) => !imported.includes(c));
+		if (todo.length === 0)
 			return { ok: false as const, error: "already_imported" as const };
 		const files = fileContent();
-		const rows = COLLECTION_NAMES.flatMap((collection) =>
-			(files[collection] as Record<string, unknown>[]).map((data) => ({
+		const rows = todo.flatMap((collection) => [
+			// Marker so the collection counts as imported even if all its items are later deleted.
+			{
+				collection: META,
+				id: collection,
+				data: { importedAt: new Date().toISOString() },
+			},
+			...(files[collection] as Record<string, unknown>[]).map((data) => ({
 				collection,
 				id: itemId(collection, data),
 				data,
 			})),
-		);
-		await db.insert(contentItems).values(rows);
+		]);
+		// Legacy imports (before markers existed) get their marker too.
+		const legacy = imported.map((collection) => ({
+			collection: META,
+			id: collection,
+			data: { importedAt: "legacy" },
+		}));
+		await db
+			.insert(contentItems)
+			.values([...rows, ...legacy])
+			.onConflictDoNothing();
 		invalidateContentCache();
 		await ensureContentFresh();
-		return { ok: true as const, count: rows.length };
+		return {
+			ok: true as const,
+			count: rows.length - todo.length,
+			collections: todo,
+		};
 	},
 );
 
@@ -128,10 +153,9 @@ export const saveContentItem = createServerFn({ method: "POST" })
 		const item = parsed.data as Record<string, unknown>;
 		const id = itemId(data.collection, item);
 		const db = getDb();
-		const [{ n }] = await db
-			.select({ n: sql<number>`count(*)::int` })
-			.from(contentItems);
-		if (n === 0) return { ok: false, error: "not_imported" };
+		if (!(await importedCollections()).includes(data.collection)) {
+			return { ok: false, error: "not_imported" };
+		}
 
 		const renamed = data.previousId !== undefined && data.previousId !== id;
 		if (data.previousId === undefined || renamed) {

@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
 	COLLECTION_NAMES,
 	type CollectionName,
+	isSingleton,
 	itemId,
 	type JsonObject,
 } from "#/lib/content-schemas";
@@ -23,6 +24,12 @@ export const COLLECTION_LABELS: Record<CollectionName, string> = {
 	events: "Sự kiện",
 	people: "Con người",
 	news: "Tin tức",
+	specialties: "Đặc sản",
+	businesses: "Cơ sở kinh doanh",
+	gallery: "Thư viện ảnh",
+	contacts: "Danh bạ",
+	site: "Thông tin chung",
+	history: "Lịch sử",
 };
 
 // ---------- path helpers ("date.day" → obj.date.day) ----------
@@ -84,6 +91,16 @@ function FieldInput({
 				(getPath(item, field.path) as
 					| { vi?: string; en?: string }
 					| undefined) ?? {};
+			// Optional bilingual fields disappear entirely when both languages are empty.
+			const update = (l: "vi" | "en", value: string) => {
+				const next = { vi: v.vi ?? "", en: v.en ?? "", [l]: value };
+				set(
+					field.path,
+					field.optional && !next.vi.trim() && !next.en.trim()
+						? undefined
+						: next,
+				);
+			};
 			return (
 				<fieldset className="grid gap-2 sm:grid-cols-2">
 					<legend className={lbl}>{field.label}</legend>
@@ -95,9 +112,7 @@ function FieldInput({
 									aria-label={`${field.label} (${l})`}
 									value={v[l] ?? ""}
 									placeholder={l === "vi" ? "Tiếng Việt" : "English"}
-									onChange={(e) =>
-										set(field.path, { ...v, [l]: e.target.value })
-									}
+									onChange={(e) => update(l, e.target.value)}
 									className={input}
 								/>
 							) : (
@@ -105,14 +120,85 @@ function FieldInput({
 									aria-label={`${field.label} (${l})`}
 									value={v[l] ?? ""}
 									placeholder={l === "vi" ? "Tiếng Việt" : "English"}
-									onChange={(e) =>
-										set(field.path, { ...v, [l]: e.target.value })
-									}
+									onChange={(e) => update(l, e.target.value)}
 									className={input}
 								/>
 							)}
 						</div>
 					))}
+				</fieldset>
+			);
+		}
+		case "list": {
+			const list = (getPath(item, field.path) as Obj[] | undefined) ?? [];
+			const write = (next: Obj[]) => set(field.path, next);
+			const move = (i: number, d: -1 | 1) => {
+				const next = [...list];
+				[next[i], next[i + d]] = [next[i + d], next[i]];
+				write(next);
+			};
+			const small =
+				"rounded-full border border-earth-300 px-2 py-0.5 text-xs font-semibold disabled:opacity-40";
+			return (
+				<fieldset className="space-y-3">
+					<legend className={lbl}>
+						{field.label} ({list.length})
+					</legend>
+					{list.map((entry, i) => (
+						<div
+							// biome-ignore lint/suspicious/noArrayIndexKey: entries have no id; position is the identity
+							key={i}
+							className="space-y-2 rounded-xl border border-earth-300/60 bg-paper p-3"
+						>
+							<div className="flex items-center gap-2">
+								<span className="text-sm font-semibold text-rice-900">
+									{field.itemLabel} {i + 1}
+								</span>
+								<button
+									type="button"
+									disabled={i === 0}
+									onClick={() => move(i, -1)}
+									className={small}
+									aria-label="Lên"
+								>
+									↑
+								</button>
+								<button
+									type="button"
+									disabled={i === list.length - 1}
+									onClick={() => move(i, 1)}
+									className={small}
+									aria-label="Xuống"
+								>
+									↓
+								</button>
+								<button
+									type="button"
+									onClick={() => write(list.filter((_, j) => j !== i))}
+									className="ml-auto text-xs font-semibold text-lotus"
+								>
+									Xoá mục này
+								</button>
+							</div>
+							{field.fields.map((sub) => (
+								<FieldInput
+									key={sub.kind === "lang" ? sub.lang : sub.path}
+									field={sub}
+									item={entry}
+									onChange={(nextEntry) =>
+										write(list.map((e, j) => (j === i ? nextEntry : e)))
+									}
+								/>
+							))}
+						</div>
+					))}
+					<button
+						type="button"
+						onClick={() => write([...list, structuredClone(field.empty)])}
+						className="rounded-full border border-dashed border-earth-500 px-4 py-1.5 text-sm font-semibold text-earth-700"
+					>
+						＋ Thêm {field.itemLabel.toLowerCase()}
+					</button>
 				</fieldset>
 			);
 		}
@@ -344,6 +430,7 @@ export function ContentEditor({
 		issues?: string[];
 	} | null>(null);
 	const fields = FIELDS[collection];
+	const singleton = isSingleton(collection);
 	const items = [...state.items].sort((a, b) =>
 		collection === "news"
 			? String(b.date).localeCompare(String(a.date))
@@ -420,21 +507,29 @@ export function ContentEditor({
 				</button>
 			</nav>
 
-			{!state.imported && (
+			{state.missing.length > 0 && (
 				<div className="rounded-2xl border border-earth-500/50 bg-earth-300/20 p-5">
 					<p className="font-semibold text-rice-900">
-						Nội dung vẫn đang lấy từ các file trong mã nguồn.
+						{state.missing.length === COLLECTION_NAMES.length
+							? "Nội dung vẫn đang lấy từ các file trong mã nguồn."
+							: "Một số loại nội dung vẫn đang lấy từ file."}
 					</p>
 					<p className="mt-1 text-sm text-ink-soft">
-						Bấm nút dưới để sao chép một lần toàn bộ địa danh, thôn, sự kiện,
-						con người và tin tức vào cơ sở dữ liệu. Từ đó trở đi bạn sửa nội
-						dung ngay tại đây; các file chỉ còn là dữ liệu ban đầu.
+						Chưa nhập:{" "}
+						{state.missing.map((c) => COLLECTION_LABELS[c]).join(", ")}. Bấm nút
+						dưới để sao chép một lần các mục này vào cơ sở dữ liệu (nội dung đã
+						nhập và đã sửa trước đó không bị thay đổi). Từ đó trở đi bạn sửa
+						chúng ngay tại đây.
 					</p>
 					<button
 						type="button"
 						disabled={busy}
 						onClick={async () => {
-							if (!confirm("Nhập toàn bộ nội dung từ file vào cơ sở dữ liệu?"))
+							if (
+								!confirm(
+									"Nhập các loại nội dung còn thiếu từ file vào cơ sở dữ liệu?",
+								)
+							)
 								return;
 							setBusy(true);
 							try {
@@ -451,7 +546,9 @@ export function ContentEditor({
 						}}
 						className="mt-3 rounded-full bg-rice-700 px-5 py-2 text-sm font-semibold text-paper disabled:opacity-60"
 					>
-						Nhập nội dung từ file
+						{state.missing.length === COLLECTION_NAMES.length
+							? "Nhập nội dung từ file"
+							: "Nhập phần còn thiếu từ file"}
 					</button>
 				</div>
 			)}
@@ -511,6 +608,7 @@ export function ContentEditor({
 						<p className="text-sm text-ink-soft">{items.length} mục</p>
 						<button
 							type="button"
+							hidden={singleton}
 							disabled={!state.imported}
 							onClick={() => setEditing({ item: newItem(collection) })}
 							className="rounded-full bg-rice-700 px-4 py-2 text-sm font-semibold text-paper disabled:opacity-50"
@@ -551,6 +649,7 @@ export function ContentEditor({
 									</button>
 									<button
 										type="button"
+										hidden={singleton}
 										disabled={!state.imported || busy}
 										onClick={async () => {
 											if (!confirm(`Xoá "${itemTitle(collection, it)}"?`))

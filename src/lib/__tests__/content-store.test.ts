@@ -1,5 +1,13 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { getNews, getPerson, places } from "../content";
+import {
+	businesses,
+	contacts,
+	getNews,
+	getPerson,
+	history,
+	places,
+	site,
+} from "../content";
 import {
 	COLLECTION_NAMES,
 	COLLECTIONS,
@@ -16,7 +24,7 @@ describe("content import", () => {
 	it("every item in the bundled files passes the editor's validation", () => {
 		const files = fileContent();
 		for (const c of COLLECTION_NAMES) {
-			for (const item of files[c] as Record<string, unknown>[]) {
+			for (const item of files[c] as unknown as Record<string, unknown>[]) {
 				const r = COLLECTIONS[c].safeParse(item);
 				expect(
 					r.success,
@@ -34,6 +42,15 @@ describe("content import", () => {
 		expect(people.find((p) => p.slug === "ba-trieu")?.en?.name).toBe(
 			"Lady Triệu (Triệu Thị Trinh)",
 		);
+	});
+
+	it("flattens contacts and normalises timeline years for the editor", () => {
+		const {
+			contacts: c,
+			history: [h],
+		} = fileContent();
+		expect(c.find((x) => x.phone === "113")?.id).toBe("emergency-1");
+		expect(h.timeline[0].year).toEqual({ vi: "248", en: "248" });
 	});
 });
 
@@ -54,7 +71,7 @@ describe("applySnapshot", () => {
 				? { ...v, name: { vi: "Thôn Đông", en: "Đông village" }, sample: false }
 				: v,
 		);
-		return { version: "v1", ...f };
+		return { version: "v1", imported: [...COLLECTION_NAMES], ...f };
 	};
 
 	it("replaces content in place for every reader", () => {
@@ -91,10 +108,47 @@ describe("applySnapshot", () => {
 		expect(contentVersion()).toBe("files");
 	});
 
+	it("keeps using files for collections that aren't imported", () => {
+		const f = fileContent();
+		f.places[0] = { ...f.places[0], name: { vi: "Đã sửa", en: "Edited" } };
+		f.businesses = [];
+		applySnapshot({
+			version: "partial",
+			imported: ["places", "businesses"],
+			...f,
+			contacts: [],
+		});
+		expect(places[0].name.vi).toBe("Đã sửa");
+		expect(businesses).toHaveLength(0); // imported, then emptied: stays empty
+		expect(contacts.length).toBeGreaterThan(0); // not imported: still the files
+	});
+
+	it("updates the site texts and history in place", () => {
+		const f = fileContent();
+		f.site[0] = {
+			...f.site[0],
+			name: { vi: "Xã Triệu Lộc mới", en: "New Triệu Lộc" },
+		};
+		f.history[0] = { ...f.history[0], timeline: [] };
+		const siteRef = site;
+		applySnapshot({
+			version: "singletons",
+			imported: ["site", "history"],
+			...f,
+		});
+		expect(site).toBe(siteRef);
+		expect(site.name.vi).toBe("Xã Triệu Lộc mới");
+		expect("id" in site).toBe(false);
+		expect(history.timeline).toHaveLength(0);
+		applySnapshot(null);
+		expect(site.name.vi).toBe("Xã Triệu Lộc");
+		expect(history.timeline.length).toBeGreaterThan(0);
+	});
+
 	it("ignores re-applying the same version", () => {
 		const s = snapshot();
 		applySnapshot(s);
-		s.places[0].name.vi = "khác";
+		if (s.places) s.places[0].name.vi = "khác";
 		applySnapshot(s); // same version → no change
 		expect(places[0].name.vi).toBe("Đền Bà Triệu (đã sửa)");
 	});

@@ -93,13 +93,102 @@ export const newsSchema = z.object({
 	en: newsLang.optional(),
 });
 
+const Lopt = (max = 300) =>
+	z.object({ vi: text(max), en: text(max) }).optional();
+
+export const specialtySchema = z.object({
+	id: slug,
+	name: L(150),
+	tag: L(80),
+	body: L(1000),
+	photo: text(500).optional(),
+});
+
+export const businessSchema = z.object({
+	id: slug,
+	name: text(150).min(1),
+	category: L(80),
+	village: L(150),
+	phone: text(40),
+	body: L(1000),
+});
+
+export const galleryItemSchema = z.object({
+	id: slug,
+	caption: L(200),
+	season: z.enum(["spring", "summer", "autumn", "winter"]),
+	/** Image URL; empty = illustrated placeholder. */
+	src: text(500),
+});
+
+export const contactSchema = z.object({
+	id: slug,
+	group: z.enum(["emergency", "commune", "schools", "heritage"]),
+	order: z.number().int().min(0).max(1000),
+	name: L(150),
+	phone: text(40),
+	address: Lopt(200),
+	hours: Lopt(200),
+	sample: z.boolean().optional(),
+});
+
+/** Single item (id "main"): site-wide texts used on the home page, footer and stats strip. */
+export const siteSchema = z.object({
+	id: z.literal("main"),
+	name: L(100),
+	province: L(100),
+	center: coords,
+	stats: z.object({
+		area: text(40),
+		population: text(40),
+		villages: text(40),
+		distance: text(40),
+	}),
+	contact: z.object({
+		email: z.string().trim().email(),
+		facebook: text(300),
+		address: L(300),
+	}),
+	highlights: z
+		.array(
+			z.object({
+				title: L(150),
+				body: L(400),
+				to: z.enum(["places", "history", "food"]),
+			}),
+		)
+		.max(6),
+});
+
+/** Single item (id "main"): the History & Culture page. */
+export const historySchema = z.object({
+	id: z.literal("main"),
+	intro: L(3000),
+	timeline: z
+		.array(z.object({ year: L(40), title: L(150), body: L(1000) }))
+		.max(50),
+	figure: z.object({ quote: L(1000), body: L(3000) }),
+	traditions: z.array(z.object({ title: L(150), body: L(2000) })).max(20),
+});
+
 export const COLLECTIONS = {
 	places: placeSchema,
 	villages: villageSchema,
 	events: eventSchema,
 	people: personSchema,
 	news: newsSchema,
+	specialties: specialtySchema,
+	businesses: businessSchema,
+	gallery: galleryItemSchema,
+	contacts: contactSchema,
+	site: siteSchema,
+	history: historySchema,
 } as const;
+
+/** Collections that hold exactly one item with id "main". */
+export const SINGLETONS = ["site", "history"] as const;
+export const isSingleton = (c: string) =>
+	(SINGLETONS as readonly string[]).includes(c);
 
 export type CollectionName = keyof typeof COLLECTIONS;
 export const COLLECTION_NAMES = Object.keys(COLLECTIONS) as CollectionName[];
@@ -110,14 +199,32 @@ export type EventItem = z.infer<typeof eventSchema>;
 export type PersonItem = z.infer<typeof personSchema>;
 export type NewsItem = z.infer<typeof newsSchema>;
 
-export type ContentSnapshot = {
-	/** Changes whenever any item changes; lets clients skip re-applying identical content. */
-	version: string;
+export type SpecialtyItem = z.infer<typeof specialtySchema>;
+export type BusinessItem = z.infer<typeof businessSchema>;
+export type GalleryItemData = z.infer<typeof galleryItemSchema>;
+export type ContactItem = z.infer<typeof contactSchema>;
+export type SiteItem = z.infer<typeof siteSchema>;
+export type HistoryItem = z.infer<typeof historySchema>;
+
+export type ContentData = {
 	places: PlaceItem[];
 	villages: VillageItem[];
 	events: EventItem[];
 	people: PersonItem[];
 	news: NewsItem[];
+	specialties: SpecialtyItem[];
+	businesses: BusinessItem[];
+	gallery: GalleryItemData[];
+	contacts: ContactItem[];
+	site: SiteItem[];
+	history: HistoryItem[];
+};
+
+export type ContentSnapshot = Partial<ContentData> & {
+	/** Changes whenever any item changes; lets clients skip re-applying identical content. */
+	version: string;
+	/** Collections that live in the database. Others keep using the bundled files. */
+	imported: CollectionName[];
 };
 
 /** Item id (slug for people and news). */
