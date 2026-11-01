@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getNews, getPeople } from "#/lib/content";
+import { STORY_PREFIX } from "#/lib/contribute";
 import { LANGS } from "#/lib/i18n";
 import { SITE_URL } from "#/lib/seo";
 import { villages } from "#/lib/villages";
@@ -33,9 +34,18 @@ function entry(path: string, lastmod?: string) {
 export const Route = createFileRoute("/sitemap.xml")({
 	server: {
 		handlers: {
-			GET: () => {
+			GET: async () => {
 				const news = getNews("vi").map((p) => entry(`/news/${p.slug}`, p.date));
 				news.push(...getPeople("vi").map((p) => entry(`/people/${p.slug}`)));
+				// Published community stories (empty if the database isn't configured).
+				// Imported lazily so the database driver never ends up in the browser bundle.
+				const { listPublished } = await import("#/server/published-queries");
+				const stories = await listPublished("story", 500);
+				news.push(
+					...stories.map((s) =>
+						entry(`/news/${STORY_PREFIX}${s.id}`, s.publishedAt.slice(0, 10)),
+					),
+				);
 				// Placeholder villages stay out of the sitemap until they have real content.
 				news.push(
 					...villages

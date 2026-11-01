@@ -70,7 +70,7 @@ pnpm check      # Biome lint + format
 
 ## Contributions (Neon Postgres + Vercel Blob)
 
-Visitors can send stories, photos, business listings, events and corrections from `/:lang/contribute`. Everything lands in a Postgres table as **pending**; you review it at **`/admin`**. Approved photos whose sender ticked the consent box appear automatically in the Gallery under "Ảnh từ bà con". Other kinds are for you to read and copy into the content files.
+Visitors can send stories, photos, business listings, events and corrections from `/:lang/contribute`. Everything lands in a Postgres table as **pending**; you review it at **`/admin`**. For stories, events, businesses and photos you can **✎ edit** (fix wording, link a village, set the event date or the business phone) and then **⤒ publish**: stories appear in News ("Bà con kể"), events on the Events page, businesses in the directory, photos in the Gallery. Only items whose sender ticked the consent box can be published; **⤓ unpublish** takes them down again. The sender's original wording is kept for reference. Corrections and "other" messages are for editors only.
 
 Spam protection: a hidden honeypot field, a minimum fill time, and a limit of 5 submissions per hour per IP (only a salted hash of the IP is stored). Photos are resized in the browser (max 2000px, JPEG, ≤1.4 MB each, up to 3).
 
@@ -87,7 +87,9 @@ Spam protection: a hidden honeypot field, a minimum fill time, and a limit of 5 
    ```
 5. Redeploy, then open `https://<your-site>/admin`.
 
-See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`.
+See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`. **This release adds a migration (`0001_publishing.sql`) — run `pnpm db:migrate` again after deploying.**
+
+`pnpm build` ends with a check that fails if server-only code (database driver, crypto, Blob SDK) ends up in the browser bundle. If it trips, you imported a plain value from `src/server/*` into a route — import only server functions from there.
 
 ## Installable app (PWA)
 

@@ -1,13 +1,17 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { type Kind, kindLabel } from "#/lib/contribute";
+import { getVillage, villages } from "#/lib/villages";
 import {
 	type AdminContribution,
 	adminLogin,
 	adminLogout,
 	deleteContribution,
 	getAdminState,
+	type PublishError,
 	reviewContribution,
+	setPublished,
+	updateContribution,
 } from "#/server/contributions";
 import type { ContributionStatus } from "#/server/schema";
 
@@ -191,16 +195,78 @@ function LogoutButton() {
 	);
 }
 
+const PUBLISH_ERRORS: Record<PublishError, string> = {
+	not_found: "Không tìm thấy đóng góp.",
+	no_consent: "Người gửi chưa đồng ý cho đăng, nên không thể đăng lên trang.",
+	unsupported:
+		"Loại đóng góp này chỉ để ban biên tập đọc, không đăng lên trang.",
+	missing_date: "Sự kiện cần có ngày diễn ra trước khi đăng.",
+	missing_photo: "Không có ảnh để đăng.",
+};
+
+/** Where a published item appears on the site. */
+function liveLink(item: AdminContribution) {
+	if (item.kind === "story")
+		return {
+			to: "/$lang/news/$slug",
+			params: { lang: "vi", slug: `cong-dong-${item.id}` },
+			label: "Tin tức",
+		};
+	if (item.kind === "event")
+		return { to: "/$lang/events", params: { lang: "vi" }, label: "Sự kiện" };
+	if (item.kind === "business")
+		return {
+			to: "/$lang/food",
+			params: { lang: "vi" },
+			label: "Danh bạ cơ sở",
+		};
+	if (item.kind === "photo")
+		return {
+			to: "/$lang/gallery",
+			params: { lang: "vi" },
+			label: "Thư viện ảnh",
+		};
+	return null;
+}
+
+const field =
+	"w-full rounded-xl border border-earth-300 bg-paper px-3 py-2 text-sm outline-none focus:border-rice-500";
+const fieldLabel = "mb-1 block text-xs font-semibold text-ink-soft";
+
 function ContributionCard({ item }: { item: AdminContribution }) {
 	const router = useRouter();
 	const [note, setNote] = useState(item.adminNote ?? "");
 	const [busy, setBusy] = useState(false);
+	const [editing, setEditing] = useState(false);
+	const [message, setMessage] = useState<{
+		tone: "ok" | "error";
+		text: string;
+	} | null>(null);
+	const [form, setForm] = useState({
+		title: item.title,
+		message: item.message,
+		villageId: item.villageId ?? "",
+		eventDate: item.eventDate ?? "",
+		eventDays: item.eventDays,
+		eventLocation: item.eventLocation ?? item.village ?? "",
+		businessCategory: item.businessCategory ?? "",
+		businessPhone: item.businessPhone ?? "",
+	});
+	const publishable = ["story", "event", "business", "photo"].includes(
+		item.kind,
+	);
+	const live = item.publishedAt !== null;
+	const link = liveLink(item);
 
-	async function act(fn: () => Promise<unknown>) {
+	async function act(fn: () => Promise<unknown>, done?: string) {
 		setBusy(true);
+		setMessage(null);
 		try {
 			await fn();
+			if (done) setMessage({ tone: "ok", text: done });
 			await router.invalidate();
+		} catch {
+			setMessage({ tone: "error", text: "Có lỗi xảy ra, vui lòng thử lại." });
 		} finally {
 			setBusy(false);
 		}
@@ -212,6 +278,51 @@ function ContributionCard({ item }: { item: AdminContribution }) {
 				data: { id: item.id, status, note: note || undefined },
 			}),
 		);
+
+	const save = () =>
+		act(async () => {
+			await updateContribution({
+				data: {
+					id: item.id,
+					title: form.title,
+					message: form.message,
+					villageId: form.villageId || null,
+					eventDate: form.eventDate || null,
+					eventDays: Number(form.eventDays) || 1,
+					eventLocation: form.eventLocation || null,
+					businessCategory: form.businessCategory || null,
+					businessPhone: form.businessPhone || null,
+				},
+			});
+			setEditing(false);
+		}, "Đã lưu.");
+
+	async function publish(on: boolean) {
+		setBusy(true);
+		setMessage(null);
+		try {
+			const res = await setPublished({ data: { id: item.id, publish: on } });
+			if (res.ok) {
+				setMessage({
+					tone: "ok",
+					text: on ? "Đã đăng lên trang." : "Đã gỡ khỏi trang.",
+				});
+				await router.invalidate();
+			} else {
+				setMessage({ tone: "error", text: PUBLISH_ERRORS[res.error] });
+			}
+		} catch {
+			setMessage({ tone: "error", text: "Có lỗi xảy ra, vui lòng thử lại." });
+		} finally {
+			setBusy(false);
+		}
+	}
+
+	const set = (k: keyof typeof form) => (e: { target: { value: string } }) =>
+		setForm((f) => ({
+			...f,
+			[k]: k === "eventDays" ? Number(e.target.value) : e.target.value,
+		}));
 
 	return (
 		<li className="rounded-2xl border border-earth-300/50 bg-card p-5">
@@ -234,19 +345,176 @@ function ContributionCard({ item }: { item: AdminContribution }) {
 				>
 					{item.consent ? "Đồng ý đăng" : "Chưa đồng ý đăng"}
 				</span>
-			</div>
-			<h2 className="mt-2 text-xl font-semibold text-rice-900">{item.title}</h2>
-			<p className="mt-1 text-sm text-ink-soft">
-				{item.name}
-				{item.village && ` · ${item.village}`}
-				{item.contact && (
-					<>
-						{" · "}
-						<span className="font-medium text-ink">{item.contact}</span>
-					</>
+				{live && (
+					<span className="rounded-full bg-rice-700 px-2 py-0.5 normal-case tracking-normal text-paper">
+						● Đang hiển thị
+					</span>
 				)}
-			</p>
-			<p className="mt-3 whitespace-pre-wrap text-ink">{item.message}</p>
+			</div>
+
+			{editing ? (
+				<div className="mt-4 space-y-3 rounded-xl bg-paper-2 p-4">
+					<label className="block">
+						<span className={fieldLabel}>Tiêu đề</span>
+						<input
+							value={form.title}
+							onChange={set("title")}
+							maxLength={200}
+							className={field}
+						/>
+					</label>
+					<label className="block">
+						<span className={fieldLabel}>
+							Nội dung (hiển thị dạng văn bản thường)
+						</span>
+						<textarea
+							value={form.message}
+							onChange={set("message")}
+							rows={8}
+							maxLength={5000}
+							className={field}
+						/>
+					</label>
+					<label className="block">
+						<span className={fieldLabel}>Thôn</span>
+						<select
+							value={form.villageId}
+							onChange={set("villageId")}
+							className={field}
+						>
+							<option value="">— Không gắn thôn —</option>
+							{villages.map((v) => (
+								<option key={v.id} value={v.id}>
+									{v.name.vi}
+								</option>
+							))}
+						</select>
+					</label>
+					{item.kind === "event" && (
+						<div className="grid gap-3 sm:grid-cols-3">
+							<label className="block">
+								<span className={fieldLabel}>Ngày diễn ra (dương lịch)</span>
+								<input
+									type="date"
+									value={form.eventDate}
+									onChange={set("eventDate")}
+									className={field}
+								/>
+							</label>
+							<label className="block">
+								<span className={fieldLabel}>Số ngày</span>
+								<input
+									type="number"
+									min={1}
+									max={30}
+									value={form.eventDays}
+									onChange={set("eventDays")}
+									className={field}
+								/>
+							</label>
+							<label className="block">
+								<span className={fieldLabel}>Địa điểm</span>
+								<input
+									value={form.eventLocation}
+									onChange={set("eventLocation")}
+									maxLength={200}
+									className={field}
+								/>
+							</label>
+						</div>
+					)}
+					{item.kind === "business" && (
+						<div className="grid gap-3 sm:grid-cols-2">
+							<label className="block">
+								<span className={fieldLabel}>
+									Ngành hàng (vd: Ẩm thực, Nông sản)
+								</span>
+								<input
+									value={form.businessCategory}
+									onChange={set("businessCategory")}
+									maxLength={80}
+									className={field}
+								/>
+							</label>
+							<label className="block">
+								<span className={fieldLabel}>Số điện thoại công khai</span>
+								<input
+									value={form.businessPhone}
+									onChange={set("businessPhone")}
+									maxLength={40}
+									className={field}
+								/>
+							</label>
+						</div>
+					)}
+					<div className="flex gap-2">
+						<button
+							type="button"
+							disabled={busy}
+							onClick={() => void save()}
+							className="rounded-full bg-rice-700 px-4 py-2 text-sm font-semibold text-paper disabled:opacity-60"
+						>
+							Lưu thay đổi
+						</button>
+						<button
+							type="button"
+							onClick={() => setEditing(false)}
+							className="rounded-full border border-earth-300 px-4 py-2 text-sm font-semibold text-ink"
+						>
+							Huỷ
+						</button>
+					</div>
+				</div>
+			) : (
+				<>
+					<h2 className="mt-2 text-xl font-semibold text-rice-900">
+						{item.title}
+					</h2>
+					<p className="mt-1 text-sm text-ink-soft">
+						{item.name}
+						{item.village && ` · ${item.village}`}
+						{item.contact && (
+							<>
+								{" · "}
+								<span className="font-medium text-ink">{item.contact}</span>
+							</>
+						)}
+					</p>
+					{(item.eventDate || item.businessCategory || item.villageId) && (
+						<p className="mt-2 flex flex-wrap gap-2 text-xs">
+							{item.villageId && (
+								<span className="rounded-full bg-paper-2 px-2 py-1">
+									🏘️ {getVillage(item.villageId)?.name.vi ?? item.villageId}
+								</span>
+							)}
+							{item.eventDate && (
+								<span className="rounded-full bg-paper-2 px-2 py-1">
+									📅 {item.eventDate}
+									{item.eventDays > 1 && ` (${item.eventDays} ngày)`}
+									{item.eventLocation && ` · ${item.eventLocation}`}
+								</span>
+							)}
+							{item.businessCategory && (
+								<span className="rounded-full bg-paper-2 px-2 py-1">
+									🏪 {item.businessCategory}
+									{item.businessPhone && ` · ☎ ${item.businessPhone}`}
+								</span>
+							)}
+						</p>
+					)}
+					<p className="mt-3 whitespace-pre-wrap text-ink">{item.message}</p>
+					{item.original && (
+						<details className="mt-2 text-sm text-ink-soft">
+							<summary className="cursor-pointer">
+								Xem bản gốc người gửi
+							</summary>
+							<p className="mt-2 font-semibold">{item.original.title}</p>
+							<p className="whitespace-pre-wrap">{item.original.message}</p>
+						</details>
+					)}
+				</>
+			)}
+
 			{item.photos.length > 0 && (
 				<div className="mt-4 flex flex-wrap gap-3">
 					{item.photos.map((p) => (
@@ -262,9 +530,7 @@ function ContributionCard({ item }: { item: AdminContribution }) {
 				</div>
 			)}
 			<label className="mt-4 block">
-				<span className="mb-1 block text-xs font-semibold text-ink-soft">
-					Ghi chú nội bộ
-				</span>
+				<span className={fieldLabel}>Ghi chú nội bộ</span>
 				<input
 					value={note}
 					onChange={(e) => setNote(e.target.value)}
@@ -272,22 +538,67 @@ function ContributionCard({ item }: { item: AdminContribution }) {
 					className="w-full rounded-xl border border-earth-300 bg-paper px-3 py-2 text-sm outline-none focus:border-rice-500"
 				/>
 			</label>
-			<div className="mt-4 flex flex-wrap gap-2">
+
+			{message && (
+				<p
+					role={message.tone === "error" ? "alert" : "status"}
+					className={`mt-3 rounded-xl px-3 py-2 text-sm font-medium ${
+						message.tone === "error"
+							? "bg-lotus/15 text-lotus"
+							: "bg-rice-100 text-rice-900"
+					}`}
+				>
+					{message.text}
+				</p>
+			)}
+
+			<div className="mt-4 flex flex-wrap items-center gap-2">
+				{publishable && !editing && (
+					<button
+						type="button"
+						disabled={busy}
+						onClick={() => setEditing(true)}
+						className="rounded-full border border-earth-300 px-4 py-2 text-sm font-semibold text-ink disabled:opacity-60"
+					>
+						✎ Sửa
+					</button>
+				)}
+				{publishable &&
+					(live ? (
+						<button
+							type="button"
+							disabled={busy}
+							onClick={() => void publish(false)}
+							className="rounded-full border border-rice-700 px-4 py-2 text-sm font-semibold text-rice-900 disabled:opacity-60"
+						>
+							⤓ Gỡ khỏi trang
+						</button>
+					) : (
+						<button
+							type="button"
+							disabled={busy || !item.consent}
+							title={item.consent ? undefined : PUBLISH_ERRORS.no_consent}
+							onClick={() => void publish(true)}
+							className="rounded-full bg-rice-700 px-4 py-2 text-sm font-semibold text-paper disabled:opacity-50"
+						>
+							⤒ Đăng lên trang
+						</button>
+					))}
 				{item.status !== "approved" && (
 					<button
 						type="button"
 						disabled={busy}
-						onClick={() => setStatus("approved")}
-						className="rounded-full bg-rice-700 px-4 py-2 text-sm font-semibold text-paper disabled:opacity-60"
+						onClick={() => void setStatus("approved")}
+						className="rounded-full border border-earth-300 px-4 py-2 text-sm font-semibold text-ink disabled:opacity-60"
 					>
-						✓ Duyệt
+						✓ Duyệt (không đăng)
 					</button>
 				)}
 				{item.status !== "rejected" && (
 					<button
 						type="button"
 						disabled={busy}
-						onClick={() => setStatus("rejected")}
+						onClick={() => void setStatus("rejected")}
 						className="rounded-full border border-earth-300 px-4 py-2 text-sm font-semibold text-ink disabled:opacity-60"
 					>
 						✕ Từ chối
@@ -297,11 +608,21 @@ function ContributionCard({ item }: { item: AdminContribution }) {
 					<button
 						type="button"
 						disabled={busy}
-						onClick={() => setStatus("pending")}
+						onClick={() => void setStatus("pending")}
 						className="rounded-full border border-earth-300 px-4 py-2 text-sm font-semibold text-ink disabled:opacity-60"
 					>
-						↺ Chuyển về chờ duyệt
+						↺ Chờ duyệt
 					</button>
+				)}
+				{live && link && (
+					<Link
+						to={link.to}
+						params={link.params}
+						target="_blank"
+						className="text-sm font-semibold text-rice-700 hover:underline"
+					>
+						Xem trên trang ({link.label}) ↗
+					</Link>
 				)}
 				<button
 					type="button"
@@ -320,12 +641,6 @@ function ContributionCard({ item }: { item: AdminContribution }) {
 					Xoá
 				</button>
 			</div>
-			{item.kind === "photo" && item.status === "approved" && !item.consent && (
-				<p className="mt-3 text-xs text-lotus">
-					Ảnh này đã duyệt nhưng người gửi chưa đồng ý đăng, nên sẽ không hiện
-					trong Thư viện ảnh.
-				</p>
-			)}
 		</li>
 	);
 }

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ContributeCta } from "#/components/ContributeCta";
 import { PageHeader } from "#/components/PageHeader";
 import {
+	communityEvent,
 	type EventCategory,
 	eventCategoryLabel,
 	googleCalendarUrl,
@@ -12,6 +13,7 @@ import {
 import { type Lang, pick, t } from "#/lib/i18n";
 import { solarToLunar, todayInVietnam, yearName } from "#/lib/lunar";
 import { seo } from "#/lib/seo";
+import { getPublishedEvents } from "#/server/published";
 
 export const Route = createFileRoute("/$lang/events")({
 	head: ({ params }) => {
@@ -24,6 +26,7 @@ export const Route = createFileRoute("/$lang/events")({
 			"events",
 		);
 	},
+	loader: () => getPublishedEvents(),
 	component: EventsPage,
 });
 
@@ -78,7 +81,18 @@ function EventsPage() {
 
 	const today = todayInVietnam(now);
 	const todayLunar = solarToLunar(today);
-	const occurrences = useMemo(() => upcomingEvents(now), [now]);
+	const published = Route.useLoaderData();
+	const extra = useMemo(
+		() =>
+			published
+				.map(communityEvent)
+				.filter((e): e is NonNullable<typeof e> => e !== null),
+		[published],
+	);
+	const occurrences = useMemo(
+		() => upcomingEvents(now, 12, extra),
+		[now, extra],
+	);
 	const shown = occurrences.filter(
 		(o) => cat === "all" || o.event.category === cat,
 	);

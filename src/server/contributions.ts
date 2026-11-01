@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestIP } from "@tanstack/react-start/server";
-import { and, count, desc, eq, gte } from "drizzle-orm";
+import { and, count, desc, eq, gte, isNotNull } from "drizzle-orm";
 import { z } from "zod";
 import { LIMITS, type SubmitResult } from "#/lib/contribute";
 import {
@@ -157,6 +157,7 @@ export const getCommunityPhotos = createServerFn({ method: "GET" }).handler(
 						eq(contributions.kind, "photo"),
 						eq(contributions.status, "approved"),
 						eq(contributions.consent, true),
+						isNotNull(contributions.publishedAt),
 					),
 				)
 				.orderBy(desc(contributions.createdAt))
@@ -186,6 +187,14 @@ export type AdminContribution = {
 	adminNote: string | null;
 	createdAt: string;
 	reviewedAt: string | null;
+	publishedAt: string | null;
+	original: { title: string; message: string } | null;
+	villageId: string | null;
+	eventDate: string | null;
+	eventDays: number;
+	eventLocation: string | null;
+	businessCategory: string | null;
+	businessPhone: string | null;
 };
 
 export type AdminState = {
@@ -231,6 +240,7 @@ export const getAdminState = createServerFn({ method: "GET" })
 				...r,
 				createdAt: r.createdAt.toISOString(),
 				reviewedAt: r.reviewedAt?.toISOString() ?? null,
+				publishedAt: r.publishedAt?.toISOString() ?? null,
 			})),
 		};
 	});
@@ -273,10 +283,117 @@ export const reviewContribution = createServerFn({ method: "POST" })
 				status: data.status,
 				adminNote: data.note ?? null,
 				reviewedAt: data.status === "pending" ? null : new Date(),
+				// Only approved items can stay live.
+				...(data.status === "approved" ? {} : { publishedAt: null }),
 			})
 			.where(eq(contributions.id, data.id));
 		return { ok: true as const };
 	});
+
+// ---------- Admin: edit & publish ----------
+
+const editInput = z.object({
+	id: z.number().int().positive(),
+	title: z.string().trim().min(1).max(200),
+	message: z.string().trim().min(1).max(5000),
+	villageId: z.string().max(60).nullable(),
+	eventDate: z
+		.string()
+		.regex(/^\d{4}-\d{2}-\d{2}$/)
+		.nullable(),
+	eventDays: z.number().int().min(1).max(30),
+	eventLocation: z.string().trim().max(200).nullable(),
+	businessCategory: z.string().trim().max(80).nullable(),
+	businessPhone: z.string().trim().max(40).nullable(),
+});
+
+/** Saves an editor's changes; the sender's original wording is kept the first time the text changes. */
+export const updateContribution = createServerFn({ method: "POST" })
+	.validator((input: unknown) => editInput.parse(input))
+	.handler(async ({ data }) => {
+		requireAdmin();
+		const db = getDb();
+		const [row] = await db
+			.select({
+				title: contributions.title,
+				message: contributions.message,
+				original: contributions.original,
+			})
+			.from(contributions)
+			.where(eq(contributions.id, data.id));
+		if (!row) return { ok: false as const, error: "not_found" };
+		const textChanged =
+			row.title !== data.title || row.message !== data.message;
+		await db
+			.update(contributions)
+			.set({
+				title: data.title,
+				message: data.message,
+				villageId: data.villageId || null,
+				eventDate: data.eventDate || null,
+				eventDays: data.eventDays,
+				eventLocation: data.eventLocation || null,
+				businessCategory: data.businessCategory || null,
+				businessPhone: data.businessPhone || null,
+				...(textChanged && !row.original
+					? { original: { title: row.title, message: row.message } }
+					: {}),
+			})
+			.where(eq(contributions.id, data.id));
+		return { ok: true as const };
+	});
+
+export type PublishError =
+	| "not_found"
+	| "no_consent"
+	| "unsupported"
+	| "missing_date"
+	| "missing_photo";
+
+/** Puts an item live (approving it) or takes it down. */
+export const setPublished = createServerFn({ method: "POST" })
+	.validator((input: unknown) =>
+		z
+			.object({ id: z.number().int().positive(), publish: z.boolean() })
+			.parse(input),
+	)
+	.handler(
+		async ({
+			data,
+		}): Promise<{ ok: true } | { ok: false; error: PublishError }> => {
+			requireAdmin();
+			const db = getDb();
+			if (!data.publish) {
+				await db
+					.update(contributions)
+					.set({ publishedAt: null })
+					.where(eq(contributions.id, data.id));
+				return { ok: true };
+			}
+			const [row] = await db
+				.select()
+				.from(contributions)
+				.where(eq(contributions.id, data.id));
+			if (!row) return { ok: false, error: "not_found" };
+			// The sender's name is shown publicly, so publishing requires their consent.
+			if (!row.consent) return { ok: false, error: "no_consent" };
+			if (!["story", "event", "business", "photo"].includes(row.kind))
+				return { ok: false, error: "unsupported" };
+			if (row.kind === "event" && !row.eventDate)
+				return { ok: false, error: "missing_date" };
+			if (row.kind === "photo" && row.photos.length === 0)
+				return { ok: false, error: "missing_photo" };
+			await db
+				.update(contributions)
+				.set({
+					status: "approved",
+					reviewedAt: row.reviewedAt ?? new Date(),
+					publishedAt: new Date(),
+				})
+				.where(eq(contributions.id, data.id));
+			return { ok: true };
+		},
+	);
 
 export const deleteContribution = createServerFn({ method: "POST" })
 	.validator((input: unknown) =>
