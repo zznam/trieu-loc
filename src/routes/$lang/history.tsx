@@ -81,7 +81,7 @@ function HistoryPage() {
 					{history.traditions.map((tr) => (
 						<article
 							key={tr.title.vi}
-							className="rounded-2xl border border-earth-300/50 bg-white/60 p-6"
+							className="rounded-2xl border border-earth-300/50 bg-card/70 p-6"
 						>
 							<h3 className="text-xl font-semibold text-rice-900">
 								{pick(lang, tr.title)}

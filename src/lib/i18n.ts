@@ -21,6 +21,14 @@ const dict = {
 	"nav.news": { vi: "Tin tức", en: "News" },
 	"nav.gallery": { vi: "Thư viện ảnh", en: "Gallery" },
 	"nav.menu": { vi: "Menu", en: "Menu" },
+	"theme.toDark": {
+		vi: "Chuyển sang giao diện tối",
+		en: "Switch to dark mode",
+	},
+	"theme.toLight": {
+		vi: "Chuyển sang giao diện sáng",
+		en: "Switch to light mode",
+	},
 	"lang.switch": { vi: "English", en: "Tiếng Việt" },
 	"home.kicker": {
 		vi: "Xã Triệu Lộc · Tỉnh Thanh Hoá",

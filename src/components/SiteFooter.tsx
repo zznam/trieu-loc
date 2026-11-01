@@ -3,7 +3,7 @@ import { type Lang, pick, t } from "#/lib/i18n";
 
 export function SiteFooter({ lang }: { lang: Lang }) {
 	return (
-		<footer className="mt-24 bg-rice-900 text-rice-100">
+		<footer className="site-footer mt-24 bg-rice-900 text-rice-100">
 			<div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2">
 				<div>
 					<p className="font-serif text-2xl font-semibold text-paper">
