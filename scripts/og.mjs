@@ -5,7 +5,10 @@ import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
 
 const PAGES = {
-	home: { vi: "Quê hương Bà Triệu, bên dòng sông Lèn", en: "Homeland of Lady Triệu, on the Lèn River" },
+	home: {
+		vi: "Quê hương Bà Triệu, bên dòng sông Lèn",
+		en: "Homeland of Lady Triệu, on the Lèn River",
+	},
 	history: { vi: "Lịch sử & Văn hoá", en: "History & Culture" },
 	places: { vi: "Địa danh & Bản đồ", en: "Places & Map" },
 	food: { vi: "Đặc sản & Cơ sở địa phương", en: "Food & Local Business" },
@@ -14,7 +17,10 @@ const PAGES = {
 	people: { vi: "Người Triệu Lộc", en: "People of Triệu Lộc" },
 	events: { vi: "Lịch sự kiện", en: "Events calendar" },
 };
-const KICKER = { vi: "Xã Triệu Lộc · Tỉnh Thanh Hoá", en: "Triệu Lộc Commune · Thanh Hóa, Vietnam" };
+const KICKER = {
+	vi: "Xã Triệu Lộc · Tỉnh Thanh Hoá",
+	en: "Triệu Lộc Commune · Thanh Hóa, Vietnam",
+};
 
 const landscape = `
 <svg viewBox="0 0 800 420" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%">
@@ -28,7 +34,10 @@ const landscape = `
 <path d="M0 335 Q240 318 440 334 T800 328 V420 H0Z" fill="#c9a94f"/>
 <path d="M0 372 Q200 356 420 372 T800 362 V420 H0Z" fill="#c4dbd5"/></svg>`;
 
-const html = (title, kicker) => `<!doctype html><html><head><meta charset="utf-8">
+const html = (
+	title,
+	kicker,
+) => `<!doctype html><html><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@600&family=Lora:wght@600&display=block" rel="stylesheet">
 <style>body{margin:0;width:1200px;height:630px;position:relative;overflow:hidden;font-family:'Be Vietnam Pro'}
 .fade{position:absolute;inset:0;background:linear-gradient(90deg,#faf6ec 0%,rgba(250,246,236,.85) 50%,rgba(250,246,236,0) 85%)}
@@ -46,9 +55,15 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
 for (const [name, titles] of Object.entries(PAGES)) {
 	for (const lang of ["vi", "en"]) {
-		await page.setContent(html(titles[lang], KICKER[lang]), { waitUntil: "networkidle" });
+		await page.setContent(html(titles[lang], KICKER[lang]), {
+			waitUntil: "networkidle",
+		});
 		await page.evaluate(() => document.fonts.ready);
-		await page.screenshot({ path: `public/og/${name}-${lang}.jpg`, type: "jpeg", quality: 82 });
+		await page.screenshot({
+			path: `public/og/${name}-${lang}.jpg`,
+			type: "jpeg",
+			quality: 82,
+		});
 		console.log(`public/og/${name}-${lang}.jpg`);
 	}
 }
