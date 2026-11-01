@@ -85,6 +85,10 @@ Spam protection: a hidden honeypot field, a minimum fill time, and a limit of 5 
 
 See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`.
 
+## Analytics
+
+Vercel Web Analytics (cookie-free visitor counts) and Speed Insights (real-user page speed) are wired in. Turn them on in the Vercel project: *Analytics* tab → **Enable**, and *Speed Insights* tab → **Enable**. Nothing is collected until then.
+
 ## Deploy to Vercel
 
 The project uses the Vercel deployment adapter (`vercel.json` → `"framework": "tanstack-start"`; Nitro builds the Vercel output automatically).
