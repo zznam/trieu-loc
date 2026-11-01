@@ -19,6 +19,7 @@ import { Route as LangFoodRouteImport } from './routes/$lang/food'
 import { Route as LangGalleryRouteImport } from './routes/$lang/gallery'
 import { Route as LangHistoryRouteImport } from './routes/$lang/history'
 import { Route as LangPlacesRouteImport } from './routes/$lang/places'
+import { Route as LangSearchRouteImport } from './routes/$lang/search'
 import { Route as LangNewsIndexRouteImport } from './routes/$lang/news/index'
 import { Route as LangNewsSlugRouteImport } from './routes/$lang/news/$slug'
 import { Route as LangPeopleIndexRouteImport } from './routes/$lang/people/index'
@@ -74,6 +75,11 @@ const LangPlacesRoute = LangPlacesRouteImport.update({
   path: '/places',
   getParentRoute: () => LangRoute,
 } as any)
+const LangSearchRoute = LangSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => LangRoute,
+} as any)
 const LangNewsIndexRoute = LangNewsIndexRouteImport.update({
   id: '/news/',
   path: '/news/',
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/$lang/gallery': typeof LangGalleryRoute
   '/$lang/history': typeof LangHistoryRoute
   '/$lang/places': typeof LangPlacesRoute
+  '/$lang/search': typeof LangSearchRoute
   '/$lang/': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/people/$slug': typeof LangPeopleSlugRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/$lang/gallery': typeof LangGalleryRoute
   '/$lang/history': typeof LangHistoryRoute
   '/$lang/places': typeof LangPlacesRoute
+  '/$lang/search': typeof LangSearchRoute
   '/$lang': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/people/$slug': typeof LangPeopleSlugRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/$lang/gallery': typeof LangGalleryRoute
   '/$lang/history': typeof LangHistoryRoute
   '/$lang/places': typeof LangPlacesRoute
+  '/$lang/search': typeof LangSearchRoute
   '/$lang/': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/people/$slug': typeof LangPeopleSlugRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/$lang/gallery'
     | '/$lang/history'
     | '/$lang/places'
+    | '/$lang/search'
     | '/$lang/'
     | '/$lang/news/$slug'
     | '/$lang/people/$slug'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/$lang/gallery'
     | '/$lang/history'
     | '/$lang/places'
+    | '/$lang/search'
     | '/$lang'
     | '/$lang/news/$slug'
     | '/$lang/people/$slug'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/$lang/gallery'
     | '/$lang/history'
     | '/$lang/places'
+    | '/$lang/search'
     | '/$lang/'
     | '/$lang/news/$slug'
     | '/$lang/people/$slug'
@@ -272,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangPlacesRouteImport
       parentRoute: typeof LangRoute
     }
+    '/$lang/search': {
+      id: '/$lang/search'
+      path: '/search'
+      fullPath: '/$lang/search'
+      preLoaderRoute: typeof LangSearchRouteImport
+      parentRoute: typeof LangRoute
+    }
     '/$lang/news/': {
       id: '/$lang/news/'
       path: '/news'
@@ -309,6 +328,7 @@ interface LangRouteChildren {
   LangGalleryRoute: typeof LangGalleryRoute
   LangHistoryRoute: typeof LangHistoryRoute
   LangPlacesRoute: typeof LangPlacesRoute
+  LangSearchRoute: typeof LangSearchRoute
   LangIndexRoute: typeof LangIndexRoute
   LangNewsSlugRoute: typeof LangNewsSlugRoute
   LangPeopleSlugRoute: typeof LangPeopleSlugRoute
@@ -322,6 +342,7 @@ const LangRouteChildren: LangRouteChildren = {
   LangGalleryRoute: LangGalleryRoute,
   LangHistoryRoute: LangHistoryRoute,
   LangPlacesRoute: LangPlacesRoute,
+  LangSearchRoute: LangSearchRoute,
   LangIndexRoute: LangIndexRoute,
   LangNewsSlugRoute: LangNewsSlugRoute,
   LangPeopleSlugRoute: LangPeopleSlugRoute,

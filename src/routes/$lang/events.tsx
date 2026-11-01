@@ -84,6 +84,13 @@ function EventsPage() {
 	);
 
 	const groups: { label: string; items: Occurrence[] }[] = [];
+	// Only the first occurrence of each event gets the anchor id search results link to.
+	const anchored = new Set<string>();
+	const anchorId = (id: string) => {
+		if (anchored.has(id)) return undefined;
+		anchored.add(id);
+		return id;
+	};
 	for (const o of shown) {
 		const label = monthLabel(lang, o);
 		const last = groups.at(-1);
@@ -149,7 +156,8 @@ function EventsPage() {
 								return (
 									<li
 										key={`${o.event.id}-${o.start.year}`}
-										className="flex gap-4 rounded-2xl border border-earth-300/50 bg-card/70 p-4 sm:p-5"
+										id={anchorId(o.event.id)}
+										className="scroll-mt-24 flex gap-4 rounded-2xl border border-earth-300/50 bg-card/70 p-4 sm:p-5"
 									>
 										<div className="w-16 shrink-0 rounded-xl bg-paper-2 py-2 text-center">
 											<span className="block text-[11px] font-semibold uppercase text-earth-700">

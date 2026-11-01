@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { type DictKey, type Lang, t } from "#/lib/i18n";
+import { SearchButton } from "./SearchButton";
 import { ThemeToggle } from "./ThemeToggle";
 
 const NAV: { to: string; key: DictKey }[] = [
@@ -25,7 +26,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 			params={{ lang }}
 			activeOptions={{ exact: item.to === "/$lang" }}
 			onClick={() => setOpen(false)}
-			className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-ink-soft transition hover:bg-rice-100 hover:text-rice-900"
+			className="whitespace-nowrap rounded-full px-2.5 py-2 text-sm font-medium text-ink-soft transition hover:bg-rice-100 hover:text-rice-900"
 			activeProps={{ className: "bg-rice-100 text-rice-900" }}
 		>
 			{t(lang, item.key)}
@@ -35,7 +36,11 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 	return (
 		<header className="sticky top-0 z-[1000] border-b border-earth-300/40 bg-paper/90 backdrop-blur">
 			<div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-				<Link to="/$lang" params={{ lang }} className="flex items-center gap-2">
+				<Link
+					to="/$lang"
+					params={{ lang }}
+					className="flex shrink-0 items-center gap-2 whitespace-nowrap"
+				>
 					<span className="grid h-9 w-9 place-items-center rounded-full bg-rice-700 font-serif text-lg font-bold text-paper">
 						T
 					</span>
@@ -51,7 +56,8 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 				<nav className="hidden items-center gap-1 xl:flex" aria-label="Main">
 					{links}
 				</nav>
-				<div className="flex items-center gap-2">
+				<div className="flex shrink-0 items-center gap-2">
+					<SearchButton lang={lang} />
 					<ThemeToggle lang={lang} />
 					<Link
 						to="."
@@ -62,7 +68,12 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 						className="rounded-full border border-earth-300 px-3 py-1.5 text-xs font-semibold text-earth-700 hover:bg-earth-300/20"
 						hrefLang={other}
 					>
-						{t(lang, "lang.switch")}
+						<span className="sm:hidden" aria-hidden="true">
+							{other.toUpperCase()}
+						</span>
+						<span className="sr-only sm:not-sr-only">
+							{t(lang, "lang.switch")}
+						</span>
 					</Link>
 					<button
 						type="button"
@@ -71,7 +82,11 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 						aria-controls="mobile-nav"
 						onClick={() => setOpen((v) => !v)}
 					>
-						{open ? "✕" : "☰"} {t(lang, "nav.menu")}
+						{open ? "✕" : "☰"}
+						<span className="sr-only sm:not-sr-only">
+							{" "}
+							{t(lang, "nav.menu")}
+						</span>
 					</button>
 				</div>
 			</div>

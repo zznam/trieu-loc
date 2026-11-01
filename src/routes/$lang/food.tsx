@@ -4,6 +4,7 @@ import { PageHeader, SampleNote } from "#/components/PageHeader";
 import { businesses, site, specialties } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
+import { fold } from "#/lib/text";
 
 export const Route = createFileRoute("/$lang/food")({
 	head: ({ params }) => {
@@ -19,14 +20,6 @@ export const Route = createFileRoute("/$lang/food")({
 	component: FoodPage,
 });
 
-const normalize = (s: string) =>
-	s
-		.normalize("NFD")
-		.replace(/[̀-ͯ]/g, "")
-		.replace(/đ/g, "d")
-		.replace(/Đ/g, "D")
-		.toLowerCase();
-
 function FoodPage() {
 	const lang = Route.useParams().lang as Lang;
 	const [query, setQuery] = useState("");
@@ -38,10 +31,10 @@ function FoodPage() {
 	);
 	const filtered = businesses.filter((b) => {
 		const inCat = category === "all" || pick(lang, b.category) === category;
-		const hay = normalize(
+		const hay = fold(
 			`${b.name} ${pick(lang, b.body)} ${pick(lang, b.village)}`,
 		);
-		return inCat && hay.includes(normalize(query.trim()));
+		return inCat && hay.includes(fold(query.trim()));
 	});
 
 	return (
@@ -56,7 +49,8 @@ function FoodPage() {
 					{specialties.map((s, i) => (
 						<article
 							key={s.id}
-							className="overflow-hidden rounded-2xl border border-earth-300/50 bg-card/70"
+							id={s.id}
+							className="scroll-mt-24 overflow-hidden rounded-2xl border border-earth-300/50 bg-card/70"
 						>
 							<div
 								className="h-28"
@@ -126,7 +120,8 @@ function FoodPage() {
 						{filtered.map((b) => (
 							<article
 								key={b.id}
-								className="rounded-2xl border border-earth-300/50 bg-card p-5"
+								id={b.id}
+								className="scroll-mt-24 rounded-2xl border border-earth-300/50 bg-card p-5"
 							>
 								<div className="flex items-start justify-between gap-3">
 									<h3 className="text-lg font-semibold text-rice-900">
