@@ -36,7 +36,7 @@ function Home() {
 	return (
 		<>
 			<section className="relative overflow-hidden">
-				<HeroArt className="absolute inset-0 h-full w-full" />
+				<HeroArt className="absolute inset-0 h-full w-full dark:opacity-40" />
 				<div className="absolute inset-0 bg-gradient-to-r from-paper via-paper/80 to-transparent" />
 				<div className="relative mx-auto max-w-6xl px-4 py-20 sm:py-32">
 					<p className="text-sm font-semibold uppercase tracking-widest text-earth-700">
@@ -92,7 +92,7 @@ function Home() {
 							key={h.to}
 							to={HIGHLIGHT_ROUTES[h.to as keyof typeof HIGHLIGHT_ROUTES]}
 							params={{ lang }}
-							className="group rounded-2xl border border-earth-300/50 bg-white/60 p-6 transition hover:-translate-y-0.5 hover:shadow-lg"
+							className="group rounded-2xl border border-earth-300/50 bg-card/70 p-6 transition hover:-translate-y-0.5 hover:shadow-lg"
 						>
 							<h3 className="text-xl font-semibold text-rice-900">
 								{pick(lang, h.title)}
@@ -149,7 +149,7 @@ function Home() {
 							key={post.slug}
 							to="/$lang/news/$slug"
 							params={{ lang, slug: post.slug }}
-							className="rounded-2xl border border-earth-300/50 bg-white/60 p-6 transition hover:shadow-lg"
+							className="rounded-2xl border border-earth-300/50 bg-card/70 p-6 transition hover:shadow-lg"
 						>
 							<time
 								className="text-xs font-semibold uppercase tracking-widest text-earth-700"

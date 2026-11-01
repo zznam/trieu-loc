@@ -59,7 +59,7 @@ function GalleryPage() {
 					{items.map((item, i) => (
 						<figure
 							key={item.id}
-							className={`overflow-hidden rounded-2xl border border-earth-300/50 bg-white ${i % 5 === 0 ? "md:col-span-2 md:row-span-2" : ""}`}
+							className={`overflow-hidden rounded-2xl border border-earth-300/50 bg-card ${i % 5 === 0 ? "md:col-span-2 md:row-span-2" : ""}`}
 						>
 							<div className={i % 5 === 0 ? "aspect-square" : "aspect-[4/3]"}>
 								<Photo

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { type DictKey, type Lang, t } from "#/lib/i18n";
+import { ThemeToggle } from "./ThemeToggle";
 
 const NAV: { to: string; key: DictKey }[] = [
 	{ to: "/$lang", key: "nav.home" },
@@ -49,6 +50,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 					{links}
 				</nav>
 				<div className="flex items-center gap-2">
+					<ThemeToggle lang={lang} />
 					<Link
 						to="."
 						params={(prev: Record<string, string>) => ({
