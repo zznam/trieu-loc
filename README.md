@@ -79,13 +79,14 @@ Spam protection: a hidden honeypot field, a minimum fill time, and a limit of 5 
 1. **Database** — Vercel project → *Storage* → *Create* → **Neon** (Marketplace, free plan) → connect it to the project. This adds `DATABASE_URL`.
 2. **Photo storage** — *Storage* → *Create* → **Blob** → connect it. This adds `BLOB_READ_WRITE_TOKEN`. (Skip it and the form still works, without photos.)
 3. **Admin password** — *Settings* → *Environment Variables* → add `ADMIN_PASSWORD` (long and random). Changing it later signs everyone out.
-4. **Create the table** — on your machine:
+4. **Email alerts (optional)** — create a free account at [resend.com](https://resend.com), make an API key, then add `RESEND_API_KEY` and `NOTIFY_EMAIL` (comma-separate several addresses). Until you verify your own domain in Resend, emails can only go to your Resend account's address, so use that as `NOTIFY_EMAIL`; after verifying, set `NOTIFY_FROM` (e.g. `Triệu Lộc <thongbao@your-domain.vn>`). Each email has the submission details, reply-to set to the sender's email (if they gave one) and a button to `/admin`.
+5. **Create the table** — on your machine:
    ```bash
    vercel env pull .env.local        # brings DATABASE_URL down
    export $(grep DATABASE_URL .env.local | xargs)
    pnpm db:migrate
    ```
-5. Redeploy, then open `https://<your-site>/admin`.
+6. Redeploy, then open `https://<your-site>/admin`.
 
 See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`. **This release adds a migration (`0001_publishing.sql`) — run `pnpm db:migrate` again after deploying.**
 
