@@ -33,6 +33,7 @@ const KIND_LABEL: Record<SearchKind, DictKey> = {
 	business: "food.directory",
 	event: "nav.events",
 	history: "nav.history",
+	village: "nav.villages",
 };
 
 const KIND_ICON: Record<SearchKind, string> = {
@@ -43,6 +44,7 @@ const KIND_ICON: Record<SearchKind, string> = {
 	business: "🏪",
 	event: "📅",
 	history: "📜",
+	village: "🏘️",
 };
 
 function SearchPage() {

@@ -2,13 +2,24 @@
 	{
 		"id": "tet",
 		"category": "holiday",
-		"title": { "vi": "Tết Nguyên Đán", "en": "Lunar New Year (Tết)" },
+		"title": {
+			"vi": "Tết Nguyên Đán",
+			"en": "Lunar New Year (Tết)"
+		},
 		"body": {
 			"vi": "Ba ngày Tết cổ truyền — dịp sum họp gia đình, chúc Tết họ hàng làng xóm.",
 			"en": "The three days of traditional New Year — family reunions and visits to relatives and neighbours."
 		},
-		"location": { "vi": "Khắp xã", "en": "Across the commune" },
-		"date": { "calendar": "lunar", "day": 1, "month": 1, "days": 3 }
+		"location": {
+			"vi": "Khắp xã",
+			"en": "Across the commune"
+		},
+		"date": {
+			"calendar": "lunar",
+			"day": 1,
+			"month": 1,
+			"days": 3
+		}
 	},
 	{
 		"id": "ram-thang-gieng",
@@ -21,13 +32,23 @@
 			"vi": "Ngày rằm đầu tiên của năm mới, bà con đi lễ đền, chùa cầu bình an.",
 			"en": "The first full moon of the year, when people visit temples and pagodas to pray for peace."
 		},
-		"location": { "vi": "Đình, đền trong xã", "en": "Village temples" },
-		"date": { "calendar": "lunar", "day": 15, "month": 1 }
+		"location": {
+			"vi": "Đình, đền trong xã",
+			"en": "Village temples"
+		},
+		"date": {
+			"calendar": "lunar",
+			"day": 15,
+			"month": 1
+		}
 	},
 	{
 		"id": "le-hoi-ba-trieu",
 		"category": "festival",
-		"title": { "vi": "Lễ hội đền Bà Triệu", "en": "Bà Triệu Temple Festival" },
+		"title": {
+			"vi": "Lễ hội đền Bà Triệu",
+			"en": "Bà Triệu Temple Festival"
+		},
 		"body": {
 			"vi": "Lễ hội truyền thống — Di sản văn hoá phi vật thể quốc gia: tế lễ, rước kiệu, tái hiện cuộc khởi nghĩa năm 248.",
 			"en": "The traditional festival and national intangible heritage: rites, palanquin procession and a re-enactment of the uprising of 248."
@@ -36,29 +57,55 @@
 			"vi": "Khu di tích Bà Triệu, thôn Phú Điền",
 			"en": "Bà Triệu Relic Site, Phú Điền village"
 		},
-		"date": { "calendar": "lunar", "day": 21, "month": 2, "days": 4 }
+		"date": {
+			"calendar": "lunar",
+			"day": 21,
+			"month": 2,
+			"days": 4
+		},
+		"villageId": "phu-dien"
 	},
 	{
 		"id": "gio-to",
 		"category": "holiday",
-		"title": { "vi": "Giỗ Tổ Hùng Vương", "en": "Hùng Kings' Commemoration" },
+		"title": {
+			"vi": "Giỗ Tổ Hùng Vương",
+			"en": "Hùng Kings' Commemoration"
+		},
 		"body": {
 			"vi": "Ngày lễ tưởng nhớ các Vua Hùng — nghỉ lễ toàn quốc.",
 			"en": "National day honouring the Hùng Kings — a public holiday."
 		},
-		"location": { "vi": "Toàn quốc", "en": "Nationwide" },
-		"date": { "calendar": "lunar", "day": 10, "month": 3 }
+		"location": {
+			"vi": "Toàn quốc",
+			"en": "Nationwide"
+		},
+		"date": {
+			"calendar": "lunar",
+			"day": 10,
+			"month": 3
+		}
 	},
 	{
 		"id": "doan-ngo",
 		"category": "holiday",
-		"title": { "vi": "Tết Đoan Ngọ", "en": "Đoan Ngọ (Mid-year festival)" },
+		"title": {
+			"vi": "Tết Đoan Ngọ",
+			"en": "Đoan Ngọ (Mid-year festival)"
+		},
 		"body": {
 			"vi": "“Tết giết sâu bọ” — ăn rượu nếp, hoa quả đầu mùa.",
 			"en": "The “killing insects” festival — glutinous rice wine and early-summer fruit."
 		},
-		"location": { "vi": "Khắp xã", "en": "Across the commune" },
-		"date": { "calendar": "lunar", "day": 5, "month": 5 }
+		"location": {
+			"vi": "Khắp xã",
+			"en": "Across the commune"
+		},
+		"date": {
+			"calendar": "lunar",
+			"day": 5,
+			"month": 5
+		}
 	},
 	{
 		"id": "thuong-binh-liet-si",
@@ -75,34 +122,61 @@
 			"vi": "Nghĩa trang liệt sĩ xã",
 			"en": "Commune martyrs' cemetery"
 		},
-		"date": { "calendar": "solar", "day": 27, "month": 7 }
+		"date": {
+			"calendar": "solar",
+			"day": 27,
+			"month": 7
+		}
 	},
 	{
 		"id": "vu-lan",
 		"category": "holiday",
-		"title": { "vi": "Lễ Vu Lan", "en": "Vu Lan (Filial Piety Day)" },
+		"title": {
+			"vi": "Lễ Vu Lan",
+			"en": "Vu Lan (Filial Piety Day)"
+		},
 		"body": {
 			"vi": "Rằm tháng Bảy — mùa báo hiếu cha mẹ, tổ tiên.",
 			"en": "The 7th-month full moon — a time to honour parents and ancestors."
 		},
-		"location": { "vi": "Các chùa trong vùng", "en": "Local pagodas" },
-		"date": { "calendar": "lunar", "day": 15, "month": 7 }
+		"location": {
+			"vi": "Các chùa trong vùng",
+			"en": "Local pagodas"
+		},
+		"date": {
+			"calendar": "lunar",
+			"day": 15,
+			"month": 7
+		}
 	},
 	{
 		"id": "quoc-khanh",
 		"category": "holiday",
-		"title": { "vi": "Quốc khánh", "en": "National Day" },
+		"title": {
+			"vi": "Quốc khánh",
+			"en": "National Day"
+		},
 		"body": {
 			"vi": "Kỷ niệm ngày Quốc khánh nước CHXHCN Việt Nam.",
 			"en": "Vietnam's National Day."
 		},
-		"location": { "vi": "Toàn quốc", "en": "Nationwide" },
-		"date": { "calendar": "solar", "day": 2, "month": 9 }
+		"location": {
+			"vi": "Toàn quốc",
+			"en": "Nationwide"
+		},
+		"date": {
+			"calendar": "solar",
+			"day": 2,
+			"month": 9
+		}
 	},
 	{
 		"id": "trung-thu",
 		"category": "community",
-		"title": { "vi": "Tết Trung thu", "en": "Mid-Autumn Festival" },
+		"title": {
+			"vi": "Tết Trung thu",
+			"en": "Mid-Autumn Festival"
+		},
 		"body": {
 			"vi": "Đêm hội trăng rằm cho thiếu nhi ở các thôn: rước đèn, phá cỗ. (Lịch cụ thể từng thôn — cần cập nhật.)",
 			"en": "Lantern parades and moon-cake feasts for children in each village. (Village schedules to be added.)"
@@ -111,7 +185,11 @@
 			"vi": "Nhà văn hoá các thôn",
 			"en": "Village cultural houses"
 		},
-		"date": { "calendar": "lunar", "day": 15, "month": 8 }
+		"date": {
+			"calendar": "lunar",
+			"day": 15,
+			"month": 8
+		}
 	},
 	{
 		"id": "dai-doan-ket",
@@ -124,8 +202,15 @@
 			"vi": "Ngày hội tại khu dân cư các thôn, kỷ niệm ngày thành lập Mặt trận Tổ quốc Việt Nam (18/11).",
 			"en": "Village gatherings marking the founding of the Vietnam Fatherland Front (18 November)."
 		},
-		"location": { "vi": "Các thôn", "en": "All villages" },
-		"date": { "calendar": "solar", "day": 18, "month": 11 }
+		"location": {
+			"vi": "Các thôn",
+			"en": "All villages"
+		},
+		"date": {
+			"calendar": "solar",
+			"day": 18,
+			"month": 11
+		}
 	},
 	{
 		"id": "hop-mat-dong-huong-2026",
@@ -138,7 +223,15 @@
 			"vi": "Sự kiện mẫu — thay bằng sự kiện thật, hoặc xoá đi.",
 			"en": "Sample event — replace with a real one or delete it."
 		},
-		"location": { "vi": "Hà Nội", "en": "Hanoi" },
-		"date": { "calendar": "solar", "day": 20, "month": 12, "year": 2026 }
+		"location": {
+			"vi": "Hà Nội",
+			"en": "Hanoi"
+		},
+		"date": {
+			"calendar": "solar",
+			"day": 20,
+			"month": 12,
+			"year": 2026
+		}
 	}
 ]

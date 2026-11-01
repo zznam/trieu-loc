@@ -1,0 +1,254 @@
+[
+	{
+		"id": "phu-dien",
+		"former": "trieu-loc",
+		"sample": false,
+		"name": {
+			"vi": "Thôn Phú Điền",
+			"en": "Phú Điền village"
+		},
+		"coords": [19.93, 105.819],
+		"intro": {
+			"vi": "Vùng đất cổ xưa có tên Bồ Điền, nơi có Khu di tích quốc gia đặc biệt Bà Triệu: đền thờ dưới chân núi Gai, lăng mộ trên núi Tùng và đình Phú Điền — nơi người dân thờ Bà làm Thành hoàng làng. Mỗi năm, lễ hội đền Bà Triệu (21–24 tháng 2 âm lịch) lại đưa hàng vạn du khách về thôn.",
+			"en": "The ancient land once called Bồ Điền, home to the Bà Triệu special national monument: the temple at the foot of Mount Gai, the tomb on Mount Tùng and Phú Điền communal house, where villagers worship Lady Triệu as their guardian spirit. Every year the festival (21st–24th of the 2nd lunar month) brings tens of thousands of visitors to the village."
+		},
+		"facts": [
+			{
+				"vi": "Khu di tích Bà Triệu — Di tích quốc gia đặc biệt (2014)",
+				"en": "Bà Triệu Relic Site — special national monument (2014)"
+			},
+			{
+				"vi": "Lễ hội đền Bà Triệu — Di sản văn hoá phi vật thể quốc gia",
+				"en": "Bà Triệu Temple Festival — national intangible heritage"
+			},
+			{
+				"vi": "Nghi thức rước kiệu và huyền tích “kiệu bay” của người Phú Điền",
+				"en": "The palanquin procession and the “flying palanquin” legend of Phú Điền"
+			}
+		]
+	},
+	{
+		"id": "dai-loc-1",
+		"former": "dai-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Đại Lộc 1",
+			"en": "Sample village Đại Lộc 1"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "dai-loc-2",
+		"former": "dai-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Đại Lộc 2",
+			"en": "Sample village Đại Lộc 2"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "dai-loc-3",
+		"former": "dai-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Đại Lộc 3",
+			"en": "Sample village Đại Lộc 3"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "dai-loc-4",
+		"former": "dai-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Đại Lộc 4",
+			"en": "Sample village Đại Lộc 4"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "trieu-loc-1",
+		"former": "trieu-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Triệu Lộc 1",
+			"en": "Sample village Triệu Lộc 1"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "trieu-loc-2",
+		"former": "trieu-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Triệu Lộc 2",
+			"en": "Sample village Triệu Lộc 2"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "trieu-loc-3",
+		"former": "trieu-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Triệu Lộc 3",
+			"en": "Sample village Triệu Lộc 3"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "trieu-loc-4",
+		"former": "trieu-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Triệu Lộc 4",
+			"en": "Sample village Triệu Lộc 4"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "trieu-loc-5",
+		"former": "trieu-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Triệu Lộc 5",
+			"en": "Sample village Triệu Lộc 5"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "trieu-loc-6",
+		"former": "trieu-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Triệu Lộc 6",
+			"en": "Sample village Triệu Lộc 6"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "trieu-loc-7",
+		"former": "trieu-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Triệu Lộc 7",
+			"en": "Sample village Triệu Lộc 7"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "tien-loc-1",
+		"former": "tien-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Tiến Lộc 1",
+			"en": "Sample village Tiến Lộc 1"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "tien-loc-2",
+		"former": "tien-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Tiến Lộc 2",
+			"en": "Sample village Tiến Lộc 2"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "tien-loc-3",
+		"former": "tien-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Tiến Lộc 3",
+			"en": "Sample village Tiến Lộc 3"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "tien-loc-4",
+		"former": "tien-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Tiến Lộc 4",
+			"en": "Sample village Tiến Lộc 4"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	},
+	{
+		"id": "tien-loc-5",
+		"former": "tien-loc",
+		"sample": true,
+		"name": {
+			"vi": "Thôn mẫu Tiến Lộc 5",
+			"en": "Sample village Tiến Lộc 5"
+		},
+		"intro": {
+			"vi": "Thông tin mẫu — đổi tên thôn và viết vài dòng giới thiệu: lịch sử, đình chùa, nghề truyền thống, nhà văn hoá, con người.",
+			"en": "Sample — rename the village and add a short introduction: history, temples, traditional crafts, cultural house, people."
+		},
+		"facts": []
+	}
+]

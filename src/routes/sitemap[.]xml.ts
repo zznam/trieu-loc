@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getNews, getPeople } from "#/lib/content";
 import { LANGS } from "#/lib/i18n";
 import { SITE_URL } from "#/lib/seo";
+import { villages } from "#/lib/villages";
 
 /** Language-neutral paths of every static page. */
 const PAGES = [
@@ -13,6 +14,7 @@ const PAGES = [
 	"/events",
 	"/news",
 	"/gallery",
+	"/villages",
 	"/info",
 	"/contribute",
 ];
@@ -34,6 +36,12 @@ export const Route = createFileRoute("/sitemap.xml")({
 			GET: () => {
 				const news = getNews("vi").map((p) => entry(`/news/${p.slug}`, p.date));
 				news.push(...getPeople("vi").map((p) => entry(`/people/${p.slug}`)));
+				// Placeholder villages stay out of the sitemap until they have real content.
+				news.push(
+					...villages
+						.filter((v) => !v.sample)
+						.map((v) => entry(`/villages/${v.id}`)),
+				);
 				const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${PAGES.map((p) => entry(p)).join("")}${news.join("")}</urlset>`;
 				return new Response(body, {

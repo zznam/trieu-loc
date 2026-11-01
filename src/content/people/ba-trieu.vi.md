@@ -5,6 +5,7 @@ years: 226 – 248
 role: Nữ anh hùng dân tộc, lãnh đạo khởi nghĩa chống quân Đông Ngô
 village: Gắn bó với núi Tùng, thôn Phú Điền
 summary: Người con gái đất Thanh dựng cờ khởi nghĩa năm 248, tuẫn tiết trên núi Tùng khi mới 23 tuổi.
+villageId: phu-dien
 order: 1
 ---
 

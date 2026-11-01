@@ -26,6 +26,8 @@ export type EventDef = {
 		year?: number;
 		days?: number;
 	};
+	/** Links the event to a village page. */
+	villageId?: string;
 };
 
 export type Occurrence = {

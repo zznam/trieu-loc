@@ -27,6 +27,8 @@ import { Route as LangNewsIndexRouteImport } from './routes/$lang/news/index'
 import { Route as LangNewsSlugRouteImport } from './routes/$lang/news/$slug'
 import { Route as LangPeopleIndexRouteImport } from './routes/$lang/people/index'
 import { Route as LangPeopleSlugRouteImport } from './routes/$lang/people/$slug'
+import { Route as LangVillagesIndexRouteImport } from './routes/$lang/villages/index'
+import { Route as LangVillagesIdRouteImport } from './routes/$lang/villages/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -118,6 +120,16 @@ const LangPeopleSlugRoute = LangPeopleSlugRouteImport.update({
   path: '/people/$slug',
   getParentRoute: () => LangRoute,
 } as any)
+const LangVillagesIndexRoute = LangVillagesIndexRouteImport.update({
+  id: '/villages/',
+  path: '/villages/',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangVillagesIdRoute = LangVillagesIdRouteImport.update({
+  id: '/villages/$id',
+  path: '/villages/$id',
+  getParentRoute: () => LangRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -136,8 +148,10 @@ export interface FileRoutesByFullPath {
   '/$lang/': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/people/$slug': typeof LangPeopleSlugRoute
+  '/$lang/villages/$id': typeof LangVillagesIdRoute
   '/$lang/news/': typeof LangNewsIndexRoute
   '/$lang/people/': typeof LangPeopleIndexRoute
+  '/$lang/villages/': typeof LangVillagesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -155,8 +169,10 @@ export interface FileRoutesByTo {
   '/$lang': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/people/$slug': typeof LangPeopleSlugRoute
+  '/$lang/villages/$id': typeof LangVillagesIdRoute
   '/$lang/news': typeof LangNewsIndexRoute
   '/$lang/people': typeof LangPeopleIndexRoute
+  '/$lang/villages': typeof LangVillagesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -176,8 +192,10 @@ export interface FileRoutesById {
   '/$lang/': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/people/$slug': typeof LangPeopleSlugRoute
+  '/$lang/villages/$id': typeof LangVillagesIdRoute
   '/$lang/news/': typeof LangNewsIndexRoute
   '/$lang/people/': typeof LangPeopleIndexRoute
+  '/$lang/villages/': typeof LangVillagesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -198,8 +216,10 @@ export interface FileRouteTypes {
     | '/$lang/'
     | '/$lang/news/$slug'
     | '/$lang/people/$slug'
+    | '/$lang/villages/$id'
     | '/$lang/news/'
     | '/$lang/people/'
+    | '/$lang/villages/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -217,8 +237,10 @@ export interface FileRouteTypes {
     | '/$lang'
     | '/$lang/news/$slug'
     | '/$lang/people/$slug'
+    | '/$lang/villages/$id'
     | '/$lang/news'
     | '/$lang/people'
+    | '/$lang/villages'
   id:
     | '__root__'
     | '/'
@@ -237,8 +259,10 @@ export interface FileRouteTypes {
     | '/$lang/'
     | '/$lang/news/$slug'
     | '/$lang/people/$slug'
+    | '/$lang/villages/$id'
     | '/$lang/news/'
     | '/$lang/people/'
+    | '/$lang/villages/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -377,6 +401,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangPeopleSlugRouteImport
       parentRoute: typeof LangRoute
     }
+    '/$lang/villages/': {
+      id: '/$lang/villages/'
+      path: '/villages'
+      fullPath: '/$lang/villages/'
+      preLoaderRoute: typeof LangVillagesIndexRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/villages/$id': {
+      id: '/$lang/villages/$id'
+      path: '/villages/$id'
+      fullPath: '/$lang/villages/$id'
+      preLoaderRoute: typeof LangVillagesIdRouteImport
+      parentRoute: typeof LangRoute
+    }
   }
 }
 
@@ -392,8 +430,10 @@ interface LangRouteChildren {
   LangIndexRoute: typeof LangIndexRoute
   LangNewsSlugRoute: typeof LangNewsSlugRoute
   LangPeopleSlugRoute: typeof LangPeopleSlugRoute
+  LangVillagesIdRoute: typeof LangVillagesIdRoute
   LangNewsIndexRoute: typeof LangNewsIndexRoute
   LangPeopleIndexRoute: typeof LangPeopleIndexRoute
+  LangVillagesIndexRoute: typeof LangVillagesIndexRoute
 }
 
 const LangRouteChildren: LangRouteChildren = {
@@ -408,8 +448,10 @@ const LangRouteChildren: LangRouteChildren = {
   LangIndexRoute: LangIndexRoute,
   LangNewsSlugRoute: LangNewsSlugRoute,
   LangPeopleSlugRoute: LangPeopleSlugRoute,
+  LangVillagesIdRoute: LangVillagesIdRoute,
   LangNewsIndexRoute: LangNewsIndexRoute,
   LangPeopleIndexRoute: LangPeopleIndexRoute,
+  LangVillagesIndexRoute: LangVillagesIndexRoute,
 }
 
 const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)

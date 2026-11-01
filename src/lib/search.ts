@@ -11,6 +11,7 @@ import {
 import { eventCategoryLabel, events } from "./events";
 import { type Lang, pick, t } from "./i18n";
 import { fold } from "./text";
+import { formerCommuneLabel, villages } from "./villages";
 
 export type SearchKind =
 	| "place"
@@ -19,7 +20,8 @@ export type SearchKind =
 	| "food"
 	| "business"
 	| "event"
-	| "history";
+	| "history"
+	| "village";
 
 export type SearchDoc = {
 	kind: SearchKind;
@@ -97,6 +99,16 @@ function buildIndex(lang: Lang) {
 			params: { lang },
 			hash: e.id,
 		})),
+		...villages
+			.filter((v) => !v.sample)
+			.map((v) => ({
+				kind: "village" as const,
+				title: pick(lang, v.name),
+				text: `${pick(lang, v.intro)} ${v.facts.map((f) => pick(lang, f)).join(" · ")}`,
+				meta: pick(lang, formerCommuneLabel[v.former]),
+				to: "/$lang/villages/$id",
+				params: { lang, id: v.id },
+			})),
 		...history.timeline.map((h) => ({
 			kind: "history" as const,
 			title: pick(lang, h.title),
