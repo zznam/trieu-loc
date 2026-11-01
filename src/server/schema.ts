@@ -6,6 +6,7 @@ import {
 	jsonb,
 	pgEnum,
 	pgTable,
+	primaryKey,
 	serial,
 	text,
 	timestamp,
@@ -120,3 +121,18 @@ export const messages = pgTable(
 
 export type Message = typeof messages.$inferSelect;
 export type MessageKind = (typeof MESSAGE_KINDS)[number];
+
+// ---------- Reactions: one ❤️ per visitor per page ----------
+
+export const reactions = pgTable(
+	"reactions",
+	{
+		/** Same format as message targets, e.g. "news:<slug>". */
+		target: varchar("target", { length: 160 }).notNull(),
+		ipHash: varchar("ip_hash", { length: 64 }).notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(t) => [primaryKey({ columns: [t.target, t.ipHash] })],
+);

@@ -14,6 +14,7 @@ A bilingual (Vietnamese / English) community website for **Xã Triệu Lộc, t�
 | `/:lang/events` | Upcoming festivals, holidays and community events (lunar + solar dates) |
 | `/:lang/news` | News & announcements (Markdown) |
 | `/:lang/villages` | The 17 villages; each page gathers its places, people and events with a map |
+| Comments & ❤️ | At the bottom of news posts, people profiles and village pages; comments are moderated in `/admin` → *Bình luận* |
 | `/:lang/guestbook` | Moderated guestbook: messages to the hometown, shown after approval |
 | `/:lang/info` | Live weather (Open-Meteo) and a phone directory |
 | `/:lang/contribute` | Form for photos, stories, businesses, events and corrections |
@@ -96,7 +97,7 @@ Spam protection: a hidden honeypot field, a minimum fill time, and a limit of 5 
    ```
 6. Redeploy, then open `https://<your-site>/admin`.
 
-See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`. **Whenever a PR adds a file to `drizzle/`, run `pnpm db:migrate` again after deploying** (latest: `0002_messages.sql` for the guestbook).
+See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`. **Whenever a PR adds a file to `drizzle/`, run `pnpm db:migrate` again after deploying** (latest: `0003_reactions.sql` for ❤️ reactions).
 
 `pnpm build` ends with a check that fails if server-only code (database driver, crypto, Blob SDK) ends up in the browser bundle. If it trips, you imported a plain value from `src/server/*` into a route — import only server functions from there.
 

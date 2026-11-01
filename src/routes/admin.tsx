@@ -30,6 +30,7 @@ const STATUSES: { value: ContributionStatus; label: string }[] = [
 const SECTIONS = [
 	{ value: "contributions", label: "Đóng góp" },
 	{ value: "guestbook", label: "Sổ lưu bút" },
+	{ value: "comment", label: "Bình luận" },
 ] as const;
 type Section = (typeof SECTIONS)[number]["value"];
 
@@ -172,6 +173,9 @@ function AdminPage() {
 	);
 }
 
+/** "news:slug" → "/vi/news/slug" (comment targets map 1:1 onto Vietnamese page URLs). */
+const targetUrl = (target: string) => `/vi/${target.replace(":", "/")}`;
+
 function MessageCard({ item }: { item: AdminMessage }) {
 	const router = useRouter();
 	const [busy, setBusy] = useState(false);
@@ -199,7 +203,14 @@ function MessageCard({ item }: { item: AdminMessage }) {
 				{item.target && (
 					<>
 						<span>·</span>
-						<span className="normal-case tracking-normal">{item.target}</span>
+						<a
+							href={targetUrl(item.target)}
+							target="_blank"
+							rel="noreferrer"
+							className="normal-case tracking-normal text-rice-700 hover:underline"
+						>
+							{item.target} ↗
+						</a>
 					</>
 				)}
 			</p>

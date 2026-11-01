@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Avatar } from "#/components/Avatar";
+import { Comments } from "#/components/Comments";
 import { getPerson, personCategoryLabel } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
@@ -58,6 +59,7 @@ function PersonPage() {
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: trusted Markdown committed to the repo, not user input
 				dangerouslySetInnerHTML={{ __html: person.html }}
 			/>
+			<Comments lang={lang} target={`people:${person.slug}`} />
 		</article>
 	);
 }
