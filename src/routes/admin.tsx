@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { AccountsPanel, ChangePasswordForm } from "#/components/admin/Accounts";
 import { ContentEditor } from "#/components/admin/ContentEditor";
 import { COLLECTION_NAMES, type CollectionName } from "#/lib/content-schemas";
 import { type Kind, kindLabel } from "#/lib/contribute";
 import { getVillage, villages } from "#/lib/villages";
+import { getAccountsAdmin, getAdminSession } from "#/server/accounts";
 import { getContentAdmin } from "#/server/content";
 import {
 	type AdminContribution,
@@ -42,6 +44,7 @@ const SECTIONS = [
 	{ value: "comment", label: "Bình luận" },
 	{ value: "newsletter", label: "Bản tin" },
 	{ value: "content", label: "Nội dung" },
+	{ value: "accounts", label: "Tài khoản" },
 ] as const;
 type Section = (typeof SECTIONS)[number]["value"];
 
@@ -70,22 +73,37 @@ export const Route = createFileRoute("/admin")({
 		collection: search.collection ?? "places",
 	}),
 	loader: async ({ deps }) => {
-		const none = { contrib: null, msgs: null, news: null, content: null };
+		const session = await getAdminSession();
+		const none = {
+			session,
+			contrib: null,
+			msgs: null,
+			news: null,
+			content: null,
+			accounts: null,
+		};
+		// Nothing else is loaded until someone is signed in.
+		if (!session.me) return none;
 		if (deps.section === "contributions") {
 			return {
 				...none,
 				contrib: await getAdminState({ data: { status: deps.status } }),
 			};
 		}
-		if (deps.section === "newsletter") {
+		if (deps.section === "newsletter")
 			return { ...none, news: await getNewsletterAdmin() };
-		}
 		if (deps.section === "content") {
 			return {
 				...none,
 				content: await getContentAdmin({
 					data: { collection: deps.collection },
 				}),
+			};
+		}
+		if (deps.section === "accounts") {
+			return {
+				...none,
+				accounts: session.me.role === "owner" ? await getAccountsAdmin() : null,
 			};
 		}
 		return {
@@ -105,17 +123,19 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
-	const { contrib, msgs, news, content } = Route.useLoaderData();
+	const { session, contrib, msgs, news, content, accounts } =
+		Route.useLoaderData();
+	const me = session.me;
 	const {
 		status = "pending",
 		section = "contributions",
 		collection = "places",
 	} = Route.useSearch();
 	const other = msgs ?? news ?? content;
-	const authed = contrib?.authed ?? other?.authed ?? false;
+	const authed = me !== null;
 	const configured = contrib?.configured ?? {
-		db: other?.configured.db ?? false,
-		admin: other?.configured.admin ?? false,
+		db: other?.configured.db ?? true,
+		admin: session.configured,
 		blob: true, // not relevant outside contributions
 		notify: true,
 	};
@@ -137,14 +157,26 @@ function AdminPage() {
 					<span className="text-sm font-semibold uppercase tracking-widest text-earth-700">
 						Quản trị
 					</span>
-					{authed ? <LogoutButton /> : <span />}
+					{me ? (
+						<span className="flex items-center gap-3 text-sm">
+							<span className="text-ink-soft">
+								{me.name} ·{" "}
+								{me.role === "owner" ? "Chủ sở hữu" : "Biên tập viên"}
+							</span>
+							<LogoutButton />
+						</span>
+					) : (
+						<span />
+					)}
 				</div>
 				{authed && (
 					<nav
 						className="mx-auto flex max-w-5xl gap-1 px-4"
 						aria-label="Mục quản trị"
 					>
-						{SECTIONS.map((s) => (
+						{SECTIONS.filter(
+							(s) => s.value !== "accounts" || me?.role === "owner",
+						).map((s) => (
 							<Link
 								key={s.value}
 								to="/admin"
@@ -163,12 +195,42 @@ function AdminPage() {
 			</header>
 			<main className="mx-auto max-w-5xl px-4 py-8">
 				<ConfigWarnings configured={configured} />
-				{!configured.admin ? null : !authed ? (
-					<LoginForm />
+				{me?.bootstrap && section !== "accounts" && (
+					<div className="mb-6 rounded-2xl border border-lotus/40 bg-lotus/10 p-4 text-sm">
+						Bạn đang đăng nhập bằng <strong>mật khẩu chung</strong>.{" "}
+						<Link
+							to="/admin"
+							search={{ section: "accounts" }}
+							className="font-semibold underline"
+						>
+							Tạo tài khoản chủ sở hữu
+						</Link>{" "}
+						để mỗi người dùng tài khoản riêng và có nhật ký hoạt động.
+					</div>
+				)}
+				{me && !me.bootstrap && section !== "accounts" && (
+					<div className="mb-6">
+						<ChangePasswordForm />
+					</div>
+				)}
+				{!configured.admin ? null : !me ? (
+					<LoginForm withEmail={session.accountsExist} />
+				) : section === "accounts" ? (
+					accounts ? (
+						<AccountsPanel me={me} state={accounts} />
+					) : (
+						<p className="rounded-2xl bg-paper-2 p-8 text-center text-ink-soft">
+							Chỉ chủ sở hữu quản lý tài khoản.
+						</p>
+					)
 				) : news ? (
-					<NewsletterPanel state={news} />
+					<NewsletterPanel state={news} owner={me.role === "owner"} />
 				) : content ? (
-					<ContentEditor collection={collection} state={content} />
+					<ContentEditor
+						collection={collection}
+						state={content}
+						owner={me.role === "owner"}
+					/>
 				) : (
 					<>
 						<nav className="mb-6 flex flex-wrap gap-2" aria-label="Trạng thái">
@@ -351,42 +413,68 @@ function ConfigWarnings({
 	);
 }
 
-function LoginForm() {
+function LoginForm({ withEmail }: { withEmail: boolean }) {
 	const router = useRouter();
-	const [error, setError] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 	const [busy, setBusy] = useState(false);
+	const field =
+		"w-full rounded-xl border border-earth-300 bg-paper px-4 py-2.5 outline-none focus:border-rice-500";
 	return (
 		<form
 			className="mx-auto mt-10 max-w-sm space-y-4 rounded-2xl border border-earth-300/50 bg-card p-6"
 			onSubmit={async (e) => {
 				e.preventDefault();
 				setBusy(true);
-				setError(false);
-				const password = String(
-					new FormData(e.currentTarget).get("password") ?? "",
-				);
-				const res = await adminLogin({ data: { password } });
+				setError(null);
+				const fd = new FormData(e.currentTarget);
+				const res = await adminLogin({
+					data: {
+						email: String(fd.get("email") ?? ""),
+						password: String(fd.get("password") ?? ""),
+					},
+				});
 				setBusy(false);
 				if (res.ok) await router.invalidate();
-				else setError(true);
+				else
+					setError(
+						res.error === "locked"
+							? "Đăng nhập sai quá nhiều lần. Vui lòng thử lại sau 15 phút."
+							: withEmail
+								? "Sai email hoặc mật khẩu."
+								: "Sai mật khẩu.",
+					);
 			}}
 		>
 			<h1 className="text-2xl font-semibold text-rice-900">Đăng nhập</h1>
+			{withEmail && (
+				<label className="block">
+					<span className="mb-1.5 block text-sm font-semibold text-rice-900">
+						Email
+					</span>
+					<input
+						name="email"
+						type="email"
+						required
+						autoComplete="username"
+						className={field}
+					/>
+				</label>
+			)}
 			<label className="block">
 				<span className="mb-1.5 block text-sm font-semibold text-rice-900">
-					Mật khẩu quản trị
+					{withEmail ? "Mật khẩu" : "Mật khẩu quản trị"}
 				</span>
 				<input
 					name="password"
 					type="password"
 					required
 					autoComplete="current-password"
-					className="w-full rounded-xl border border-earth-300 bg-paper px-4 py-2.5 outline-none focus:border-rice-500"
+					className={field}
 				/>
 			</label>
 			{error && (
 				<p role="alert" className="text-sm font-medium text-lotus">
-					Sai mật khẩu.
+					{error}
 				</p>
 			)}
 			<button
@@ -873,7 +961,13 @@ const SEND_ERRORS: Record<string, string> = {
 	no_subscribers: "Chưa có người đăng ký nào đã xác nhận.",
 };
 
-function NewsletterPanel({ state }: { state: NewsletterAdmin }) {
+function NewsletterPanel({
+	state,
+	owner,
+}: {
+	state: NewsletterAdmin;
+	owner: boolean;
+}) {
 	const router = useRouter();
 	const [lang, setLang] = useState<"vi" | "en">("vi");
 	const [busy, setBusy] = useState(false);
@@ -1010,7 +1104,10 @@ function NewsletterPanel({ state }: { state: NewsletterAdmin }) {
 					</button>
 					<button
 						type="button"
-						disabled={busy || !configured.email || counts.active === 0}
+						disabled={
+							busy || !owner || !configured.email || counts.active === 0
+						}
+						title={owner ? undefined : "Chỉ chủ sở hữu gửi bản tin"}
 						onClick={() => {
 							if (confirm(`Gửi bản tin cho ${counts.active} người đăng ký?`))
 								void run(() => sendNewsletter());

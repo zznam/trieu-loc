@@ -196,3 +196,59 @@ export const contentItems = pgTable(
 	},
 	(t) => [primaryKey({ columns: [t.collection, t.id] })],
 );
+
+// ---------- Editor accounts ----------
+
+export const ADMIN_ROLES = ["owner", "editor"] as const;
+export const adminRole = pgEnum("admin_role", ADMIN_ROLES);
+
+export const adminUsers = pgTable("admin_users", {
+	id: serial("id").primaryKey(),
+	/** Stored lower-cased. */
+	email: varchar("email", { length: 254 }).notNull().unique(),
+	name: varchar("name", { length: 100 }).notNull(),
+	role: adminRole("role").notNull().default("editor"),
+	/** scrypt$N$r$p$salt$hash */
+	passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+	disabled: boolean("disabled").notNull().default(false),
+	createdAt: timestamp("created_at", { withTimezone: true })
+		.notNull()
+		.defaultNow(),
+	lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+});
+
+export const adminSessions = pgTable(
+	"admin_sessions",
+	{
+		/** SHA-256 of the random cookie token (the token itself is never stored). */
+		tokenHash: varchar("token_hash", { length: 64 }).primaryKey(),
+		userId: integer("user_id")
+			.notNull()
+			.references(() => adminUsers.id, { onDelete: "cascade" }),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+	},
+	(t) => [index("admin_sessions_user_idx").on(t.userId)],
+);
+
+export const auditLog = pgTable(
+	"audit_log",
+	{
+		id: serial("id").primaryKey(),
+		userId: integer("user_id"),
+		/** Name/email at the time, kept even if the account is later removed. */
+		actor: varchar("actor", { length: 160 }).notNull(),
+		action: varchar("action", { length: 60 }).notNull(),
+		target: varchar("target", { length: 200 }),
+		ipHash: varchar("ip_hash", { length: 64 }),
+		at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+	},
+	(t) => [
+		index("audit_log_at_idx").on(t.at),
+		index("audit_log_action_ip_idx").on(t.action, t.ipHash, t.at),
+	],
+);
+
+export type AdminRole = (typeof ADMIN_ROLES)[number];

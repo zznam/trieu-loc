@@ -5,12 +5,14 @@ import { and, count, desc, eq, gte, isNotNull } from "drizzle-orm";
 import { z } from "zod";
 import { LIMITS, type SubmitResult } from "#/lib/contribute";
 import {
-	checkPassword,
-	endSession,
+	audit,
+	currentAdmin,
 	isAdminConfigured,
 	isAdminRequest,
+	type LoginResult,
+	login,
+	logout,
 	requireAdmin,
-	startSession,
 } from "./auth";
 import { getDb, isDbConfigured } from "./db";
 import { isNotifyConfigured, notifyNewSubmission } from "./notify";
@@ -232,8 +234,9 @@ export const getAdminState = createServerFn({ method: "GET" })
 			notify: isNotifyConfigured(),
 		};
 		const counts = { pending: 0, approved: 0, rejected: 0 };
-		if (!isAdminRequest() || !configured.db) {
-			return { configured, authed: isAdminRequest(), counts, items: [] };
+		const authed = await isAdminRequest();
+		if (!authed || !configured.db) {
+			return { configured, authed, counts, items: [] };
 		}
 		const db = getDb();
 		const grouped = await db
@@ -260,22 +263,24 @@ export const getAdminState = createServerFn({ method: "GET" })
 		};
 	});
 
+/** Email + password sign-in (or the shared ADMIN_PASSWORD while no accounts exist). */
 export const adminLogin = createServerFn({ method: "POST" })
 	.validator((input: unknown) =>
-		z.object({ password: z.string().max(200) }).parse(input),
+		z
+			.object({
+				email: z.string().max(254).default(""),
+				password: z.string().max(200),
+			})
+			.parse(input),
 	)
-	.handler(async ({ data }) => {
-		if (!checkPassword(data.password)) {
-			await new Promise((r) => setTimeout(r, 800)); // slow down guessing
-			return { ok: false as const };
-		}
-		startSession();
-		return { ok: true as const };
-	});
+	.handler(
+		({ data }): Promise<LoginResult> => login(data.email, data.password),
+	);
 
 export const adminLogout = createServerFn({ method: "POST" }).handler(
 	async () => {
-		endSession();
+		await audit(await currentAdmin(), "logout");
+		await logout();
 		return { ok: true as const };
 	},
 );
@@ -291,7 +296,8 @@ export const reviewContribution = createServerFn({ method: "POST" })
 			.parse(input),
 	)
 	.handler(async ({ data }) => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, `contribution_${data.status}`, `#${data.id}`);
 		await getDb()
 			.update(contributions)
 			.set({
@@ -326,7 +332,8 @@ const editInput = z.object({
 export const updateContribution = createServerFn({ method: "POST" })
 	.validator((input: unknown) => editInput.parse(input))
 	.handler(async ({ data }) => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, "contribution_edit", `#${data.id}`);
 		const db = getDb();
 		const [row] = await db
 			.select({
@@ -376,7 +383,12 @@ export const setPublished = createServerFn({ method: "POST" })
 		async ({
 			data,
 		}): Promise<{ ok: true } | { ok: false; error: PublishError }> => {
-			requireAdmin();
+			const me = await requireAdmin();
+			await audit(
+				me,
+				data.publish ? "contribution_publish" : "contribution_unpublish",
+				`#${data.id}`,
+			);
 			const db = getDb();
 			if (!data.publish) {
 				await db
@@ -415,7 +427,8 @@ export const deleteContribution = createServerFn({ method: "POST" })
 		z.object({ id: z.number().int().positive() }).parse(input),
 	)
 	.handler(async ({ data }) => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, "contribution_delete", `#${data.id}`);
 		const db = getDb();
 		const [row] = await db
 			.delete(contributions)
