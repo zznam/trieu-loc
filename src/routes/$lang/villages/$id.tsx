@@ -57,6 +57,13 @@ function VillagePage() {
 
 	return (
 		<>
+			{village.photo && (
+				<img
+					src={village.photo}
+					alt={pick(lang, village.name)}
+					className="h-56 w-full object-cover sm:h-80"
+				/>
+			)}
 			<header className="grain border-b border-earth-300/40 bg-paper-2">
 				<div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
 					<Link

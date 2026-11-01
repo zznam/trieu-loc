@@ -31,6 +31,8 @@ A bilingual (Vietnamese / English) community website for **Xã Triệu Lộc, t�
 
 Until you import (or without a database, e.g. in local development and tests), the site keeps reading the files.
 
+**Photos**: places, villages, people, food specialties and gallery items have a photo field with **Tải ảnh lên** — the image is resized in the browser (≤2000 px JPEG) and stored in **Vercel Blob** (`BLOB_READ_WRITE_TOKEN`, the same store as contribution photos). Replacing or removing a photo deletes the old file once nothing else uses it, and **🧹 Dọn ảnh không dùng** removes uploads that were never saved. You can also paste an image URL. For local development without Blob, set `LOCAL_UPLOADS=1` to store uploads in `.data/uploads/` (never in production).
+
 ### In the files
 
 All content starts in `src/content/`:
