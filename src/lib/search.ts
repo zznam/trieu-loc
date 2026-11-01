@@ -40,6 +40,11 @@ const stripHtml = (html: string) =>
 		.replace(/\s+/g, " ")
 		.trim();
 
+/** Called by the content store when content changes, so the index is rebuilt. */
+export function resetSearchIndex() {
+	cache.clear();
+}
+
 const cache = new Map<
 	Lang,
 	{ doc: SearchDoc; title: string; text: string }[]

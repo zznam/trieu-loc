@@ -8,6 +8,7 @@ import { communityEvent, upcomingEvents } from "#/lib/events";
 import { type Lang, pick } from "#/lib/i18n";
 import { looksLikeBot, requestIpHash } from "./abuse";
 import { isAdminConfigured, isAdminRequest, requireAdmin } from "./auth";
+import { ensureContentFresh } from "./content-db";
 import { getDb, isDbConfigured } from "./db";
 import { buildDigest, type Digest, UNSUBSCRIBE_PLACEHOLDER } from "./digest";
 import {
@@ -191,6 +192,7 @@ const fmt = (lang: Lang, iso: string) =>
 	);
 
 async function digestFor(lang: Lang, now = new Date()): Promise<Digest> {
+	await ensureContentFresh();
 	const since = new Date(now.getTime() - 30 * 86_400_000)
 		.toISOString()
 		.slice(0, 10);

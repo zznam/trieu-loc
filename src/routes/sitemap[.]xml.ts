@@ -36,6 +36,8 @@ export const Route = createFileRoute("/sitemap.xml")({
 	server: {
 		handlers: {
 			GET: async () => {
+				// Make sure edited content (if any) is what we list.
+				await (await import("#/server/content-db")).ensureContentFresh();
 				const news = getNews("vi").map((p) => entry(`/news/${p.slug}`, p.date));
 				news.push(...getPeople("vi").map((p) => entry(`/people/${p.slug}`)));
 				// Published community stories (empty if the database isn't configured).

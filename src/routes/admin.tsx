@@ -1,7 +1,10 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { ContentEditor } from "#/components/admin/ContentEditor";
+import { COLLECTION_NAMES, type CollectionName } from "#/lib/content-schemas";
 import { type Kind, kindLabel } from "#/lib/contribute";
 import { getVillage, villages } from "#/lib/villages";
+import { getContentAdmin } from "#/server/content";
 import {
 	type AdminContribution,
 	adminLogin,
@@ -38,13 +41,21 @@ const SECTIONS = [
 	{ value: "guestbook", label: "Sổ lưu bút" },
 	{ value: "comment", label: "Bình luận" },
 	{ value: "newsletter", label: "Bản tin" },
+	{ value: "content", label: "Nội dung" },
 ] as const;
 type Section = (typeof SECTIONS)[number]["value"];
 
 export const Route = createFileRoute("/admin")({
 	validateSearch: (
 		s: Record<string, unknown>,
-	): { status?: ContributionStatus; section?: Section } => ({
+	): {
+		status?: ContributionStatus;
+		section?: Section;
+		collection?: CollectionName;
+	} => ({
+		...((COLLECTION_NAMES as string[]).includes(String(s.collection))
+			? { collection: s.collection as CollectionName }
+			: {}),
 		...(STATUSES.some((x) => x.value === s.status)
 			? { status: s.status as ContributionStatus }
 			: {}),
@@ -56,24 +67,32 @@ export const Route = createFileRoute("/admin")({
 	loaderDeps: ({ search }) => ({
 		status: search.status ?? "pending",
 		section: search.section ?? "contributions",
+		collection: search.collection ?? "places",
 	}),
 	loader: async ({ deps }) => {
+		const none = { contrib: null, msgs: null, news: null, content: null };
 		if (deps.section === "contributions") {
 			return {
+				...none,
 				contrib: await getAdminState({ data: { status: deps.status } }),
-				msgs: null,
-				news: null,
 			};
 		}
 		if (deps.section === "newsletter") {
-			return { contrib: null, msgs: null, news: await getNewsletterAdmin() };
+			return { ...none, news: await getNewsletterAdmin() };
+		}
+		if (deps.section === "content") {
+			return {
+				...none,
+				content: await getContentAdmin({
+					data: { collection: deps.collection },
+				}),
+			};
 		}
 		return {
-			contrib: null,
+			...none,
 			msgs: await getMessagesAdmin({
 				data: { kind: deps.section, status: deps.status },
 			}),
-			news: null,
 		};
 	},
 	head: () => ({
@@ -86,12 +105,17 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
-	const { contrib, msgs, news } = Route.useLoaderData();
-	const { status = "pending", section = "contributions" } = Route.useSearch();
-	const authed = contrib?.authed ?? msgs?.authed ?? news?.authed ?? false;
+	const { contrib, msgs, news, content } = Route.useLoaderData();
+	const {
+		status = "pending",
+		section = "contributions",
+		collection = "places",
+	} = Route.useSearch();
+	const other = msgs ?? news ?? content;
+	const authed = contrib?.authed ?? other?.authed ?? false;
 	const configured = contrib?.configured ?? {
-		db: msgs?.configured.db ?? news?.configured.db ?? false,
-		admin: msgs?.configured.admin ?? news?.configured.admin ?? false,
+		db: other?.configured.db ?? false,
+		admin: other?.configured.admin ?? false,
 		blob: true, // not relevant outside contributions
 		notify: true,
 	};
@@ -143,6 +167,8 @@ function AdminPage() {
 					<LoginForm />
 				) : news ? (
 					<NewsletterPanel state={news} />
+				) : content ? (
+					<ContentEditor collection={collection} state={content} />
 				) : (
 					<>
 						<nav className="mb-6 flex flex-wrap gap-2" aria-label="Trạng thái">
