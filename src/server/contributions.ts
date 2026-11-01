@@ -13,6 +13,7 @@ import {
 	startSession,
 } from "./auth";
 import { getDb, isDbConfigured } from "./db";
+import { isNotifyConfigured, notifyNewSubmission } from "./notify";
 import {
 	CONTRIBUTION_KINDS,
 	CONTRIBUTION_STATUSES,
@@ -120,6 +121,19 @@ export const submitContribution = createServerFn({ method: "POST" })
 				consent: data.consent === "on",
 				ipHash,
 			});
+			// Awaited (serverless functions may stop once the response is sent) but time-boxed
+			// to 5 s, and any failure is swallowed: the submission is already saved.
+			await notifyNewSubmission({
+				kind: data.kind,
+				title: data.title,
+				message: data.message,
+				name: data.name,
+				village: data.village,
+				contact: data.contact,
+				lang: data.lang,
+				consent: data.consent === "on",
+				photoCount: stored.length,
+			});
 			return { ok: true };
 		} catch (err) {
 			console.error("submitContribution failed", err);
@@ -198,7 +212,7 @@ export type AdminContribution = {
 };
 
 export type AdminState = {
-	configured: { db: boolean; blob: boolean; admin: boolean };
+	configured: { db: boolean; blob: boolean; admin: boolean; notify: boolean };
 	authed: boolean;
 	counts: Record<ContributionStatus, number>;
 	items: AdminContribution[];
@@ -215,6 +229,7 @@ export const getAdminState = createServerFn({ method: "GET" })
 			db: isDbConfigured(),
 			blob: isBlobConfigured(),
 			admin: isAdminConfigured(),
+			notify: isNotifyConfigured(),
 		};
 		const counts = { pending: 0, approved: 0, rejected: 0 };
 		if (!isAdminRequest() || !configured.db) {

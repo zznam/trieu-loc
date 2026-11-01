@@ -104,13 +104,15 @@ function AdminPage() {
 function ConfigWarnings({
 	configured,
 }: {
-	configured: { db: boolean; blob: boolean; admin: boolean };
+	configured: { db: boolean; blob: boolean; admin: boolean; notify: boolean };
 }) {
 	const missing = [
 		!configured.admin && "ADMIN_PASSWORD (mật khẩu trang quản trị)",
 		!configured.db && "DATABASE_URL (cơ sở dữ liệu Neon)",
 		!configured.blob &&
 			"BLOB_READ_WRITE_TOKEN (lưu ảnh Vercel Blob — chỉ cần nếu muốn nhận ảnh)",
+		!configured.notify &&
+			"RESEND_API_KEY + NOTIFY_EMAIL (email báo khi có đóng góp mới — không bắt buộc)",
 	].filter(Boolean);
 	if (missing.length === 0) return null;
 	return (
