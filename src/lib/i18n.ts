@@ -397,6 +397,59 @@ const dict = {
 	"comments.like": { vi: "Thả tim", en: "Like" },
 	"comments.unlike": { vi: "Bỏ tim", en: "Unlike" },
 	"comments.likeLabel": { vi: "Yêu thích", en: "Like" },
+	"newsletter.title": {
+		vi: "Nhận bản tin hằng tháng",
+		en: "Get the monthly newsletter",
+	},
+	"newsletter.lead": {
+		vi: "Tin quê, sự kiện và lịch lễ hội gửi về hộp thư mỗi tháng một lần.",
+		en: "Hometown news, events and festival dates, once a month.",
+	},
+	"newsletter.email": { vi: "Địa chỉ email", en: "Email address" },
+	"newsletter.subscribe": { vi: "Đăng ký", en: "Subscribe" },
+	"newsletter.checkInbox": {
+		vi: "Gần xong! Hãy mở email và bấm nút xác nhận.",
+		en: "Almost done! Check your inbox and click the confirmation button.",
+	},
+	"newsletter.err.invalid": {
+		vi: "Email chưa đúng định dạng.",
+		en: "That email address doesn't look right.",
+	},
+	"newsletter.err.notConfigured": {
+		vi: "Bản tin chưa được kích hoạt. Vui lòng thử lại sau.",
+		en: "The newsletter isn't switched on yet. Please try again later.",
+	},
+	"newsletter.confirmTitle": {
+		vi: "Xác nhận đăng ký bản tin",
+		en: "Confirm your subscription",
+	},
+	"newsletter.confirmBody": {
+		vi: "Bấm nút để bắt đầu nhận bản tin cho",
+		en: "Press the button to start receiving the newsletter at",
+	},
+	"newsletter.confirmButton": { vi: "Xác nhận", en: "Confirm" },
+	"newsletter.confirmed": {
+		vi: "Đã xác nhận! Bạn sẽ nhận bản tin Triệu Lộc mỗi tháng.",
+		en: "Confirmed! You'll receive the Triệu Lộc newsletter every month.",
+	},
+	"newsletter.unsubTitle": { vi: "Huỷ đăng ký bản tin", en: "Unsubscribe" },
+	"newsletter.unsubBody": {
+		vi: "Bấm nút để ngừng nhận bản tin tại",
+		en: "Press the button to stop the newsletter at",
+	},
+	"newsletter.unsubButton": { vi: "Huỷ đăng ký", en: "Unsubscribe" },
+	"newsletter.unsubscribed": {
+		vi: "Bạn đã huỷ đăng ký. Hẹn gặp lại trên trang Triệu Lộc!",
+		en: "You've been unsubscribed. See you on the Triệu Lộc site!",
+	},
+	"newsletter.badLink": {
+		vi: "Liên kết không hợp lệ hoặc đã hết hạn.",
+		en: "This link is invalid or has expired.",
+	},
+	"newsletter.already": {
+		vi: "Email này đã được xác nhận trước đó.",
+		en: "This email was already confirmed.",
+	},
 	"notFound.title": { vi: "Không tìm thấy trang", en: "Page not found" },
 	"notFound.body": {
 		vi: "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",

@@ -30,13 +30,25 @@ export default defineConfig({
 			testMatch: /mobile\.spec\.ts/,
 		},
 	],
-	webServer: {
-		command: `pnpm preview --port ${PORT}`,
-		port: PORT,
-		reuseExistingServer: !process.env.CI,
-		env: {
-			DATABASE_URL: process.env.DATABASE_URL ?? "",
-			ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "e2e-admin-password",
+	webServer: [
+		{
+			// Fake Resend API so email flows (notifications, newsletter) can be tested offline.
+			command: "node tests/e2e/mock-resend.mjs",
+			port: 4599,
+			reuseExistingServer: !process.env.CI,
 		},
-	},
+		{
+			command: `pnpm preview --port ${PORT}`,
+			port: PORT,
+			reuseExistingServer: !process.env.CI,
+			env: {
+				DATABASE_URL: process.env.DATABASE_URL ?? "",
+				ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? "e2e-admin-password",
+				RESEND_API_KEY: "re_e2e",
+				RESEND_API_URL: "http://localhost:4599/emails",
+				NOTIFY_EMAIL: "editor@example.test",
+				NOTIFY_FROM: "Triệu Lộc <thongbao@example.test>",
+			},
+		},
+	],
 });

@@ -19,6 +19,12 @@ import {
 	getMessagesAdmin,
 	moderateMessage,
 } from "#/server/messages";
+import {
+	getNewsletterAdmin,
+	type NewsletterAdmin,
+	sendNewsletter,
+	sendTestNewsletter,
+} from "#/server/newsletter";
 import type { ContributionStatus } from "#/server/schema";
 
 const STATUSES: { value: ContributionStatus; label: string }[] = [
@@ -31,6 +37,7 @@ const SECTIONS = [
 	{ value: "contributions", label: "Đóng góp" },
 	{ value: "guestbook", label: "Sổ lưu bút" },
 	{ value: "comment", label: "Bình luận" },
+	{ value: "newsletter", label: "Bản tin" },
 ] as const;
 type Section = (typeof SECTIONS)[number]["value"];
 
@@ -50,18 +57,25 @@ export const Route = createFileRoute("/admin")({
 		status: search.status ?? "pending",
 		section: search.section ?? "contributions",
 	}),
-	loader: async ({ deps }) =>
-		deps.section === "contributions"
-			? {
-					contrib: await getAdminState({ data: { status: deps.status } }),
-					msgs: null,
-				}
-			: {
-					contrib: null,
-					msgs: await getMessagesAdmin({
-						data: { kind: deps.section, status: deps.status },
-					}),
-				},
+	loader: async ({ deps }) => {
+		if (deps.section === "contributions") {
+			return {
+				contrib: await getAdminState({ data: { status: deps.status } }),
+				msgs: null,
+				news: null,
+			};
+		}
+		if (deps.section === "newsletter") {
+			return { contrib: null, msgs: null, news: await getNewsletterAdmin() };
+		}
+		return {
+			contrib: null,
+			msgs: await getMessagesAdmin({
+				data: { kind: deps.section, status: deps.status },
+			}),
+			news: null,
+		};
+	},
 	head: () => ({
 		meta: [
 			{ title: "Quản trị · Triệu Lộc" },
@@ -72,12 +86,12 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
-	const { contrib, msgs } = Route.useLoaderData();
+	const { contrib, msgs, news } = Route.useLoaderData();
 	const { status = "pending", section = "contributions" } = Route.useSearch();
-	const authed = contrib?.authed ?? msgs?.authed ?? false;
+	const authed = contrib?.authed ?? msgs?.authed ?? news?.authed ?? false;
 	const configured = contrib?.configured ?? {
-		db: msgs?.configured.db ?? false,
-		admin: msgs?.configured.admin ?? false,
+		db: msgs?.configured.db ?? news?.configured.db ?? false,
+		admin: msgs?.configured.admin ?? news?.configured.admin ?? false,
 		blob: true, // not relevant outside contributions
 		notify: true,
 	};
@@ -127,6 +141,8 @@ function AdminPage() {
 				<ConfigWarnings configured={configured} />
 				{!configured.admin ? null : !authed ? (
 					<LoginForm />
+				) : news ? (
+					<NewsletterPanel state={news} />
 				) : (
 					<>
 						<nav className="mb-6 flex flex-wrap gap-2" aria-label="Trạng thái">
@@ -821,5 +837,189 @@ function ContributionCard({ item }: { item: AdminContribution }) {
 				</button>
 			</div>
 		</li>
+	);
+}
+
+const SEND_ERRORS: Record<string, string> = {
+	not_configured: "Chưa cấu hình RESEND_API_KEY / NOTIFY_EMAIL.",
+	send_failed: "Gửi không thành công — xem log trên Vercel.",
+	recently_sent: "Bản tin vừa được gửi trong vòng 1 giờ qua. Hãy đợi thêm.",
+	no_subscribers: "Chưa có người đăng ký nào đã xác nhận.",
+};
+
+function NewsletterPanel({ state }: { state: NewsletterAdmin }) {
+	const router = useRouter();
+	const [lang, setLang] = useState<"vi" | "en">("vi");
+	const [busy, setBusy] = useState(false);
+	const [message, setMessage] = useState<{
+		tone: "ok" | "error";
+		text: string;
+	} | null>(null);
+	const { counts, configured, preview } = state;
+	const digest = preview?.[lang];
+
+	async function run(
+		fn: () => Promise<{
+			ok: boolean;
+			error?: string;
+			to?: string;
+			sent?: number;
+			failed?: number;
+		}>,
+	) {
+		setBusy(true);
+		setMessage(null);
+		try {
+			const r = await fn();
+			if (r.ok) {
+				setMessage({
+					tone: "ok",
+					text:
+						r.to !== undefined
+							? `Đã gửi thư thử tới ${r.to}.`
+							: `Đã gửi cho ${r.sent} người${r.failed ? `, lỗi ${r.failed}` : ""}.`,
+				});
+				await router.invalidate();
+			} else {
+				setMessage({
+					tone: "error",
+					text: SEND_ERRORS[r.error ?? ""] ?? "Có lỗi xảy ra.",
+				});
+			}
+		} catch {
+			setMessage({ tone: "error", text: "Có lỗi xảy ra." });
+		} finally {
+			setBusy(false);
+		}
+	}
+
+	return (
+		<div className="space-y-6">
+			{(!configured.email || !configured.verifiedSender) && (
+				<div className="rounded-2xl border border-earth-500/50 bg-earth-300/20 p-5 text-sm">
+					{!configured.email && (
+						<p>
+							• Cần RESEND_API_KEY để gửi email (xác nhận đăng ký và bản tin).
+						</p>
+					)}
+					{!configured.verifiedSender && (
+						<p>
+							• Chưa có NOTIFY_FROM: cần xác minh tên miền trong Resend rồi đặt
+							NOTIFY_FROM, nếu không Resend chỉ gửi được tới email chủ tài
+							khoản.
+						</p>
+					)}
+				</div>
+			)}
+
+			<dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+				{[
+					["Đang nhận", counts.active],
+					["Tiếng Việt / English", `${counts.activeVi} / ${counts.activeEn}`],
+					["Chờ xác nhận", counts.pending],
+					["Đã huỷ", counts.unsubscribed],
+				].map(([k, v]) => (
+					<div
+						key={String(k)}
+						className="rounded-2xl bg-card p-4 ring-1 ring-earth-300/50"
+					>
+						<dt className="text-xs font-semibold uppercase tracking-widest text-earth-700">
+							{k}
+						</dt>
+						<dd className="mt-1 font-serif text-2xl font-semibold text-rice-900">
+							{v}
+						</dd>
+					</div>
+				))}
+			</dl>
+
+			<div className="rounded-2xl bg-card p-5 ring-1 ring-earth-300/50">
+				<div className="flex flex-wrap items-center justify-between gap-3">
+					<h2 className="text-lg font-semibold text-rice-900">
+						Xem trước: {digest?.subject}{" "}
+						<span className="text-sm font-normal text-ink-soft">
+							({digest?.itemCount ?? 0} mục)
+						</span>
+					</h2>
+					<div className="flex gap-1">
+						{(["vi", "en"] as const).map((l) => (
+							<button
+								key={l}
+								type="button"
+								aria-pressed={lang === l}
+								onClick={() => setLang(l)}
+								className={`rounded-full px-3 py-1 text-sm font-semibold ${lang === l ? "bg-rice-700 text-paper" : "border border-earth-300"}`}
+							>
+								{l.toUpperCase()}
+							</button>
+						))}
+					</div>
+				</div>
+				{digest && (
+					<iframe
+						title="Xem trước bản tin"
+						srcDoc={digest.html}
+						sandbox=""
+						className="mt-4 h-[560px] w-full rounded-xl border border-earth-300/50 bg-white"
+					/>
+				)}
+				{message && (
+					<p
+						role={message.tone === "error" ? "alert" : "status"}
+						className={`mt-4 rounded-xl px-3 py-2 text-sm font-medium ${message.tone === "error" ? "bg-lotus/15 text-lotus" : "bg-rice-100 text-rice-900"}`}
+					>
+						{message.text}
+					</p>
+				)}
+				<div className="mt-4 flex flex-wrap gap-2">
+					<button
+						type="button"
+						disabled={busy || !configured.email || !configured.notifyEmail}
+						onClick={() =>
+							void run(() => sendTestNewsletter({ data: { lang } }))
+						}
+						className="rounded-full border border-earth-300 px-4 py-2 text-sm font-semibold disabled:opacity-50"
+					>
+						Gửi thử cho tôi (NOTIFY_EMAIL)
+					</button>
+					<button
+						type="button"
+						disabled={busy || !configured.email || counts.active === 0}
+						onClick={() => {
+							if (confirm(`Gửi bản tin cho ${counts.active} người đăng ký?`))
+								void run(() => sendNewsletter());
+						}}
+						className="rounded-full bg-rice-700 px-4 py-2 text-sm font-semibold text-paper disabled:opacity-50"
+					>
+						Gửi cho {counts.active} người
+					</button>
+				</div>
+			</div>
+
+			<div>
+				<h2 className="mb-2 text-lg font-semibold text-rice-900">Đã gửi</h2>
+				{state.sends.length === 0 ? (
+					<p className="text-ink-soft">Chưa gửi bản tin nào.</p>
+				) : (
+					<ul className="divide-y divide-earth-300/40 rounded-2xl bg-card ring-1 ring-earth-300/50">
+						{state.sends.map((s) => (
+							<li
+								key={s.id}
+								className="flex flex-wrap justify-between gap-2 px-4 py-3 text-sm"
+							>
+								<span className="font-medium">{s.subject}</span>
+								<span className="text-ink-soft">
+									{new Date(s.sentAt).toLocaleString("vi-VN")} · {s.recipients}{" "}
+									người
+									{s.failed > 0 && (
+										<span className="text-lotus"> · lỗi {s.failed}</span>
+									)}
+								</span>
+							</li>
+						))}
+					</ul>
+				)}
+			</div>
+		</div>
 	);
 }
