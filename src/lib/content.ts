@@ -53,22 +53,14 @@ export const placeCategoryLabel: Record<PlaceCategory, L> = {
 	public: { vi: "Công cộng", en: "Public" },
 };
 
-// ---------- News (Markdown files: src/content/news/<slug>.<lang>.md) ----------
+// ---------- Markdown collections (src/content/<collection>/<slug>.<lang>.md) ----------
 
-export type NewsPost = {
+type MdDoc = {
 	slug: string;
 	lang: Lang;
-	title: string;
-	date: string;
-	summary: string;
+	data: Record<string, string>;
 	html: string;
 };
-
-const rawNews = import.meta.glob("../content/news/*.md", {
-	query: "?raw",
-	import: "default",
-	eager: true,
-}) as Record<string, string>;
 
 function parseFrontmatter(raw: string): {
 	data: Record<string, string>;
@@ -88,36 +80,130 @@ function parseFrontmatter(raw: string): {
 	return { data, body: match[2] };
 }
 
-const allNews: NewsPost[] = Object.entries(rawNews)
-	.map(([path, raw]) => {
-		const file = path.split("/").pop() ?? "";
-		const m = /^(.+)\.(vi|en)\.md$/.exec(file);
-		if (!m) return null;
-		const { data, body } = parseFrontmatter(raw);
-		return {
-			slug: m[1],
-			lang: m[2] as Lang,
-			title: data.title ?? m[1],
-			date: data.date ?? m[1].slice(0, 10),
-			summary: data.summary ?? "",
-			html: marked.parse(body, { async: false }),
-		} satisfies NewsPost;
-	})
-	.filter((p): p is NewsPost => p !== null)
-	.sort((a, b) => b.date.localeCompare(a.date));
+function loadCollection(files: Record<string, string>): MdDoc[] {
+	return Object.entries(files)
+		.map(([path, raw]) => {
+			const m = /^(.+)\.(vi|en)\.md$/.exec(path.split("/").pop() ?? "");
+			if (!m) return null;
+			const { data, body } = parseFrontmatter(raw);
+			return {
+				slug: m[1],
+				lang: m[2] as Lang,
+				data,
+				html: marked.parse(body, { async: false }),
+			};
+		})
+		.filter((d): d is MdDoc => d !== null);
+}
 
-/** Posts for a language; falls back to the Vietnamese version when a translation is missing. */
+/** Finds a doc in the requested language, falling back to Vietnamese when the translation is missing. */
+function findDoc<T extends { slug: string; lang: Lang }>(
+	docs: T[],
+	lang: Lang,
+	slug: string,
+): T | undefined {
+	return (
+		docs.find((d) => d.slug === slug && d.lang === lang) ??
+		docs.find((d) => d.slug === slug && d.lang === "vi")
+	);
+}
+
+function localized<T extends { slug: string; lang: Lang }>(
+	docs: T[],
+	lang: Lang,
+): T[] {
+	return [...new Set(docs.map((d) => d.slug))]
+		.map((slug) => findDoc(docs, lang, slug))
+		.filter((d): d is T => d !== undefined);
+}
+
+// ---------- News ----------
+
+export type NewsPost = {
+	slug: string;
+	lang: Lang;
+	title: string;
+	date: string;
+	summary: string;
+	html: string;
+};
+
+const allNews: NewsPost[] = loadCollection(
+	import.meta.glob("../content/news/*.md", {
+		query: "?raw",
+		import: "default",
+		eager: true,
+	}) as Record<string, string>,
+).map((d) => ({
+	slug: d.slug,
+	lang: d.lang,
+	title: d.data.title ?? d.slug,
+	date: d.data.date ?? d.slug.slice(0, 10),
+	summary: d.data.summary ?? "",
+	html: d.html,
+}));
+
 export function getNews(lang: Lang): NewsPost[] {
-	const slugs = [...new Set(allNews.map((p) => p.slug))];
-	return slugs
-		.map((slug) => getPost(lang, slug))
-		.filter((p): p is NewsPost => p !== undefined)
-		.sort((a, b) => b.date.localeCompare(a.date));
+	return localized(allNews, lang).sort((a, b) => b.date.localeCompare(a.date));
 }
 
 export function getPost(lang: Lang, slug: string): NewsPost | undefined {
-	return (
-		allNews.find((p) => p.slug === slug && p.lang === lang) ??
-		allNews.find((p) => p.slug === slug && p.lang === "vi")
+	return findDoc(allNews, lang, slug);
+}
+
+// ---------- People ----------
+
+export type PersonCategory = "history" | "notable" | "diaspora";
+
+export const personCategoryLabel: Record<PersonCategory, L> = {
+	history: { vi: "Nhân vật lịch sử", en: "Historical figures" },
+	notable: { vi: "Người con quê hương", en: "Notable locals" },
+	diaspora: { vi: "Người con xa quê", en: "Living far from home" },
+};
+
+export type Person = {
+	slug: string;
+	lang: Lang;
+	name: string;
+	category: PersonCategory;
+	/** Free text: lifespan, era or "Sinh năm 1985" */
+	years: string;
+	role: string;
+	village: string;
+	summary: string;
+	photo: string;
+	order: number;
+	html: string;
+};
+
+const allPeople: Person[] = loadCollection(
+	import.meta.glob("../content/people/*.md", {
+		query: "?raw",
+		import: "default",
+		eager: true,
+	}) as Record<string, string>,
+).map((d) => ({
+	slug: d.slug,
+	lang: d.lang,
+	name: d.data.name ?? d.slug,
+	category: (["history", "notable", "diaspora"].includes(d.data.category)
+		? d.data.category
+		: "notable") as PersonCategory,
+	years: d.data.years ?? "",
+	role: d.data.role ?? "",
+	village: d.data.village ?? "",
+	summary: d.data.summary ?? "",
+	photo: d.data.photo ?? "",
+	order: Number(d.data.order ?? 100),
+	html: d.html,
+}));
+
+export function getPeople(lang: Lang): Person[] {
+	return localized(allPeople, lang).sort(
+		(a, b) => a.order - b.order || a.name.localeCompare(b.name, "vi"),
 	);
+}
+
+export function getPerson(lang: Lang, slug: string): Person | undefined {
+	return findDoc(allPeople, lang, slug);
 }

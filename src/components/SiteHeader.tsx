@@ -8,6 +8,7 @@ const NAV: { to: string; key: DictKey }[] = [
 	{ to: "/$lang/history", key: "nav.history" },
 	{ to: "/$lang/places", key: "nav.places" },
 	{ to: "/$lang/food", key: "nav.food" },
+	{ to: "/$lang/people", key: "nav.people" },
 	{ to: "/$lang/news", key: "nav.news" },
 	{ to: "/$lang/gallery", key: "nav.gallery" },
 ];
@@ -23,7 +24,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 			params={{ lang }}
 			activeOptions={{ exact: item.to === "/$lang" }}
 			onClick={() => setOpen(false)}
-			className="rounded-full px-3 py-2 text-sm font-medium text-ink-soft transition hover:bg-rice-100 hover:text-rice-900"
+			className="whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-ink-soft transition hover:bg-rice-100 hover:text-rice-900"
 			activeProps={{ className: "bg-rice-100 text-rice-900" }}
 		>
 			{t(lang, item.key)}
@@ -46,7 +47,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 						</span>
 					</span>
 				</Link>
-				<nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
+				<nav className="hidden items-center gap-1 xl:flex" aria-label="Main">
 					{links}
 				</nav>
 				<div className="flex items-center gap-2">
@@ -64,7 +65,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 					</Link>
 					<button
 						type="button"
-						className="rounded-full border border-earth-300 px-3 py-1.5 text-xs font-semibold text-ink lg:hidden"
+						className="rounded-full border border-earth-300 px-3 py-1.5 text-xs font-semibold text-ink xl:hidden"
 						aria-expanded={open}
 						aria-controls="mobile-nav"
 						onClick={() => setOpen((v) => !v)}
@@ -76,7 +77,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 			{open && (
 				<nav
 					id="mobile-nav"
-					className="flex flex-col gap-1 border-t border-earth-300/40 px-4 py-3 lg:hidden"
+					className="flex flex-col gap-1 border-t border-earth-300/40 px-4 py-3 xl:hidden"
 					aria-label="Mobile"
 				>
 					{links}

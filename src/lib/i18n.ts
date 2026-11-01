@@ -18,6 +18,7 @@ const dict = {
 	"nav.history": { vi: "Lịch sử & Văn hoá", en: "History & Culture" },
 	"nav.places": { vi: "Địa danh", en: "Places" },
 	"nav.food": { vi: "Đặc sản & Cơ sở", en: "Food & Local Business" },
+	"nav.people": { vi: "Con người", en: "People" },
 	"nav.news": { vi: "Tin tức", en: "News" },
 	"nav.gallery": { vi: "Thư viện ảnh", en: "Gallery" },
 	"nav.menu": { vi: "Menu", en: "Menu" },
@@ -130,6 +131,15 @@ const dict = {
 	"footer.note": {
 		vi: "Trang cộng đồng, không phải cổng thông tin chính thức của UBND xã.",
 		en: "Community site — not the official portal of the commune People's Committee.",
+	},
+	"people.title": { vi: "Người Triệu Lộc", en: "People of Triệu Lộc" },
+	"people.lead": {
+		vi: "Những nhân vật lịch sử, người con quê hương và những người con xa quê — mỗi người một câu chuyện.",
+		en: "Historical figures, notable locals and those living far from home — each with a story.",
+	},
+	"people.share": {
+		vi: "Bạn là người con Triệu Lộc? Hãy chia sẻ câu chuyện của bạn hoặc giới thiệu một người đáng nhớ.",
+		en: "From Triệu Lộc? Share your story, or tell us about someone worth remembering.",
 	},
 	"notFound.title": { vi: "Không tìm thấy trang", en: "Page not found" },
 	"notFound.body": {
