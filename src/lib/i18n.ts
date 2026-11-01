@@ -172,6 +172,18 @@ const dict = {
 		vi: "Thôn bạn có sự kiện sắp tới? Gửi cho chúng tôi để đưa lên lịch.",
 		en: "Got an upcoming village event? Send it to us to be listed.",
 	},
+	"search.title": { vi: "Tìm kiếm", en: "Search" },
+	"search.placeholder": {
+		vi: "Tìm địa danh, tin tức, con người, đặc sản… (gõ không dấu cũng được)",
+		en: "Search places, news, people, food…",
+	},
+	"search.results": { vi: "kết quả", en: "results" },
+	"search.empty": {
+		vi: "Không tìm thấy kết quả phù hợp. Thử từ khoá khác?",
+		en: "No results. Try another word?",
+	},
+	"search.try": { vi: "Thử tìm:", en: "Try:" },
+	"search.open": { vi: "Tìm kiếm (Ctrl K)", en: "Search (Ctrl K)" },
 	"notFound.title": { vi: "Không tìm thấy trang", en: "Page not found" },
 	"notFound.body": {
 		vi: "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",

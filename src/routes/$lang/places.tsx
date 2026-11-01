@@ -107,7 +107,8 @@ function PlacesPage() {
 					{shown.map((p) => (
 						<article
 							key={p.id}
-							className="flex flex-col rounded-2xl border border-earth-300/50 bg-card/70 p-6"
+							id={p.id}
+							className="scroll-mt-24 flex flex-col rounded-2xl border border-earth-300/50 bg-card/70 p-6"
 						>
 							<p className="text-xs font-semibold uppercase tracking-widest text-earth-700">
 								{pick(lang, placeCategoryLabel[p.category])} ·{" "}

@@ -129,3 +129,17 @@ h3 {
 	--color-paper: #faf6ec;
 	--color-earth-300: #d9b77f;
 }
+
+/* Briefly highlight the card a search result jumped to */
+:target {
+	animation: target-flash 2s ease-out;
+}
+@keyframes target-flash {
+	0%,
+	40% {
+		box-shadow: 0 0 0 3px var(--color-earth-500);
+	}
+	100% {
+		box-shadow: 0 0 0 3px transparent;
+	}
+}
