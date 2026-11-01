@@ -43,6 +43,8 @@ export type Field =
 			max?: number;
 	  }
 	| { kind: "checkbox"; path: string; label: string }
+	/** Optional date + time in Vietnam time ("YYYY-MM-DDTHH:mm"). */
+	| { kind: "datetime"; path: string; label: string; hint?: string }
 	/** Photo upload (resized in the browser) with preview; stores the image URL at `path`. */
 	| { kind: "image"; path: string; label: string; optional?: boolean }
 	| { kind: "coords"; path: string; label: string; optional?: boolean }
@@ -331,6 +333,12 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 			hint: "Ví dụ: 2026-12-01-hoi-thi-nau-com",
 		},
 		{ kind: "text", path: "date", label: "Ngày đăng (YYYY-MM-DD)" },
+		{
+			kind: "datetime",
+			path: "publishAt",
+			label: "Lên lịch đăng (giờ Việt Nam)",
+			hint: "Để trống = hiển thị ngay. Bài được ẩn khỏi trang, tìm kiếm, sitemap và bản tin cho tới thời điểm này.",
+		},
 		...(["vi", "en"] as const).map(
 			(lang): Field => ({
 				kind: "lang",

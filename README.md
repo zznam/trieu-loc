@@ -111,6 +111,12 @@ See `.env.example` for all variables. When the schema changes: edit `src/server/
 
 `pnpm build` ends with a check that fails if server-only code (database driver, crypto, Blob SDK) ends up in the browser bundle. If it trips, you imported a plain value from `src/server/*` into a route — import only server functions from there.
 
+## Scheduled publishing
+
+- **News** (`/admin` → Nội dung → Tin tức): set **Lên lịch đăng** (Vietnam time). Until then the post is hidden from the news list, its page (404), search, the sitemap, comments and the newsletter; the editor list shows ⏰.
+- **Community stories, events, businesses and photos** (`/admin` → Đóng góp): pick a time next to **⏰ Lên lịch đăng**. Scheduled items show "⏰ Lên lịch: …" and can be cancelled with **⤓ Huỷ lịch đăng**.
+- No cron job is needed: visibility is decided on every request, to the minute.
+
 ## Editor accounts
 
 `/admin` → **Tài khoản** (owners only):

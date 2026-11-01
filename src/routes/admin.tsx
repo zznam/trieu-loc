@@ -4,6 +4,7 @@ import { AccountsPanel, ChangePasswordForm } from "#/components/admin/Accounts";
 import { ContentEditor } from "#/components/admin/ContentEditor";
 import { COLLECTION_NAMES, type CollectionName } from "#/lib/content-schemas";
 import { type Kind, kindLabel } from "#/lib/contribute";
+import { dateToVnLocal, formatVnDateTime } from "#/lib/schedule";
 import { getVillage, villages } from "#/lib/villages";
 import { getAccountsAdmin, getAdminSession } from "#/server/accounts";
 import { getContentAdmin } from "#/server/content";
@@ -564,7 +565,11 @@ function ContributionCard({ item }: { item: AdminContribution }) {
 	const publishable = ["story", "event", "business", "photo"].includes(
 		item.kind,
 	);
-	const live = item.publishedAt !== null;
+	// publishedAt in the future = scheduled; "live" covers both (the item is set to publish).
+	const publishTime = item.publishedAt ? new Date(item.publishedAt) : null;
+	const live = publishTime !== null;
+	const scheduled = publishTime !== null && publishTime.getTime() > Date.now();
+	const [publishAt, setPublishAt] = useState("");
 	const link = liveLink(item);
 
 	async function act(fn: () => Promise<unknown>, done?: string) {
@@ -610,11 +615,21 @@ function ContributionCard({ item }: { item: AdminContribution }) {
 		setBusy(true);
 		setMessage(null);
 		try {
-			const res = await setPublished({ data: { id: item.id, publish: on } });
+			const res = await setPublished({
+				data: {
+					id: item.id,
+					publish: on,
+					publishAt: on && publishAt ? publishAt : undefined,
+				},
+			});
 			if (res.ok) {
 				setMessage({
 					tone: "ok",
-					text: on ? "Đã đăng lên trang." : "Đã gỡ khỏi trang.",
+					text: on
+						? publishAt
+							? "Đã lên lịch đăng."
+							: "Đã đăng lên trang."
+						: "Đã gỡ khỏi trang.",
 				});
 				await router.invalidate();
 			} else {
@@ -654,11 +669,16 @@ function ContributionCard({ item }: { item: AdminContribution }) {
 				>
 					{item.consent ? "Đồng ý đăng" : "Chưa đồng ý đăng"}
 				</span>
-				{live && (
-					<span className="rounded-full bg-rice-700 px-2 py-0.5 normal-case tracking-normal text-paper">
-						● Đang hiển thị
-					</span>
-				)}
+				{live &&
+					(scheduled && publishTime ? (
+						<span className="rounded-full bg-earth-500 px-2 py-0.5 normal-case tracking-normal text-white">
+							⏰ Lên lịch: {formatVnDateTime(publishTime)}
+						</span>
+					) : (
+						<span className="rounded-full bg-rice-700 px-2 py-0.5 normal-case tracking-normal text-paper">
+							● Đang hiển thị
+						</span>
+					))}
 			</div>
 
 			{editing ? (
@@ -880,18 +900,31 @@ function ContributionCard({ item }: { item: AdminContribution }) {
 							onClick={() => void publish(false)}
 							className="rounded-full border border-rice-700 px-4 py-2 text-sm font-semibold text-rice-900 disabled:opacity-60"
 						>
-							⤓ Gỡ khỏi trang
+							{scheduled ? "⤓ Huỷ lịch đăng" : "⤓ Gỡ khỏi trang"}
 						</button>
 					) : (
-						<button
-							type="button"
-							disabled={busy || !item.consent}
-							title={item.consent ? undefined : PUBLISH_ERRORS.no_consent}
-							onClick={() => void publish(true)}
-							className="rounded-full bg-rice-700 px-4 py-2 text-sm font-semibold text-paper disabled:opacity-50"
-						>
-							⤒ Đăng lên trang
-						</button>
+						<span className="inline-flex flex-wrap items-center gap-2">
+							<button
+								type="button"
+								disabled={busy || !item.consent}
+								title={item.consent ? undefined : PUBLISH_ERRORS.no_consent}
+								onClick={() => void publish(true)}
+								className="rounded-full bg-rice-700 px-4 py-2 text-sm font-semibold text-paper disabled:opacity-50"
+							>
+								{publishAt ? "⏰ Lên lịch đăng" : "⤒ Đăng lên trang"}
+							</button>
+							<label className="flex items-center gap-1 text-xs text-ink-soft">
+								lúc
+								<input
+									type="datetime-local"
+									value={publishAt}
+									min={dateToVnLocal(new Date())}
+									onChange={(e) => setPublishAt(e.target.value)}
+									aria-label="Đăng lúc (giờ Việt Nam) — để trống để đăng ngay"
+									className="rounded-lg border border-earth-300 bg-paper px-2 py-1 text-xs"
+								/>
+							</label>
+						</span>
 					))}
 				{item.status !== "approved" && (
 					<button

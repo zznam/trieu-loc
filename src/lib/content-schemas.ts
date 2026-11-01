@@ -90,6 +90,11 @@ const newsLang = z.object({
 export const newsSchema = z.object({
 	slug,
 	date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+	/** Optional scheduled publish time, Vietnam time "YYYY-MM-DDTHH:mm"; hidden until then. */
+	publishAt: z
+		.string()
+		.regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/)
+		.optional(),
 	vi: newsLang,
 	en: newsLang.optional(),
 });

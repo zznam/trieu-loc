@@ -1,7 +1,7 @@
 // Database queries for published community content. Server-only: import it from server
 // function handlers or server routes (lazily), never from route modules at the top level,
 // or the database driver ends up in the browser bundle.
-import { and, desc, eq, isNotNull } from "drizzle-orm";
+import { and, desc, eq, lte, sql } from "drizzle-orm";
 import { getDb, isDbConfigured } from "./db";
 import { type ContributionKind, contributions } from "./schema";
 
@@ -45,7 +45,8 @@ const live = (kind: ContributionKind) =>
 		eq(contributions.kind, kind),
 		eq(contributions.status, "approved"),
 		eq(contributions.consent, true),
-		isNotNull(contributions.publishedAt),
+		// Scheduled items (publishedAt in the future) stay hidden until their time.
+		lte(contributions.publishedAt, sql`now()`),
 	);
 
 type Row = Omit<PublishedItem, "publishedAt"> & { publishedAt: Date | null };
