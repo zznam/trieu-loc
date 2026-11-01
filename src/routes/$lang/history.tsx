@@ -11,6 +11,8 @@ export const Route = createFileRoute("/$lang/history")({
 			lang,
 			t(lang, "history.title"),
 			pick(lang, history.intro).slice(0, 160),
+			"/history",
+			"history",
 		);
 	},
 	component: HistoryPage,

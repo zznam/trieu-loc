@@ -9,7 +9,13 @@ import { seo } from "#/lib/seo";
 export const Route = createFileRoute("/$lang/gallery")({
 	head: ({ params }) => {
 		const lang = params.lang as Lang;
-		return seo(lang, t(lang, "gallery.title"), t(lang, "gallery.lead"));
+		return seo(
+			lang,
+			t(lang, "gallery.title"),
+			t(lang, "gallery.lead"),
+			"/gallery",
+			"gallery",
+		);
 	},
 	component: GalleryPage,
 });

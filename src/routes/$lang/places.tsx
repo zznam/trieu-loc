@@ -15,7 +15,13 @@ const PlacesMap = lazy(() => import("#/components/PlacesMap"));
 export const Route = createFileRoute("/$lang/places")({
 	head: ({ params }) => {
 		const lang = params.lang as Lang;
-		return seo(lang, t(lang, "places.title"), t(lang, "places.lead"));
+		return seo(
+			lang,
+			t(lang, "places.title"),
+			t(lang, "places.lead"),
+			"/places",
+			"places",
+		);
 	},
 	component: PlacesPage,
 });

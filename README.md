@@ -51,6 +51,13 @@ pnpm build      # production build
 pnpm check      # Biome lint + format
 ```
 
+## SEO & sharing
+
+- `/sitemap.xml` and `/robots.txt` are generated from the content files.
+- Every page has a canonical URL, `hreflang` alternates (vi/en) and Open Graph / Twitter tags.
+- Absolute URLs use the `SITE_URL` env var (e.g. `https://trieuloc.vn`). If it's unset on Vercel, the production `*.vercel.app` URL is used.
+- Share images live in `public/og/`. After changing page titles, regenerate them with `pnpm og` (first time: `npx playwright install chromium`).
+
 ## Deploy to Vercel
 
 The project uses the Vercel deployment adapter (`vercel.json` → `"framework": "tanstack-start"`; Nitro builds the Vercel output automatically).
