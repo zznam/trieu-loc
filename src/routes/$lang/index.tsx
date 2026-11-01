@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { FestivalCountdown } from "#/components/FestivalCountdown";
 import { HeroArt } from "#/components/HeroArt";
 import { getNews, site } from "#/lib/content";
 import { type DictKey, formatDate, type Lang, pick, t } from "#/lib/i18n";
@@ -124,15 +125,16 @@ function Home() {
 						<p className="mt-3 max-w-2xl text-rice-100">
 							{t(lang, "home.festival.body")}
 						</p>
+						<Link
+							to="/$lang/history"
+							hash="traditions"
+							params={{ lang }}
+							className="mt-6 inline-block rounded-full bg-paper px-6 py-3 font-medium text-rice-900 hover:bg-rice-100"
+						>
+							{t(lang, "common.readMore")}
+						</Link>
 					</div>
-					<Link
-						to="/$lang/history"
-						hash="traditions"
-						params={{ lang }}
-						className="justify-self-start rounded-full bg-paper px-6 py-3 font-medium text-rice-900 hover:bg-rice-100"
-					>
-						{t(lang, "common.readMore")}
-					</Link>
+					<FestivalCountdown lang={lang} />
 				</div>
 			</section>
 
