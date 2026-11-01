@@ -270,6 +270,12 @@ const dict = {
 	},
 	"gallery.community": { vi: "Ảnh từ bà con", en: "Photos from the community" },
 	"gallery.by": { vi: "Ảnh:", en: "Photo:" },
+	"lightbox.label": { vi: "Xem ảnh", en: "Photo viewer" },
+	"lightbox.close": { vi: "Đóng", en: "Close" },
+	"lightbox.prev": { vi: "Ảnh trước", en: "Previous photo" },
+	"lightbox.next": { vi: "Ảnh sau", en: "Next photo" },
+	"lightbox.swipe": { vi: "Vuốt để xem ảnh khác", en: "Swipe for more photos" },
+	"lightbox.open": { vi: "Phóng to ảnh", en: "View larger" },
 	"notFound.title": { vi: "Không tìm thấy trang", en: "Page not found" },
 	"notFound.body": {
 		vi: "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",
