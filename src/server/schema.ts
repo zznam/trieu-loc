@@ -85,3 +85,38 @@ export const contributions = pgTable(
 export type Contribution = typeof contributions.$inferSelect;
 export type ContributionKind = (typeof CONTRIBUTION_KINDS)[number];
 export type ContributionStatus = (typeof CONTRIBUTION_STATUSES)[number];
+
+// ---------- Community messages: guestbook entries and page comments ----------
+
+export const MESSAGE_KINDS = ["guestbook", "comment"] as const;
+export const messageKind = pgEnum("message_kind", MESSAGE_KINDS);
+
+export const messages = pgTable(
+	"messages",
+	{
+		id: serial("id").primaryKey(),
+		kind: messageKind("kind").notNull(),
+		/** For comments: the page it belongs to, e.g. "news:2026-11-01-ra-mat-trang-web". Null for the guestbook. */
+		target: varchar("target", { length: 160 }),
+		/** Reuses the contribution statuses: nothing is public until approved. */
+		status: contributionStatus("status").notNull().default("pending"),
+		name: varchar("name", { length: 80 }).notNull(),
+		/** Where the writer is (e.g. "TP. Hồ Chí Minh", "Đức"). */
+		place: varchar("place", { length: 80 }),
+		message: text("message").notNull(),
+		lang: varchar("lang", { length: 2 }).notNull().default("vi"),
+		ipHash: varchar("ip_hash", { length: 64 }),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+	},
+	(t) => [
+		index("messages_kind_status_created_idx").on(t.kind, t.status, t.createdAt),
+		index("messages_target_status_idx").on(t.target, t.status),
+		index("messages_ip_created_idx").on(t.ipHash, t.createdAt),
+	],
+);
+
+export type Message = typeof messages.$inferSelect;
+export type MessageKind = (typeof MESSAGE_KINDS)[number];

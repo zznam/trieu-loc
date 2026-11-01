@@ -16,6 +16,7 @@ const PAGES = [
 	"/news",
 	"/gallery",
 	"/villages",
+	"/guestbook",
 	"/info",
 	"/contribute",
 ];

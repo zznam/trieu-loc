@@ -179,6 +179,24 @@ function Home() {
 					))}
 				</div>
 			</section>
+
+			<section className="mx-auto max-w-6xl px-4 pb-4">
+				<Link
+					to="/$lang/guestbook"
+					params={{ lang }}
+					className="group flex flex-col gap-3 rounded-2xl border border-dashed border-earth-500/60 bg-paper-2 p-6 sm:flex-row sm:items-center sm:justify-between"
+				>
+					<span className="flex items-center gap-3 text-lg text-rice-900">
+						<span aria-hidden="true" className="text-3xl">
+							✉️
+						</span>
+						{t(lang, "guestbook.cta")}
+					</span>
+					<span className="font-semibold text-earth-700 group-hover:underline">
+						{t(lang, "guestbook.write")} →
+					</span>
+				</Link>
+			</section>
 		</>
 	);
 }

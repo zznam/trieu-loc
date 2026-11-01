@@ -13,6 +13,12 @@ import {
 	setPublished,
 	updateContribution,
 } from "#/server/contributions";
+import {
+	type AdminMessage,
+	deleteMessage,
+	getMessagesAdmin,
+	moderateMessage,
+} from "#/server/messages";
 import type { ContributionStatus } from "#/server/schema";
 
 const STATUSES: { value: ContributionStatus; label: string }[] = [
@@ -21,18 +27,43 @@ const STATUSES: { value: ContributionStatus; label: string }[] = [
 	{ value: "rejected", label: "Từ chối" },
 ];
 
+const SECTIONS = [
+	{ value: "contributions", label: "Đóng góp" },
+	{ value: "guestbook", label: "Sổ lưu bút" },
+] as const;
+type Section = (typeof SECTIONS)[number]["value"];
+
 export const Route = createFileRoute("/admin")({
 	validateSearch: (
 		s: Record<string, unknown>,
-	): { status?: ContributionStatus } =>
-		STATUSES.some((x) => x.value === s.status)
+	): { status?: ContributionStatus; section?: Section } => ({
+		...(STATUSES.some((x) => x.value === s.status)
 			? { status: s.status as ContributionStatus }
-			: {},
-	loaderDeps: ({ search }) => ({ status: search.status ?? "pending" }),
-	loader: ({ deps }) => getAdminState({ data: { status: deps.status } }),
+			: {}),
+		...(SECTIONS.some((x) => x.value === s.section) &&
+		s.section !== "contributions"
+			? { section: s.section as Section }
+			: {}),
+	}),
+	loaderDeps: ({ search }) => ({
+		status: search.status ?? "pending",
+		section: search.section ?? "contributions",
+	}),
+	loader: async ({ deps }) =>
+		deps.section === "contributions"
+			? {
+					contrib: await getAdminState({ data: { status: deps.status } }),
+					msgs: null,
+				}
+			: {
+					contrib: null,
+					msgs: await getMessagesAdmin({
+						data: { kind: deps.section, status: deps.status },
+					}),
+				},
 	head: () => ({
 		meta: [
-			{ title: "Quản trị đóng góp · Triệu Lộc" },
+			{ title: "Quản trị · Triệu Lộc" },
 			{ name: "robots", content: "noindex, nofollow" },
 		],
 	}),
@@ -40,8 +71,18 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
-	const state = Route.useLoaderData();
-	const { status = "pending" } = Route.useSearch();
+	const { contrib, msgs } = Route.useLoaderData();
+	const { status = "pending", section = "contributions" } = Route.useSearch();
+	const authed = contrib?.authed ?? msgs?.authed ?? false;
+	const configured = contrib?.configured ?? {
+		db: msgs?.configured.db ?? false,
+		admin: msgs?.configured.admin ?? false,
+		blob: true, // not relevant outside contributions
+		notify: true,
+	};
+	const counts = contrib?.counts ??
+		msgs?.counts ?? { pending: 0, approved: 0, rejected: 0 };
+	const count = contrib?.items.length ?? msgs?.items.length ?? 0;
 
 	return (
 		<div className="min-h-screen bg-paper">
@@ -55,14 +96,35 @@ function AdminPage() {
 						← Triệu Lộc
 					</Link>
 					<span className="text-sm font-semibold uppercase tracking-widest text-earth-700">
-						Quản trị đóng góp
+						Quản trị
 					</span>
-					{state.authed ? <LogoutButton /> : <span />}
+					{authed ? <LogoutButton /> : <span />}
 				</div>
+				{authed && (
+					<nav
+						className="mx-auto flex max-w-5xl gap-1 px-4"
+						aria-label="Mục quản trị"
+					>
+						{SECTIONS.map((s) => (
+							<Link
+								key={s.value}
+								to="/admin"
+								search={s.value === "contributions" ? {} : { section: s.value }}
+								className={`rounded-t-xl px-4 py-2 text-sm font-semibold ${
+									section === s.value
+										? "bg-paper text-rice-900"
+										: "text-ink-soft hover:text-rice-900"
+								}`}
+							>
+								{s.label}
+							</Link>
+						))}
+					</nav>
+				)}
 			</header>
 			<main className="mx-auto max-w-5xl px-4 py-8">
-				<ConfigWarnings configured={state.configured} />
-				{!state.configured.admin ? null : !state.authed ? (
+				<ConfigWarnings configured={configured} />
+				{!configured.admin ? null : !authed ? (
 					<LoginForm />
 				) : (
 					<>
@@ -71,7 +133,10 @@ function AdminPage() {
 								<Link
 									key={s.value}
 									to="/admin"
-									search={{ status: s.value }}
+									search={{
+										status: s.value,
+										...(section === "contributions" ? {} : { section }),
+									}}
 									className={`rounded-full px-4 py-2 text-sm font-medium ${
 										status === s.value
 											? "bg-rice-700 text-paper"
@@ -79,18 +144,24 @@ function AdminPage() {
 									}`}
 								>
 									{s.label}{" "}
-									<span className="opacity-70">({state.counts[s.value]})</span>
+									<span className="opacity-70">({counts[s.value]})</span>
 								</Link>
 							))}
 						</nav>
-						{state.items.length === 0 ? (
+						{count === 0 ? (
 							<p className="rounded-2xl bg-paper-2 p-8 text-center text-ink-soft">
-								Không có đóng góp nào ở mục này.
+								Không có mục nào ở đây.
 							</p>
-						) : (
+						) : contrib ? (
 							<ul className="space-y-4">
-								{state.items.map((item) => (
+								{contrib.items.map((item) => (
 									<ContributionCard key={item.id} item={item} />
+								))}
+							</ul>
+						) : (
+							<ul className="space-y-3">
+								{msgs?.items.map((m) => (
+									<MessageCard key={m.id} item={m} />
 								))}
 							</ul>
 						)}
@@ -98,6 +169,101 @@ function AdminPage() {
 				)}
 			</main>
 		</div>
+	);
+}
+
+function MessageCard({ item }: { item: AdminMessage }) {
+	const router = useRouter();
+	const [busy, setBusy] = useState(false);
+	async function act(fn: () => Promise<unknown>) {
+		setBusy(true);
+		try {
+			await fn();
+			await router.invalidate();
+		} finally {
+			setBusy(false);
+		}
+	}
+	const btn =
+		"rounded-full border border-earth-300 px-3 py-1.5 text-sm font-semibold text-ink disabled:opacity-60";
+	return (
+		<li className="rounded-2xl border border-earth-300/50 bg-card p-4">
+			<p className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-widest text-earth-700">
+				<span>#{item.id}</span>
+				<span>·</span>
+				<time dateTime={item.createdAt}>
+					{new Date(item.createdAt).toLocaleString("vi-VN")}
+				</time>
+				<span>·</span>
+				<span>{item.lang.toUpperCase()}</span>
+				{item.target && (
+					<>
+						<span>·</span>
+						<span className="normal-case tracking-normal">{item.target}</span>
+					</>
+				)}
+			</p>
+			<p className="mt-2 whitespace-pre-line text-ink">{item.message}</p>
+			<p className="mt-2 text-sm text-ink-soft">
+				— <span className="font-semibold text-ink">{item.name}</span>
+				{item.place && ` · ${item.place}`}
+			</p>
+			<div className="mt-3 flex flex-wrap gap-2">
+				{item.status !== "approved" && (
+					<button
+						type="button"
+						disabled={busy}
+						onClick={() =>
+							void act(() =>
+								moderateMessage({ data: { id: item.id, status: "approved" } }),
+							)
+						}
+						className="rounded-full bg-rice-700 px-3 py-1.5 text-sm font-semibold text-paper disabled:opacity-60"
+					>
+						✓ Duyệt & hiển thị
+					</button>
+				)}
+				{item.status !== "rejected" && (
+					<button
+						type="button"
+						disabled={busy}
+						onClick={() =>
+							void act(() =>
+								moderateMessage({ data: { id: item.id, status: "rejected" } }),
+							)
+						}
+						className={btn}
+					>
+						{item.status === "approved" ? "Ẩn" : "✕ Từ chối"}
+					</button>
+				)}
+				{item.status !== "pending" && (
+					<button
+						type="button"
+						disabled={busy}
+						onClick={() =>
+							void act(() =>
+								moderateMessage({ data: { id: item.id, status: "pending" } }),
+							)
+						}
+						className={btn}
+					>
+						↺ Chờ duyệt
+					</button>
+				)}
+				<button
+					type="button"
+					disabled={busy}
+					onClick={() => {
+						if (confirm(`Xoá vĩnh viễn lời nhắn #${item.id}?`))
+							void act(() => deleteMessage({ data: { id: item.id } }));
+					}}
+					className="ml-auto rounded-full px-3 py-1.5 text-sm font-semibold text-lotus hover:bg-lotus/10 disabled:opacity-60"
+				>
+					Xoá
+				</button>
+			</div>
+		</li>
 	);
 }
 
