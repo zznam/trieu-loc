@@ -13,6 +13,7 @@ const PAGES = [
 	"/events",
 	"/news",
 	"/gallery",
+	"/info",
 	"/contribute",
 ];
 

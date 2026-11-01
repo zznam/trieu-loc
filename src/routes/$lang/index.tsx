@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FestivalCountdown } from "#/components/FestivalCountdown";
 import { HeroArt } from "#/components/HeroArt";
+import { WeatherChip } from "#/components/Weather";
 import { getNews, site } from "#/lib/content";
 import { type DictKey, formatDate, type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
@@ -87,6 +88,9 @@ function Home() {
 						</div>
 					))}
 				</dl>
+				<div className="mx-auto max-w-6xl px-4 pb-6">
+					<WeatherChip lang={lang} />
+				</div>
 			</section>
 
 			<section className="mx-auto max-w-6xl px-4 py-16">
