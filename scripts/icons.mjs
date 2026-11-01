@@ -27,7 +27,10 @@ for (const [name, size, pad] of jobs) {
 	await page.setContent(
 		`<html><body style="margin:0">${art(pad).replace("<svg ", `<svg width="${size}" height="${size}" `)}</body></html>`,
 	);
-	await page.screenshot({ path: `public/icons/${name}`, omitBackground: false });
+	await page.screenshot({
+		path: `public/icons/${name}`,
+		omitBackground: false,
+	});
 	console.log(`public/icons/${name}`);
 }
 await browser.close();

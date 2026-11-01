@@ -57,9 +57,16 @@ Bilingual fields use `{ "vi": "...", "en": "..." }`. UI labels live in `src/lib/
 ```bash
 pnpm install
 pnpm dev        # http://localhost:3000
-pnpm build      # production build
+pnpm build      # production build (+ client-bundle leak check)
 pnpm check      # Biome lint + format
+pnpm typecheck  # TypeScript
+pnpm test       # unit tests (Vitest)
+pnpm test:e2e   # end-to-end tests (Playwright) — run `pnpm build` first
 ```
+
+**End-to-end tests** start the production build on port 4173. The contribution/admin tests need a Postgres database: `DATABASE_URL=postgres://… pnpm test:e2e` (migrations run and the `contributions` table is **emptied** first — never point it at production). Without `DATABASE_URL` those tests are skipped. First time: `pnpm exec playwright install chromium`.
+
+**CI** (`.github/workflows/ci.yml`) runs lint, unit tests, build, type check and the full E2E suite against a Postgres service on every pull request and on pushes to `main`. A failed run uploads the Playwright report and traces as an artifact.
 
 ## SEO & sharing
 

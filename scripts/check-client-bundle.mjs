@@ -4,10 +4,7 @@ import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 
 // Nitro emits to .vercel/output/static/assets on Vercel, and to .output/public/assets locally.
-const candidateDirs = [
-	".vercel/output/static/assets",
-	".output/public/assets",
-];
+const candidateDirs = [".vercel/output/static/assets", ".output/public/assets"];
 const DIR = candidateDirs.find((d) => existsSync(d));
 if (!DIR) {
 	console.error(
