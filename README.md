@@ -23,9 +23,17 @@ A bilingual (Vietnamese / English) community website for **Xã Triệu Lộc, t�
 
 `/` redirects to `/vi`. The language toggle keeps you on the same page.
 
-## Editing content (no code needed)
+## Editing content
 
-All content lives in `src/content/`:
+### In the browser: `/admin` → Nội dung (recommended once the database is set up)
+
+**Places, villages, events, people and news** can be edited at `/admin` → **Nội dung**. The first time, press **Nhập nội dung từ file**: it copies those five collections from the files below into the database once. From then on the database is the source of truth: add, edit (Vietnamese and English side by side, Markdown for news and people) and delete there. Changes appear on the site within ~30 seconds. **⤓ Tải bản sao lưu** downloads a JSON backup.
+
+Until you import (or without a database, e.g. in local development and tests), the site keeps reading the files. Site texts, history, food, businesses, gallery and contacts are still edited in the files.
+
+### In the files
+
+All content starts in `src/content/`:
 
 - `site.json` — commune name, stats, contact info, home-page highlights
 - `history.json` — intro, timeline, Lady Triệu, traditions
@@ -97,7 +105,7 @@ Spam protection: a hidden honeypot field, a minimum fill time, and a limit of 5 
    ```
 6. Redeploy, then open `https://<your-site>/admin`.
 
-See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`. **Whenever a PR adds a file to `drizzle/`, run `pnpm db:migrate` again after deploying** (latest: `0004_newsletter.sql` for the newsletter).
+See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`. **Whenever a PR adds a file to `drizzle/`, run `pnpm db:migrate` again after deploying** (latest: `0005_content.sql` for the content editor).
 
 `pnpm build` ends with a check that fails if server-only code (database driver, crypto, Blob SDK) ends up in the browser bundle. If it trips, you imported a plain value from `src/server/*` into a route — import only server functions from there.
 

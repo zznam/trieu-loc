@@ -6,6 +6,7 @@ import { STORY_PREFIX } from "#/lib/contribute";
 import { getVillage } from "#/lib/villages";
 import { looksLikeBot, requestIpHash, tooManyLinks } from "./abuse";
 import { isAdminConfigured, isAdminRequest, requireAdmin } from "./auth";
+import { ensureContentFresh } from "./content-db";
 import { getDb, isDbConfigured } from "./db";
 import { notifyNewSubmission } from "./notify";
 import { findPublishedStory } from "./published-queries";
@@ -25,6 +26,7 @@ const TARGET_RE = /^(news|people|villages):[a-z0-9-]{1,140}$/;
 
 /** True if the commented / reacted-to page really exists (stops junk targets filling the tables). */
 async function targetExists(target: string) {
+	await ensureContentFresh();
 	const [type, slug] = target.split(":");
 	if (type === "people") return Boolean(getPerson("vi", slug));
 	if (type === "villages") return Boolean(getVillage(slug));

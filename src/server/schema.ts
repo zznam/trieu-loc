@@ -179,3 +179,20 @@ export const newsletterSends = pgTable("newsletter_sends", {
 	failed: integer("failed").notNull().default(0),
 	sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// ---------- Editable site content (imported once from the files, then edited in /admin) ----------
+
+export const contentItems = pgTable(
+	"content_items",
+	{
+		/** places | villages | events | people | news */
+		collection: varchar("collection", { length: 20 }).notNull(),
+		/** The item's id / slug. */
+		id: varchar("id", { length: 120 }).notNull(),
+		data: jsonb("data").notNull(),
+		updatedAt: timestamp("updated_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+	},
+	(t) => [primaryKey({ columns: [t.collection, t.id] })],
+);

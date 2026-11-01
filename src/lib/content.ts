@@ -61,6 +61,7 @@ type MdDoc = {
 	slug: string;
 	lang: Lang;
 	data: Record<string, string>;
+	markdown: string;
 	html: string;
 };
 
@@ -92,6 +93,7 @@ function loadCollection(files: Record<string, string>): MdDoc[] {
 				slug: m[1],
 				lang: m[2] as Lang,
 				data,
+				markdown: body.trim(),
 				html: marked.parse(body, { async: false }),
 			};
 		})
@@ -127,10 +129,13 @@ export type NewsPost = {
 	title: string;
 	date: string;
 	summary: string;
+	/** Markdown source (kept for the content editor). */
+	markdown: string;
 	html: string;
 };
 
-const allNews: NewsPost[] = loadCollection(
+/** Mutable: replaced in place by the content store when the database has content. */
+export const allNews: NewsPost[] = loadCollection(
 	import.meta.glob("../content/news/*.md", {
 		query: "?raw",
 		import: "default",
@@ -142,6 +147,7 @@ const allNews: NewsPost[] = loadCollection(
 	title: d.data.title ?? d.slug,
 	date: d.data.date ?? d.slug.slice(0, 10),
 	summary: d.data.summary ?? "",
+	markdown: d.markdown,
 	html: d.html,
 }));
 
@@ -176,10 +182,13 @@ export type Person = {
 	photo: string;
 	order: number;
 	villageId?: string;
+	/** Markdown source (kept for the content editor). */
+	markdown: string;
 	html: string;
 };
 
-const allPeople: Person[] = loadCollection(
+/** Mutable: replaced in place by the content store when the database has content. */
+export const allPeople: Person[] = loadCollection(
 	import.meta.glob("../content/people/*.md", {
 		query: "?raw",
 		import: "default",
@@ -199,6 +208,7 @@ const allPeople: Person[] = loadCollection(
 	photo: d.data.photo ?? "",
 	order: Number(d.data.order ?? 100),
 	villageId: d.data.villageId || undefined,
+	markdown: d.markdown,
 	html: d.html,
 }));
 
