@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { ContributeCta } from "#/components/ContributeCta";
 import { PageHeader } from "#/components/PageHeader";
-import { site } from "#/lib/content";
 import {
 	type EventCategory,
 	eventCategoryLabel,
@@ -227,15 +227,11 @@ function EventsPage() {
 					</div>
 				))}
 
-				<p className="mt-4 rounded-2xl bg-rice-700 p-6 text-paper">
-					{t(lang, "events.suggest")}{" "}
-					<a
-						className="font-semibold underline"
-						href={`mailto:${site.contact.email}`}
-					>
-						{site.contact.email}
-					</a>
-				</p>
+				<ContributeCta
+					lang={lang}
+					text={t(lang, "events.suggest")}
+					kind="event"
+				/>
 			</section>
 		</>
 	);

@@ -13,6 +13,7 @@ const PAGES = [
 	"/events",
 	"/news",
 	"/gallery",
+	"/contribute",
 ];
 
 function entry(path: string, lastmod?: string) {

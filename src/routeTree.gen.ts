@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LangRouteImport } from './routes/$lang'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LangIndexRouteImport } from './routes/$lang/index'
+import { Route as LangContributeRouteImport } from './routes/$lang/contribute'
 import { Route as LangEventsRouteImport } from './routes/$lang/events'
 import { Route as LangFoodRouteImport } from './routes/$lang/food'
 import { Route as LangGalleryRouteImport } from './routes/$lang/gallery'
@@ -35,6 +37,11 @@ const LangRoute = LangRouteImport.update({
   path: '/$lang',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
   id: '/robots.txt',
   path: '/robots.txt',
@@ -48,6 +55,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const LangIndexRoute = LangIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => LangRoute,
+} as any)
+const LangContributeRoute = LangContributeRouteImport.update({
+  id: '/contribute',
+  path: '/contribute',
   getParentRoute: () => LangRoute,
 } as any)
 const LangEventsRoute = LangEventsRouteImport.update({
@@ -104,8 +116,10 @@ const LangPeopleSlugRoute = LangPeopleSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
+  '/admin': typeof AdminRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$lang/contribute': typeof LangContributeRoute
   '/$lang/events': typeof LangEventsRoute
   '/$lang/food': typeof LangFoodRoute
   '/$lang/gallery': typeof LangGalleryRoute
@@ -120,8 +134,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$lang/contribute': typeof LangContributeRoute
   '/$lang/events': typeof LangEventsRoute
   '/$lang/food': typeof LangFoodRoute
   '/$lang/gallery': typeof LangGalleryRoute
@@ -138,8 +154,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$lang': typeof LangRouteWithChildren
+  '/admin': typeof AdminRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/$lang/contribute': typeof LangContributeRoute
   '/$lang/events': typeof LangEventsRoute
   '/$lang/food': typeof LangFoodRoute
   '/$lang/gallery': typeof LangGalleryRoute
@@ -157,8 +175,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$lang'
+    | '/admin'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/$lang/contribute'
     | '/$lang/events'
     | '/$lang/food'
     | '/$lang/gallery'
@@ -173,8 +193,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/$lang/contribute'
     | '/$lang/events'
     | '/$lang/food'
     | '/$lang/gallery'
@@ -190,8 +212,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$lang'
+    | '/admin'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/$lang/contribute'
     | '/$lang/events'
     | '/$lang/food'
     | '/$lang/gallery'
@@ -208,6 +232,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LangRoute: typeof LangRouteWithChildren
+  AdminRoute: typeof AdminRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
@@ -226,6 +251,13 @@ declare module '@tanstack/react-router' {
       path: '/$lang'
       fullPath: '/$lang'
       preLoaderRoute: typeof LangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -247,6 +279,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/$lang/'
       preLoaderRoute: typeof LangIndexRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/$lang/contribute': {
+      id: '/$lang/contribute'
+      path: '/contribute'
+      fullPath: '/$lang/contribute'
+      preLoaderRoute: typeof LangContributeRouteImport
       parentRoute: typeof LangRoute
     }
     '/$lang/events': {
@@ -323,6 +362,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface LangRouteChildren {
+  LangContributeRoute: typeof LangContributeRoute
   LangEventsRoute: typeof LangEventsRoute
   LangFoodRoute: typeof LangFoodRoute
   LangGalleryRoute: typeof LangGalleryRoute
@@ -337,6 +377,7 @@ interface LangRouteChildren {
 }
 
 const LangRouteChildren: LangRouteChildren = {
+  LangContributeRoute: LangContributeRoute,
   LangEventsRoute: LangEventsRoute,
   LangFoodRoute: LangFoodRoute,
   LangGalleryRoute: LangGalleryRoute,
@@ -355,6 +396,7 @@ const LangRouteWithChildren = LangRoute._addFileChildren(LangRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LangRoute: LangRouteWithChildren,
+  AdminRoute: AdminRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
