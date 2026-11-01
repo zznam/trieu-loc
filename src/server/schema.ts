@@ -136,3 +136,46 @@ export const reactions = pgTable(
 	},
 	(t) => [primaryKey({ columns: [t.target, t.ipHash] })],
 );
+
+// ---------- Newsletter ----------
+
+export const SUBSCRIBER_STATUSES = [
+	"pending",
+	"active",
+	"unsubscribed",
+] as const;
+export const subscriberStatus = pgEnum(
+	"subscriber_status",
+	SUBSCRIBER_STATUSES,
+);
+
+export const subscribers = pgTable(
+	"subscribers",
+	{
+		id: serial("id").primaryKey(),
+		/** Stored lower-cased. */
+		email: varchar("email", { length: 254 }).notNull().unique(),
+		lang: varchar("lang", { length: 2 }).notNull().default("vi"),
+		status: subscriberStatus("status").notNull().default("pending"),
+		/** Random secret used in confirm and unsubscribe links. */
+		token: varchar("token", { length: 64 }).notNull().unique(),
+		ipHash: varchar("ip_hash", { length: 64 }),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.notNull()
+			.defaultNow(),
+		confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
+		unsubscribedAt: timestamp("unsubscribed_at", { withTimezone: true }),
+	},
+	(t) => [
+		index("subscribers_status_idx").on(t.status),
+		index("subscribers_ip_created_idx").on(t.ipHash, t.createdAt),
+	],
+);
+
+export const newsletterSends = pgTable("newsletter_sends", {
+	id: serial("id").primaryKey(),
+	subject: varchar("subject", { length: 200 }).notNull(),
+	recipients: integer("recipients").notNull(),
+	failed: integer("failed").notNull().default(0),
+	sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
+});

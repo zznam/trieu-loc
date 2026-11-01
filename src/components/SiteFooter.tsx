@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { site } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
 import { InstallButton } from "./InstallButton";
+import { NewsletterSignup } from "./NewsletterSignup";
 
 export function SiteFooter({ lang }: { lang: Lang }) {
 	return (
@@ -18,6 +19,9 @@ export function SiteFooter({ lang }: { lang: Lang }) {
 						{t(lang, "footer.about")}
 					</p>
 					<InstallButton lang={lang} />
+					<div className="mt-6">
+						<NewsletterSignup lang={lang} />
+					</div>
 				</div>
 				<div className="sm:text-right">
 					<p className="text-sm font-semibold uppercase tracking-widest text-earth-300">

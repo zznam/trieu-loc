@@ -97,9 +97,17 @@ Spam protection: a hidden honeypot field, a minimum fill time, and a limit of 5 
    ```
 6. Redeploy, then open `https://<your-site>/admin`.
 
-See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`. **Whenever a PR adds a file to `drizzle/`, run `pnpm db:migrate` again after deploying** (latest: `0003_reactions.sql` for ❤️ reactions).
+See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`. **Whenever a PR adds a file to `drizzle/`, run `pnpm db:migrate` again after deploying** (latest: `0004_newsletter.sql` for the newsletter).
 
 `pnpm build` ends with a check that fails if server-only code (database driver, crypto, Blob SDK) ends up in the browser bundle. If it trips, you imported a plain value from `src/server/*` into a route — import only server functions from there.
+
+## Newsletter
+
+Visitors subscribe from the footer. It is **double opt-in**: they get a confirmation email and must press *Confirm* on the site (opening the link alone does nothing, so email link-scanners can't subscribe or unsubscribe anyone). Every newsletter has a personal unsubscribe link and `List-Unsubscribe` one-click headers (Gmail/Apple Mail "Unsubscribe" button).
+
+In `/admin` → **Bản tin** you see subscriber counts, a live preview of this month's digest in Vietnamese and English (news from the last 30 days, events in the next 2 months), **Gửi thử** (sends to the first `NOTIFY_EMAIL`), and **Gửi cho N người**. A second send within an hour is blocked. Each subscriber gets the edition in the language they signed up in.
+
+Needs `RESEND_API_KEY` and a **verified sending domain** in Resend with `NOTIFY_FROM` set (without one, Resend only delivers to your own account address). Sending is done in batches of 100.
 
 ## Installable app (PWA)
 
