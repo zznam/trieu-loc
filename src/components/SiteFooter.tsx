@@ -37,6 +37,13 @@ export function SiteFooter({ lang }: { lang: Lang }) {
 						Facebook
 					</a>
 					<Link
+						to="/$lang/villages"
+						params={{ lang }}
+						className="mt-1 block text-sm underline-offset-4 hover:underline"
+					>
+						{t(lang, "nav.villages")}
+					</Link>
+					<Link
 						to="/$lang/info"
 						params={{ lang }}
 						className="mt-1 block text-sm underline-offset-4 hover:underline"

@@ -314,6 +314,34 @@ const dict = {
 		vi: "Tạm thời không lấy được dữ liệu thời tiết. Vui lòng thử lại sau.",
 		en: "Weather data is temporarily unavailable. Please try again later.",
 	},
+	"nav.villages": { vi: "Thôn xóm", en: "Villages" },
+	"villages.title": {
+		vi: "Các thôn của Triệu Lộc",
+		en: "The villages of Triệu Lộc",
+	},
+	"villages.lead": {
+		vi: "17 thôn của xã Triệu Lộc mới, hình thành từ ba xã Đại Lộc, Triệu Lộc và Tiến Lộc (từ 1/7/2025).",
+		en: "The 17 villages of the new Triệu Lộc commune, formed from Đại Lộc, Triệu Lộc and Tiến Lộc (since 1 July 2025).",
+	},
+	"villages.count": { vi: "thôn", en: "villages" },
+	"villages.places": { vi: "Địa danh trong thôn", en: "Places in the village" },
+	"villages.people": { vi: "Con người", en: "People" },
+	"villages.events": { vi: "Sự kiện", en: "Events" },
+	"villages.facts": { vi: "Điểm nổi bật", en: "Highlights" },
+	"villages.empty": {
+		vi: "Chưa có nội dung cho thôn này. Bạn là người thôn? Hãy gửi câu chuyện, ảnh hoặc thông tin.",
+		en: "Nothing here yet. From this village? Send us stories, photos or information.",
+	},
+	"villages.share": {
+		vi: "Bạn là người thôn này? Hãy gửi thêm câu chuyện, ảnh hoặc thông tin để bổ sung.",
+		en: "From this village? Send more stories, photos or information to add here.",
+	},
+	"villages.sample": {
+		vi: "Thông tin mẫu — cần cập nhật tên thôn",
+		en: "Placeholder — village name to be added",
+	},
+	"villages.all": { vi: "Tất cả các thôn", en: "All villages" },
+	"villages.byVillage": { vi: "Xem theo thôn", en: "Browse by village" },
 	"notFound.title": { vi: "Không tìm thấy trang", en: "Page not found" },
 	"notFound.body": {
 		vi: "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",

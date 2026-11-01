@@ -5,6 +5,7 @@ years: 226 – 248
 role: National heroine who led the uprising against the Eastern Wu
 village: Linked to Mount Tùng, Phú Điền village
 summary: Thanh Hóa's daughter who raised the banner of revolt in 248 and died on Mount Tùng aged just 23.
+villageId: phu-dien
 order: 1
 ---
 

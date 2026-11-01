@@ -5,6 +5,7 @@ years: Sinh năm 1950
 role: Người giữ nghề tế lễ truyền thống
 village: Thôn Phú Điền
 summary: Hồ sơ mẫu — thay bằng câu chuyện của một người thật trong làng.
+villageId: phu-dien
 order: 10
 ---
 

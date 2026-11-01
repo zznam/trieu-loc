@@ -13,6 +13,7 @@ A bilingual (Vietnamese / English) community website for **Xã Triệu Lộc, t�
 | `/:lang/people` | Historical figures, notable locals and diaspora stories (Markdown) |
 | `/:lang/events` | Upcoming festivals, holidays and community events (lunar + solar dates) |
 | `/:lang/news` | News & announcements (Markdown) |
+| `/:lang/villages` | The 17 villages; each page gathers its places, people and events with a map |
 | `/:lang/info` | Live weather (Open-Meteo) and a phone directory |
 | `/:lang/contribute` | Form for photos, stories, businesses, events and corrections |
 | `/admin` | Password-protected review of contributions (Vietnamese) |
@@ -28,6 +29,7 @@ All content lives in `src/content/`:
 - `history.json` — intro, timeline, Lady Triệu, traditions
 - `places.json` — places on the map (`coords: [lat, lng]`, set `approx: false` once verified)
 - `food.json` — specialties
+- `villages.json` — the 17 thôn (grouped by former commune: `dai-loc`, `trieu-loc`, `tien-loc`). Phú Điền is filled in; the other 16 are placeholders (`"sample": true`) — rename them, write an `intro`, add `facts`, optional `coords: [lat, lng]`, then set `"sample": false` so they appear in search and the sitemap. Link content to a village by adding `"villageId": "<id>"` to a place or event, or `villageId: <id>` to a person's frontmatter
 - `contacts.json` — phone directory on the Useful info page (emergency numbers, commune services, schools). Entries marked `"sample": true` still need real numbers
 - `events.json` — events calendar. `date.calendar` is `lunar` or `solar`; omit `date.year` for an event that repeats every year, set `date.days` for multi-day events
 - `businesses.json` — business directory (**currently sample entries — replace them**)

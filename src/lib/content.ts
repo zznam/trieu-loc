@@ -17,6 +17,8 @@ export type Place = {
 	coords: [number, number];
 	approx: boolean;
 	body: L;
+	/** Links the place to a village page (src/content/villages.json). */
+	villageId?: string;
 };
 
 export type Specialty = { id: string; name: L; tag: L; body: L };
@@ -173,6 +175,7 @@ export type Person = {
 	summary: string;
 	photo: string;
 	order: number;
+	villageId?: string;
 	html: string;
 };
 
@@ -195,6 +198,7 @@ const allPeople: Person[] = loadCollection(
 	summary: d.data.summary ?? "",
 	photo: d.data.photo ?? "",
 	order: Number(d.data.order ?? 100),
+	villageId: d.data.villageId || undefined,
 	html: d.html,
 }));
 

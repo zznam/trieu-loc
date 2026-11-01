@@ -31,12 +31,16 @@ export default function PlacesMap({
 	lang,
 	places,
 	center,
+	zoom = 13,
+	height = "h-[420px] sm:h-[520px]",
 	focus,
 }: {
 	lang: Lang;
 	places: Place[];
 	center: [number, number];
 	focus?: [number, number];
+	zoom?: number;
+	height?: string;
 }) {
 	const [boundary, setBoundary] = useState<GeoData | null>(null);
 	useEffect(() => {
@@ -49,9 +53,9 @@ export default function PlacesMap({
 	return (
 		<MapContainer
 			center={center}
-			zoom={13}
+			zoom={zoom}
 			scrollWheelZoom={false}
-			className="h-[420px] w-full sm:h-[520px]"
+			className={`w-full ${height}`}
 		>
 			<TileLayer
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

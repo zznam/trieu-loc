@@ -5,6 +5,7 @@ years: Born 1950
 role: Keeper of the traditional festival rites
 village: Phú Điền village
 summary: Sample profile — replace with the story of a real person from the village.
+villageId: phu-dien
 order: 10
 ---
 

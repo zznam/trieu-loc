@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { PageHeader } from "#/components/PageHeader";
 import {
@@ -63,6 +63,13 @@ function PlacesPage() {
 				lead={t(lang, "places.lead")}
 			/>
 			<section className="mx-auto max-w-6xl px-4 py-10">
+				<Link
+					to="/$lang/villages"
+					params={{ lang }}
+					className="mb-6 inline-flex items-center gap-2 rounded-full bg-rice-100 px-4 py-2 text-sm font-semibold text-rice-900 hover:bg-rice-300/40"
+				>
+					🏘️ {t(lang, "villages.byVillage")} →
+				</Link>
 				<div className="mb-6 flex flex-wrap gap-2" role="tablist">
 					{CATEGORIES.map((c) => (
 						<button
