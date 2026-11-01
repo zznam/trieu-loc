@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { site } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
 
@@ -35,6 +36,13 @@ export function SiteFooter({ lang }: { lang: Lang }) {
 					>
 						Facebook
 					</a>
+					<Link
+						to="/$lang/contribute"
+						params={{ lang }}
+						className="mt-4 inline-block rounded-full bg-paper px-4 py-2 text-sm font-semibold text-rice-900 hover:bg-rice-100"
+					>
+						{t(lang, "contribute.cta")} →
+					</Link>
 				</div>
 			</div>
 			<div className="border-t border-rice-700/60">

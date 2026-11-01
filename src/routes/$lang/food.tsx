@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { ContributeCta } from "#/components/ContributeCta";
 import { PageHeader, SampleNote } from "#/components/PageHeader";
-import { businesses, site, specialties } from "#/lib/content";
+import { businesses, specialties } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
 import { fold } from "#/lib/text";
@@ -150,15 +151,11 @@ function FoodPage() {
 						)}
 					</div>
 
-					<p className="mt-10 rounded-2xl bg-rice-700 p-6 text-paper">
-						{t(lang, "food.addBusiness")}{" "}
-						<a
-							className="font-semibold underline"
-							href={`mailto:${site.contact.email}`}
-						>
-							{site.contact.email}
-						</a>
-					</p>
+					<ContributeCta
+						lang={lang}
+						text={t(lang, "food.addBusiness")}
+						kind="business"
+					/>
 				</div>
 			</section>
 		</>

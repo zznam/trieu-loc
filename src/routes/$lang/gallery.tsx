@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { ContributeCta } from "#/components/ContributeCta";
 import { PageHeader } from "#/components/PageHeader";
 import { Photo } from "#/components/Photo";
-import { type GalleryItem, gallery, site } from "#/lib/content";
+import { type GalleryItem, gallery } from "#/lib/content";
 import { type L, type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
+import {
+	type CommunityPhoto,
+	getCommunityPhotos,
+} from "#/server/contributions";
 
 export const Route = createFileRoute("/$lang/gallery")({
 	head: ({ params }) => {
@@ -17,6 +22,7 @@ export const Route = createFileRoute("/$lang/gallery")({
 			"gallery",
 		);
 	},
+	loader: () => getCommunityPhotos(),
 	component: GalleryPage,
 });
 
@@ -29,6 +35,7 @@ const SEASONS: Record<GalleryItem["season"], L> = {
 
 function GalleryPage() {
 	const lang = Route.useParams().lang as Lang;
+	const community = Route.useLoaderData();
 	const [season, setSeason] = useState<GalleryItem["season"] | "all">("all");
 	const items =
 		season === "all" ? gallery : gallery.filter((g) => g.season === season);
@@ -80,16 +87,58 @@ function GalleryPage() {
 						</figure>
 					))}
 				</div>
-				<p className="mt-10 text-center text-ink-soft">
-					📷{" "}
-					<a
-						className="font-semibold text-rice-700 underline"
-						href={`mailto:${site.contact.email}`}
-					>
-						{site.contact.email}
-					</a>
-				</p>
+				{community.length > 0 && (
+					<CommunityPhotos lang={lang} items={community} />
+				)}
+				<ContributeCta
+					lang={lang}
+					text={t(lang, "gallery.lead")}
+					kind="photo"
+				/>
 			</section>
 		</>
+	);
+}
+
+function CommunityPhotos({
+	lang,
+	items,
+}: {
+	lang: Lang;
+	items: CommunityPhoto[];
+}) {
+	const photos = items.flatMap((c) => c.photos.map((p) => ({ ...p, c })));
+	return (
+		<div className="mt-16">
+			<h2 className="text-2xl font-semibold text-rice-900">
+				{t(lang, "gallery.community")}
+			</h2>
+			<div className="mt-6 columns-2 gap-4 md:columns-3">
+				{photos.map((p) => (
+					<figure
+						key={p.url}
+						className="mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-earth-300/50 bg-card"
+					>
+						<a href={p.url} target="_blank" rel="noreferrer">
+							<img
+								src={p.url}
+								alt={p.c.title}
+								loading="lazy"
+								width={p.width || undefined}
+								height={p.height || undefined}
+								className="h-auto w-full"
+							/>
+						</a>
+						<figcaption className="px-3 py-2 text-sm">
+							<span className="block font-medium text-ink">{p.c.title}</span>
+							<span className="text-ink-soft">
+								{t(lang, "gallery.by")} {p.c.name}
+								{p.c.village && ` · ${p.c.village}`}
+							</span>
+						</figcaption>
+					</figure>
+				))}
+			</div>
+		</div>
 	);
 }

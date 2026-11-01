@@ -184,6 +184,92 @@ const dict = {
 	},
 	"search.try": { vi: "Thử tìm:", en: "Try:" },
 	"search.open": { vi: "Tìm kiếm (Ctrl K)", en: "Search (Ctrl K)" },
+	"contribute.title": { vi: "Đóng góp cho trang", en: "Contribute" },
+	"contribute.lead": {
+		vi: "Gửi ảnh, câu chuyện, thông tin cơ sở kinh doanh hay sự kiện của thôn. Ban biên tập sẽ xem trước khi đăng.",
+		en: "Send photos, stories, business details or village events. Our editors review everything before it's published.",
+	},
+	"contribute.cta": { vi: "Gửi đóng góp", en: "Contribute" },
+	"contribute.kind": { vi: "Bạn muốn gửi gì?", en: "What are you sending?" },
+	"contribute.name": { vi: "Họ và tên", en: "Your name" },
+	"contribute.contact": {
+		vi: "Email hoặc số điện thoại",
+		en: "Email or phone",
+	},
+	"contribute.contactHint": {
+		vi: "Không công khai — chỉ để chúng tôi liên hệ khi cần.",
+		en: "Never published — only so we can get back to you.",
+	},
+	"contribute.village": { vi: "Thôn / nơi ở", en: "Village / where you live" },
+	"contribute.titleField": { vi: "Tiêu đề", en: "Title" },
+	"contribute.message": { vi: "Nội dung", en: "Message" },
+	"contribute.messageHint": {
+		vi: "Kể câu chuyện, mô tả bức ảnh, hoặc ghi rõ thông tin cần sửa.",
+		en: "Tell the story, describe the photo, or explain what needs fixing.",
+	},
+	"contribute.photos": { vi: "Ảnh (tối đa 3)", en: "Photos (up to 3)" },
+	"contribute.photosHint": {
+		vi: "Ảnh được tự động thu nhỏ trước khi gửi. JPG, PNG hoặc WebP.",
+		en: "Photos are resized automatically before sending. JPG, PNG or WebP.",
+	},
+	"contribute.addPhotos": { vi: "Chọn ảnh", en: "Choose photos" },
+	"contribute.remove": { vi: "Bỏ ảnh", en: "Remove photo" },
+	"contribute.consent": {
+		vi: "Tôi đồng ý cho trang đăng nội dung này kèm tên tôi, và tôi có quyền chia sẻ những bức ảnh này.",
+		en: "I agree that this may be published with my name, and I have the right to share these photos.",
+	},
+	"contribute.optional": { vi: "không bắt buộc", en: "optional" },
+	"contribute.submit": { vi: "Gửi", en: "Send" },
+	"contribute.sending": { vi: "Đang gửi…", en: "Sending…" },
+	"contribute.processing": { vi: "Đang xử lý ảnh…", en: "Processing photos…" },
+	"contribute.thanks": { vi: "Cảm ơn bạn!", en: "Thank you!" },
+	"contribute.thanksBody": {
+		vi: "Đóng góp của bạn đã được gửi và đang chờ ban biên tập xem xét.",
+		en: "Your contribution has been sent and is waiting for review.",
+	},
+	"contribute.another": { vi: "Gửi thêm", en: "Send another" },
+	"contribute.err.notConfigured": {
+		vi: "Chức năng gửi đóng góp chưa được kích hoạt. Vui lòng thử lại sau.",
+		en: "Contributions aren't switched on yet. Please try again later.",
+	},
+	"contribute.err.invalid": {
+		vi: "Vui lòng điền đủ các ô bắt buộc.",
+		en: "Please fill in the required fields.",
+	},
+	"contribute.err.photoRequired": {
+		vi: "Vui lòng chọn ít nhất một ảnh.",
+		en: "Please add at least one photo.",
+	},
+	"contribute.err.tooMany": {
+		vi: "Chỉ gửi tối đa 3 ảnh mỗi lần.",
+		en: "Up to 3 photos per submission.",
+	},
+	"contribute.err.tooLarge": {
+		vi: "Ảnh quá lớn, vui lòng chọn ảnh khác.",
+		en: "A photo is too large — please pick another.",
+	},
+	"contribute.err.type": {
+		vi: "Chỉ nhận ảnh JPG, PNG hoặc WebP.",
+		en: "Only JPG, PNG or WebP photos.",
+	},
+	"contribute.err.uploads": {
+		vi: "Tạm thời chưa nhận ảnh. Bạn vẫn có thể gửi nội dung không kèm ảnh.",
+		en: "Photo uploads aren't available yet. You can still send text without photos.",
+	},
+	"contribute.err.rate": {
+		vi: "Bạn đã gửi khá nhiều trong giờ qua. Vui lòng thử lại sau.",
+		en: "You've sent quite a few in the last hour. Please try again later.",
+	},
+	"contribute.err.server": {
+		vi: "Có lỗi xảy ra, vui lòng thử lại.",
+		en: "Something went wrong — please try again.",
+	},
+	"contribute.err.photoRead": {
+		vi: "Không đọc được ảnh này, vui lòng chọn ảnh khác.",
+		en: "Couldn't read that photo — please choose another.",
+	},
+	"gallery.community": { vi: "Ảnh từ bà con", en: "Photos from the community" },
+	"gallery.by": { vi: "Ảnh:", en: "Photo:" },
 	"notFound.title": { vi: "Không tìm thấy trang", en: "Page not found" },
 	"notFound.body": {
 		vi: "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",

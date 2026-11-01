@@ -13,7 +13,10 @@
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
-    "og": "node scripts/og.mjs"
+    "og": "node scripts/og.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
@@ -21,13 +24,17 @@
     "@tanstack/react-router": "1.170.46",
     "@tanstack/react-router-devtools": "1.167.2",
     "@tanstack/react-start": "1.169.4",
+    "@vercel/blob": "1.1.1",
+    "drizzle-orm": "0.44.5",
     "leaflet": "1.9.4",
     "marked": "15.0.12",
     "nitro": "3.0.260610-beta",
+    "postgres": "3.4.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-leaflet": "5.0.0",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "zod": "3.25.76"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.5",
@@ -38,6 +45,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.1",
+    "drizzle-kit": "0.31.4",
     "playwright": "1.63.0",
     "typescript": "^6.0.2",
     "vite": "^8.0.0"

@@ -1,0 +1,294 @@
+import { createHash } from "node:crypto";
+import { createServerFn } from "@tanstack/react-start";
+import { getRequestIP } from "@tanstack/react-start/server";
+import { and, count, desc, eq, gte } from "drizzle-orm";
+import { z } from "zod";
+import { LIMITS, type SubmitResult } from "#/lib/contribute";
+import {
+	checkPassword,
+	endSession,
+	isAdminConfigured,
+	isAdminRequest,
+	requireAdmin,
+	startSession,
+} from "./auth";
+import { getDb, isDbConfigured } from "./db";
+import {
+	CONTRIBUTION_KINDS,
+	CONTRIBUTION_STATUSES,
+	type ContributionStatus,
+	contributions,
+	type StoredPhoto,
+} from "./schema";
+import { deletePhotos, isBlobConfigured, storePhoto } from "./storage";
+
+const fields = z.object({
+	kind: z.enum(CONTRIBUTION_KINDS),
+	name: z.string().trim().min(1).max(120),
+	contact: z.string().trim().max(200).optional().default(""),
+	village: z.string().trim().max(120).optional().default(""),
+	title: z.string().trim().min(1).max(200),
+	message: z.string().trim().min(1).max(5000),
+	lang: z.enum(["vi", "en"]).default("vi"),
+	consent: z.literal("on").optional(),
+	website: z.string().optional().default(""), // honeypot: real people never fill this
+	startedAt: z.coerce.number().optional().default(0),
+	dims: z.string().optional().default("[]"), // JSON [[w,h], …] measured on the client
+});
+
+type Parsed = { data: z.infer<typeof fields>; photos: File[] };
+
+function hashIp(ip: string) {
+	return createHash("sha256")
+		.update(`${process.env.ADMIN_PASSWORD ?? "trieu-loc"}:${ip}`)
+		.digest("hex");
+}
+
+// ---------- Public: submit a contribution ----------
+
+export const submitContribution = createServerFn({ method: "POST" })
+	.validator((input: FormData): Parsed | { invalid: true } => {
+		if (!(input instanceof FormData)) return { invalid: true };
+		const raw: Record<string, string> = {};
+		for (const [k, v] of input.entries()) if (typeof v === "string") raw[k] = v;
+		const parsed = fields.safeParse(raw);
+		if (!parsed.success) return { invalid: true };
+		const photos = input
+			.getAll("photos")
+			.filter((v): v is File => v instanceof File && v.size > 0);
+		return { data: parsed.data, photos };
+	})
+	.handler(async ({ data: input }): Promise<SubmitResult> => {
+		if ("invalid" in input) return { ok: false, error: "invalid" };
+		const { data, photos } = input;
+
+		// Bots: honeypot filled or form submitted inhumanly fast. Pretend success, store nothing.
+		if (
+			data.website ||
+			(data.startedAt && Date.now() - data.startedAt < LIMITS.minFillMs)
+		)
+			return { ok: true };
+
+		if (!isDbConfigured()) return { ok: false, error: "not_configured" };
+		if (data.kind === "photo" && photos.length === 0)
+			return { ok: false, error: "photo_required" };
+		if (photos.length > LIMITS.maxPhotos)
+			return { ok: false, error: "too_many_photos" };
+		for (const p of photos) {
+			if (!(LIMITS.photoTypes as readonly string[]).includes(p.type))
+				return { ok: false, error: "photo_type" };
+			if (p.size > LIMITS.maxPhotoBytes)
+				return { ok: false, error: "photo_too_large" };
+		}
+		if (photos.length && !isBlobConfigured())
+			return { ok: false, error: "uploads_unavailable" };
+
+		try {
+			const db = getDb();
+			const ip = getRequestIP({ xForwardedFor: true }) ?? "unknown";
+			const ipHash = hashIp(ip);
+			const [{ recent }] = await db
+				.select({ recent: count() })
+				.from(contributions)
+				.where(
+					and(
+						eq(contributions.ipHash, ipHash),
+						gte(contributions.createdAt, new Date(Date.now() - 3600_000)),
+					),
+				);
+			if (recent >= LIMITS.perHour) return { ok: false, error: "rate_limited" };
+
+			let dims: [number, number][] = [];
+			try {
+				dims = JSON.parse(data.dims);
+			} catch {}
+			const stored: StoredPhoto[] = [];
+			for (const [i, file] of photos.entries()) {
+				const [w, h] = dims[i] ?? [0, 0];
+				stored.push(await storePhoto(file, Number(w) || 0, Number(h) || 0));
+			}
+
+			await db.insert(contributions).values({
+				kind: data.kind,
+				name: data.name,
+				contact: data.contact || null,
+				village: data.village || null,
+				title: data.title,
+				message: data.message,
+				photos: stored,
+				lang: data.lang,
+				consent: data.consent === "on",
+				ipHash,
+			});
+			return { ok: true };
+		} catch (err) {
+			console.error("submitContribution failed", err);
+			return { ok: false, error: "server" };
+		}
+	});
+
+// ---------- Public: approved photos for the gallery ----------
+
+export type CommunityPhoto = {
+	id: number;
+	title: string;
+	name: string;
+	village: string | null;
+	photos: StoredPhoto[];
+	createdAt: string;
+};
+
+export const getCommunityPhotos = createServerFn({ method: "GET" }).handler(
+	async (): Promise<CommunityPhoto[]> => {
+		if (!isDbConfigured()) return [];
+		try {
+			const rows = await getDb()
+				.select({
+					id: contributions.id,
+					title: contributions.title,
+					name: contributions.name,
+					village: contributions.village,
+					photos: contributions.photos,
+					createdAt: contributions.createdAt,
+				})
+				.from(contributions)
+				.where(
+					and(
+						eq(contributions.kind, "photo"),
+						eq(contributions.status, "approved"),
+						eq(contributions.consent, true),
+					),
+				)
+				.orderBy(desc(contributions.createdAt))
+				.limit(48);
+			return rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }));
+		} catch (err) {
+			console.error("getCommunityPhotos failed", err);
+			return [];
+		}
+	},
+);
+
+// ---------- Admin ----------
+
+export type AdminContribution = {
+	id: number;
+	kind: string;
+	status: ContributionStatus;
+	name: string;
+	contact: string | null;
+	village: string | null;
+	title: string;
+	message: string;
+	photos: StoredPhoto[];
+	lang: string;
+	consent: boolean;
+	adminNote: string | null;
+	createdAt: string;
+	reviewedAt: string | null;
+};
+
+export type AdminState = {
+	configured: { db: boolean; blob: boolean; admin: boolean };
+	authed: boolean;
+	counts: Record<ContributionStatus, number>;
+	items: AdminContribution[];
+};
+
+const statusFilter = z.object({
+	status: z.enum(CONTRIBUTION_STATUSES).default("pending"),
+});
+
+export const getAdminState = createServerFn({ method: "GET" })
+	.validator((input: unknown) => statusFilter.parse(input ?? {}))
+	.handler(async ({ data }): Promise<AdminState> => {
+		const configured = {
+			db: isDbConfigured(),
+			blob: isBlobConfigured(),
+			admin: isAdminConfigured(),
+		};
+		const counts = { pending: 0, approved: 0, rejected: 0 };
+		if (!isAdminRequest() || !configured.db) {
+			return { configured, authed: isAdminRequest(), counts, items: [] };
+		}
+		const db = getDb();
+		const grouped = await db
+			.select({ status: contributions.status, n: count() })
+			.from(contributions)
+			.groupBy(contributions.status);
+		for (const g of grouped) counts[g.status] = g.n;
+		const rows = await db
+			.select()
+			.from(contributions)
+			.where(eq(contributions.status, data.status))
+			.orderBy(desc(contributions.createdAt))
+			.limit(200);
+		return {
+			configured,
+			authed: true,
+			counts,
+			items: rows.map(({ ipHash: _ip, ...r }) => ({
+				...r,
+				createdAt: r.createdAt.toISOString(),
+				reviewedAt: r.reviewedAt?.toISOString() ?? null,
+			})),
+		};
+	});
+
+export const adminLogin = createServerFn({ method: "POST" })
+	.validator((input: unknown) =>
+		z.object({ password: z.string().max(200) }).parse(input),
+	)
+	.handler(async ({ data }) => {
+		if (!checkPassword(data.password)) {
+			await new Promise((r) => setTimeout(r, 800)); // slow down guessing
+			return { ok: false as const };
+		}
+		startSession();
+		return { ok: true as const };
+	});
+
+export const adminLogout = createServerFn({ method: "POST" }).handler(
+	async () => {
+		endSession();
+		return { ok: true as const };
+	},
+);
+
+export const reviewContribution = createServerFn({ method: "POST" })
+	.validator((input: unknown) =>
+		z
+			.object({
+				id: z.number().int().positive(),
+				status: z.enum(CONTRIBUTION_STATUSES),
+				note: z.string().max(1000).optional(),
+			})
+			.parse(input),
+	)
+	.handler(async ({ data }) => {
+		requireAdmin();
+		await getDb()
+			.update(contributions)
+			.set({
+				status: data.status,
+				adminNote: data.note ?? null,
+				reviewedAt: data.status === "pending" ? null : new Date(),
+			})
+			.where(eq(contributions.id, data.id));
+		return { ok: true as const };
+	});
+
+export const deleteContribution = createServerFn({ method: "POST" })
+	.validator((input: unknown) =>
+		z.object({ id: z.number().int().positive() }).parse(input),
+	)
+	.handler(async ({ data }) => {
+		requireAdmin();
+		const db = getDb();
+		const [row] = await db
+			.delete(contributions)
+			.where(eq(contributions.id, data.id))
+			.returning({ photos: contributions.photos });
+		if (row) await deletePhotos(row.photos);
+		return { ok: true as const };
+	});

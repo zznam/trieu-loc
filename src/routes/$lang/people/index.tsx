@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Avatar } from "#/components/Avatar";
+import { ContributeCta } from "#/components/ContributeCta";
 import { PageHeader } from "#/components/PageHeader";
 import {
 	getPeople,
 	type PersonCategory,
 	personCategoryLabel,
-	site,
 } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
@@ -96,15 +96,11 @@ function PeoplePage() {
 					))}
 				</div>
 
-				<p className="mt-12 rounded-2xl bg-rice-700 p-6 text-paper">
-					{t(lang, "people.share")}{" "}
-					<a
-						className="font-semibold underline"
-						href={`mailto:${site.contact.email}`}
-					>
-						{site.contact.email}
-					</a>
-				</p>
+				<ContributeCta
+					lang={lang}
+					text={t(lang, "people.share")}
+					kind="story"
+				/>
 			</section>
 		</>
 	);
