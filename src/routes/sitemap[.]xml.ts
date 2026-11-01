@@ -10,6 +10,7 @@ const PAGES = [
 	"/places",
 	"/food",
 	"/people",
+	"/events",
 	"/news",
 	"/gallery",
 ];

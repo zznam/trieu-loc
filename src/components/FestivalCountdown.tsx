@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { type FestivalInfo, nextFestival } from "#/lib/festival";
+import { googleCalendarUrl } from "#/lib/events";
+import { nextFestival } from "#/lib/festival";
 import { formatDate, type Lang, t } from "#/lib/i18n";
 import { toISO } from "#/lib/lunar";
 
@@ -11,21 +12,6 @@ function useNow(intervalMs: number) {
 		return () => clearInterval(id);
 	}, [intervalMs]);
 	return now;
-}
-
-function googleCalendarUrl(f: FestivalInfo, lang: Lang) {
-	const d = (iso: string) => iso.replaceAll("-", "");
-	const endExclusive = new Date(f.endsAt + 7 * 3600_000)
-		.toISOString()
-		.slice(0, 10);
-	const params = new URLSearchParams({
-		action: "TEMPLATE",
-		text: t(lang, "home.festival.title"),
-		dates: `${d(toISO(f.start))}/${d(endExclusive)}`,
-		location: "Đền Bà Triệu, thôn Phú Điền, xã Triệu Lộc, Thanh Hoá",
-		details: t(lang, "home.festival.body"),
-	});
-	return `https://calendar.google.com/calendar/render?${params}`;
 }
 
 /**
@@ -81,7 +67,12 @@ export function FestivalCountdown({ lang }: { lang: Lang }) {
 				</div>
 			)}
 			<a
-				href={googleCalendarUrl(festival, lang)}
+				href={googleCalendarUrl(
+					festival,
+					t(lang, "home.festival.title"),
+					t(lang, "home.festival.body"),
+					"Đền Bà Triệu, thôn Phú Điền, xã Triệu Lộc, Thanh Hoá",
+				)}
 				target="_blank"
 				rel="noreferrer"
 				className="mt-4 inline-block text-sm font-semibold text-paper underline-offset-4 hover:underline"
