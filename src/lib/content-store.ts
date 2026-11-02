@@ -28,6 +28,7 @@ import type {
 } from "./content-schemas";
 import { type EventDef, events } from "./events";
 import type { Lang } from "./i18n";
+import { vnLocalToDate } from "./schedule";
 import { resetSearchIndex } from "./search";
 import { type Village, villages } from "./villages";
 
@@ -157,6 +158,9 @@ function toPosts(items: NewsItem[]): NewsPost[] {
 					summary: l.summary,
 					markdown: l.body,
 					html: md(l.body),
+					publishAt: n.publishAt
+						? vnLocalToDate(n.publishAt)?.getTime()
+						: undefined,
 				};
 			}),
 	);

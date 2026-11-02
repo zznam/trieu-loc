@@ -8,6 +8,7 @@ import {
 	type JsonObject,
 } from "#/lib/content-schemas";
 import { forceNextSync } from "#/lib/content-sync";
+import { formatVnDateTime, vnLocalToDate } from "#/lib/schedule";
 import { villages } from "#/lib/villages";
 import {
 	type ContentAdminState,
@@ -138,6 +139,42 @@ function FieldInput({
 						</div>
 					))}
 				</fieldset>
+			);
+		}
+		case "datetime": {
+			const v = (getPath(item, field.path) as string | undefined) ?? "";
+			const when = v ? vnLocalToDate(v) : null;
+			return (
+				<label className="block">
+					<span className={lbl}>{field.label}</span>
+					<span className="flex flex-wrap items-center gap-2">
+						<input
+							type="datetime-local"
+							value={v}
+							onChange={(e) => set(field.path, e.target.value || undefined)}
+							className={`${input} max-w-xs`}
+						/>
+						{v && (
+							<button
+								type="button"
+								onClick={() => set(field.path, undefined)}
+								className="text-xs font-semibold text-lotus"
+							>
+								Bỏ lịch
+							</button>
+						)}
+						{when && when.getTime() > Date.now() && (
+							<span className="rounded-full bg-earth-500 px-2 py-0.5 text-xs text-white">
+								⏰ chưa hiển thị
+							</span>
+						)}
+					</span>
+					{field.hint && (
+						<span className="mt-1 block text-xs text-ink-soft">
+							{field.hint}
+						</span>
+					)}
+				</label>
 			);
 		}
 		case "image":
@@ -683,6 +720,11 @@ export function ContentEditor({
 										<p className="text-xs text-ink-soft">
 											{id}
 											{collection === "news" && ` · ${String(it.date)}`}
+											{collection === "news" &&
+												typeof it.publishAt === "string" &&
+												(vnLocalToDate(it.publishAt)?.getTime() ?? 0) >
+													Date.now() &&
+												` · ⏰ lên lịch ${formatVnDateTime(vnLocalToDate(it.publishAt) as Date)}`}
 											{collection === "villages" && it.sample ? " · mẫu" : ""}
 										</p>
 									</div>

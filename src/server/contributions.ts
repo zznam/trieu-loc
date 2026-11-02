@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestIP } from "@tanstack/react-start/server";
-import { and, count, desc, eq, gte, isNotNull } from "drizzle-orm";
+import { and, count, desc, eq, gte, lte, sql } from "drizzle-orm";
 import { z } from "zod";
 import { LIMITS, type SubmitResult } from "#/lib/contribute";
+import { vnLocalToDate } from "#/lib/schedule";
 import {
 	audit,
 	currentAdmin,
@@ -173,7 +174,7 @@ export const getCommunityPhotos = createServerFn({ method: "GET" }).handler(
 						eq(contributions.kind, "photo"),
 						eq(contributions.status, "approved"),
 						eq(contributions.consent, true),
-						isNotNull(contributions.publishedAt),
+						lte(contributions.publishedAt, sql`now()`),
 					),
 				)
 				.orderBy(desc(contributions.createdAt))
@@ -376,7 +377,15 @@ export type PublishError =
 export const setPublished = createServerFn({ method: "POST" })
 	.validator((input: unknown) =>
 		z
-			.object({ id: z.number().int().positive(), publish: z.boolean() })
+			.object({
+				id: z.number().int().positive(),
+				publish: z.boolean(),
+				/** Optional scheduled time, Vietnam time "YYYY-MM-DDTHH:mm"; omitted = now. */
+				publishAt: z
+					.string()
+					.regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/)
+					.optional(),
+			})
 			.parse(input),
 	)
 	.handler(
@@ -384,10 +393,16 @@ export const setPublished = createServerFn({ method: "POST" })
 			data,
 		}): Promise<{ ok: true } | { ok: false; error: PublishError }> => {
 			const me = await requireAdmin();
+			const scheduled =
+				data.publish && data.publishAt ? vnLocalToDate(data.publishAt) : null;
 			await audit(
 				me,
-				data.publish ? "contribution_publish" : "contribution_unpublish",
-				`#${data.id}`,
+				data.publish
+					? scheduled
+						? "contribution_schedule"
+						: "contribution_publish"
+					: "contribution_unpublish",
+				scheduled ? `#${data.id} @ ${data.publishAt}` : `#${data.id}`,
 			);
 			const db = getDb();
 			if (!data.publish) {
@@ -415,7 +430,8 @@ export const setPublished = createServerFn({ method: "POST" })
 				.set({
 					status: "approved",
 					reviewedAt: row.reviewedAt ?? new Date(),
-					publishedAt: new Date(),
+					// A future publishedAt means "scheduled": public queries only show items whose time has come.
+					publishedAt: scheduled ?? new Date(),
 				})
 				.where(eq(contributions.id, data.id));
 			return { ok: true };
