@@ -2,12 +2,30 @@ import { marked } from "marked";
 import {
 	allNews,
 	allPeople,
+	type Business,
+	businesses,
+	type Contact,
+	contacts,
+	type GalleryItem,
+	gallery,
+	type History,
+	history,
 	type NewsPost,
 	type Person,
 	type Place,
 	places,
+	type Site,
+	type Specialty,
+	site,
+	specialties,
 } from "./content";
-import type { ContentSnapshot, NewsItem, PersonItem } from "./content-schemas";
+import type {
+	CollectionName,
+	ContentData,
+	ContentSnapshot,
+	NewsItem,
+	PersonItem,
+} from "./content-schemas";
 import { type EventDef, events } from "./events";
 import type { Lang } from "./i18n";
 import { resetSearchIndex } from "./search";
@@ -23,6 +41,16 @@ import { type Village, villages } from "./villages";
 function replace<T>(target: T[], next: T[]) {
 	target.splice(0, target.length, ...next);
 }
+
+/** Replaces all keys of a singleton object in place. */
+function replaceObject(target: object, next: object) {
+	for (const k of Object.keys(target))
+		delete (target as Record<string, unknown>)[k];
+	Object.assign(target, next);
+}
+
+const withId = <T extends object>(o: T) => ({ id: "main" as const, ...o });
+const withoutId = <T extends { id?: string }>({ id: _id, ...rest }: T) => rest;
 
 const deepCopy = <T>(v: T): T => JSON.parse(JSON.stringify(v));
 
@@ -86,12 +114,27 @@ function peopleFromFiles(list: Person[]): PersonItem[] {
 }
 
 /** The file content as captured at startup, before any database snapshot is applied. */
-const FILES: Omit<ContentSnapshot, "version"> = deepCopy({
-	places: places as ContentSnapshot["places"],
-	villages: villages as ContentSnapshot["villages"],
-	events: events as ContentSnapshot["events"],
+const FILES: ContentData = deepCopy({
+	places: places as ContentData["places"],
+	villages: villages as ContentData["villages"],
+	events: events as ContentData["events"],
 	people: peopleFromFiles(allPeople),
 	news: newsFromFiles(allNews),
+	specialties: specialties as ContentData["specialties"],
+	businesses: businesses as ContentData["businesses"],
+	gallery: gallery as ContentData["gallery"],
+	contacts: contacts as ContentData["contacts"],
+	site: [withId(site)] as ContentData["site"],
+	// The editor always uses bilingual years; the files sometimes use a plain string ("248").
+	history: [
+		withId({
+			...history,
+			timeline: history.timeline.map((t) => ({
+				...t,
+				year: typeof t.year === "string" ? { vi: t.year, en: t.year } : t.year,
+			})),
+		}),
+	] as ContentData["history"],
 });
 
 export const fileContent = () => deepCopy(FILES);
@@ -153,12 +196,25 @@ export function applySnapshot(snap: ContentSnapshot | null) {
 	const version = snap?.version ?? "files";
 	if (version === applied) return;
 	// Copy so later changes to the snapshot object (e.g. a server cache) can't leak into the live content.
-	const data = snap ? deepCopy(snap) : { ...fileContent(), version: "files" };
-	replace(places, data.places as Place[]);
-	replace(villages, data.villages as Village[]);
-	replace(events, data.events as EventDef[]);
-	replace(allNews, toPosts(data.news));
-	replace(allPeople, toPeople(data.people));
+	const db = snap ? deepCopy(snap) : null;
+	const files = fileContent();
+	// Collections not imported yet keep using the files.
+	const pick = <K extends CollectionName>(k: K): ContentData[K] =>
+		(db?.imported.includes(k) ? (db[k] ?? []) : files[k]) as ContentData[K];
+
+	replace(places, pick("places") as Place[]);
+	replace(villages, pick("villages") as Village[]);
+	replace(events, pick("events") as EventDef[]);
+	replace(allNews, toPosts(pick("news")));
+	replace(allPeople, toPeople(pick("people")));
+	replace(specialties, pick("specialties") as Specialty[]);
+	replace(businesses, pick("businesses") as Business[]);
+	replace(gallery, pick("gallery") as GalleryItem[]);
+	replace(contacts, pick("contacts") as Contact[]);
+	const siteItem = pick("site")[0] ?? files.site[0];
+	replaceObject(site, withoutId(siteItem) as Site);
+	const historyItem = pick("history")[0] ?? files.history[0];
+	replaceObject(history, withoutId(historyItem) as History);
 	resetSearchIndex();
 	applied = version;
 }

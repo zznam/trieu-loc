@@ -27,9 +27,9 @@ A bilingual (Vietnamese / English) community website for **Xã Triệu Lộc, t�
 
 ### In the browser: `/admin` → Nội dung (recommended once the database is set up)
 
-**Places, villages, events, people and news** can be edited at `/admin` → **Nội dung**. The first time, press **Nhập nội dung từ file**: it copies those five collections from the files below into the database once. From then on the database is the source of truth: add, edit (Vietnamese and English side by side, Markdown for news and people) and delete there. Changes appear on the site within ~30 seconds. **⤓ Tải bản sao lưu** downloads a JSON backup.
+**All site content** can be edited at `/admin` → **Nội dung**: places, villages, events, people, news, food specialties, businesses, gallery, contacts, the site-wide texts (name, stats, contact details, home-page highlights) and the History page (intro, timeline, traditions). The first time, press **Nhập nội dung từ file**: it copies everything from the files below into the database once. (If you imported before more collections became editable, the button reads **Nhập phần còn thiếu từ file** and only imports the missing ones — your edits are untouched.) From then on the database is the source of truth: add, edit (Vietnamese and English side by side, Markdown for news and people) and delete there. Changes appear on the site within ~30 seconds. **⤓ Tải bản sao lưu** downloads a JSON backup.
 
-Until you import (or without a database, e.g. in local development and tests), the site keeps reading the files. Site texts, history, food, businesses, gallery and contacts are still edited in the files.
+Until you import (or without a database, e.g. in local development and tests), the site keeps reading the files.
 
 ### In the files
 
