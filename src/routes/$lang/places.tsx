@@ -115,8 +115,16 @@ function PlacesPage() {
 						<article
 							key={p.id}
 							id={p.id}
-							className="scroll-mt-24 flex flex-col rounded-2xl border border-earth-300/50 bg-card/70 p-6"
+							className="scroll-mt-24 flex flex-col overflow-hidden rounded-2xl border border-earth-300/50 bg-card/70 p-6"
 						>
+							{p.photo && (
+								<img
+									src={p.photo}
+									alt={pick(lang, p.name)}
+									loading="lazy"
+									className="-mx-6 -mt-6 mb-5 h-48 w-[calc(100%+3rem)] max-w-none object-cover"
+								/>
+							)}
 							<p className="text-xs font-semibold uppercase tracking-widest text-earth-700">
 								{pick(lang, placeCategoryLabel[p.category])} ·{" "}
 								{pick(lang, p.village)}

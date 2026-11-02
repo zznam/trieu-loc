@@ -1,6 +1,6 @@
 import {
+	allNews,
 	businesses,
-	getNews,
 	getPeople,
 	history,
 	personCategoryLabel,
@@ -10,6 +10,7 @@ import {
 } from "./content";
 import { eventCategoryLabel, events } from "./events";
 import { type Lang, pick, t } from "./i18n";
+import { isLive } from "./schedule";
 import { fold } from "./text";
 import { formerCommuneLabel, villages } from "./villages";
 
@@ -32,6 +33,8 @@ export type SearchDoc = {
 	to: string;
 	params: Record<string, string>;
 	hash?: string;
+	/** Scheduled news: not searchable before this time (ms). */
+	publishAt?: number;
 };
 
 const stripHtml = (html: string) =>
@@ -61,14 +64,22 @@ function buildIndex(lang: Lang) {
 			params: { lang },
 			hash: p.id,
 		})),
-		...getNews(lang).map((n) => ({
-			kind: "news" as const,
-			title: n.title,
-			text: `${n.summary} ${stripHtml(n.html)}`,
-			meta: n.date,
-			to: "/$lang/news/$slug",
-			params: { lang, slug: n.slug },
-		})),
+		// All posts, scheduled ones included: the index is cached, so visibility is checked per query.
+		...allNews
+			.filter(
+				(n) =>
+					n.lang === lang ||
+					!allNews.some((x) => x.slug === n.slug && x.lang === lang),
+			)
+			.map((n) => ({
+				kind: "news" as const,
+				title: n.title,
+				text: `${n.summary} ${stripHtml(n.html)}`,
+				meta: n.date,
+				to: "/$lang/news/$slug",
+				params: { lang, slug: n.slug },
+				publishAt: n.publishAt,
+			})),
 		...getPeople(lang).map((p) => ({
 			kind: "person" as const,
 			title: p.name,
@@ -158,7 +169,9 @@ export function search(lang: Lang, query: string, limit = 30): SearchHit[] {
 	}
 	const phrase = terms.join(" ");
 	const hits: SearchHit[] = [];
+	const now = Date.now();
 	for (const entry of index) {
+		if (!isLive(entry.doc.publishAt, now)) continue;
 		let score = 0;
 		let ok = true;
 		for (const term of terms) {

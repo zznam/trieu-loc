@@ -7,6 +7,7 @@ import historyData from "#/content/history.json";
 import placesData from "#/content/places.json";
 import siteData from "#/content/site.json";
 import type { L, Lang } from "./i18n";
+import { isLive } from "./schedule";
 
 export type PlaceCategory = "relic" | "nature" | "public";
 
@@ -20,6 +21,7 @@ export type Place = {
 	body: L;
 	/** Links the place to a village page (src/content/villages.json). */
 	villageId?: string;
+	photo?: string;
 };
 
 export type Specialty = {
@@ -200,6 +202,8 @@ export type NewsPost = {
 	/** Markdown source (kept for the content editor). */
 	markdown: string;
 	html: string;
+	/** Scheduled publish time (ms); the post is hidden until then. */
+	publishAt?: number;
 };
 
 /** Mutable: replaced in place by the content store when the database has content. */
@@ -219,12 +223,20 @@ export const allNews: NewsPost[] = loadCollection(
 	html: d.html,
 }));
 
-export function getNews(lang: Lang): NewsPost[] {
-	return localized(allNews, lang).sort((a, b) => b.date.localeCompare(a.date));
+/** Published news (scheduled posts stay hidden until their time). */
+export function getNews(lang: Lang, now = Date.now()): NewsPost[] {
+	return localized(allNews, lang)
+		.filter((p) => isLive(p.publishAt, now))
+		.sort((a, b) => b.date.localeCompare(a.date));
 }
 
-export function getPost(lang: Lang, slug: string): NewsPost | undefined {
-	return findDoc(allNews, lang, slug);
+export function getPost(
+	lang: Lang,
+	slug: string,
+	now = Date.now(),
+): NewsPost | undefined {
+	const post = findDoc(allNews, lang, slug);
+	return post && isLive(post.publishAt, now) ? post : undefined;
 }
 
 // ---------- People ----------

@@ -3,7 +3,7 @@ import { expect, type Page, test } from "@playwright/test";
 const ADMIN = process.env.ADMIN_PASSWORD ?? "e2e-admin-password";
 
 async function login(page: Page, url: string) {
-	await page.goto(url);
+	await page.goto(url, { waitUntil: "networkidle" });
 	await page.fill("input[name=password]", ADMIN);
 	await page.getByRole("button", { name: "Đăng nhập" }).click();
 	await expect(page.getByRole("button", { name: "Đăng xuất" })).toBeVisible();
@@ -55,7 +55,9 @@ test.describe("content editor", () => {
 		).toBeVisible();
 
 		// Validation errors are shown
-		await page.goto("/admin?section=content&collection=news");
+		await page.goto("/admin?section=content&collection=news", {
+			waitUntil: "networkidle",
+		});
 		await page.getByRole("button", { name: "＋ Thêm mới" }).click();
 		await page
 			.getByRole("textbox", { name: "Đường dẫn (slug)" })
@@ -111,7 +113,9 @@ test.describe("content editor", () => {
 		);
 
 		// Delete it
-		await page.goto("/admin?section=content&collection=news");
+		await page.goto("/admin?section=content&collection=news", {
+			waitUntil: "networkidle",
+		});
 		page.once("dialog", (d) => d.accept());
 		await page
 			.locator("li", { hasText: "2026-12-01-hoi-thi-nau-com" })
@@ -181,7 +185,9 @@ test.describe("content editor", () => {
 		await expect(page.locator("dl")).toContainText("30,00 km²");
 
 		// History: add a timeline entry with the list editor
-		await page.goto("/admin?section=content&collection=history");
+		await page.goto("/admin?section=content&collection=history", {
+			waitUntil: "networkidle",
+		});
 		await page.getByRole("button", { name: "✎ Sửa" }).click();
 		await page.getByRole("button", { name: "＋ Thêm mốc" }).click();
 		const last = page
@@ -208,7 +214,9 @@ test.describe("content editor", () => {
 		await expect(page.getByText("Test milestone")).toBeVisible();
 
 		// Contacts: give the commune office a phone number
-		await page.goto("/admin?section=content&collection=contacts");
+		await page.goto("/admin?section=content&collection=contacts", {
+			waitUntil: "networkidle",
+		});
 		await page
 			.locator("li", { hasText: "UBND xã Triệu Lộc" })
 			.getByRole("button", { name: "✎ Sửa" })
@@ -222,5 +230,106 @@ test.describe("content editor", () => {
 		await expect(page.getByRole("status")).toContainText("Đã lưu");
 		await page.goto("/vi/info");
 		await expect(page.locator('a[href="tel:0237000000"]')).toBeVisible();
+	});
+
+	test("upload, show, replace and clean up photos", async ({
+		page,
+		request,
+	}) => {
+		await login(page, "/admin?section=content&collection=gallery");
+		page.once("dialog", (d) => d.accept());
+		await page.getByRole("button", { name: "Nhập nội dung từ file" }).click();
+		await expect(page.getByRole("status")).toContainText(/Đã nhập/);
+
+		// A real image to upload: a screenshot of the page itself
+		const png = await page.screenshot({
+			type: "png",
+			clip: { x: 0, y: 0, width: 800, height: 500 },
+		});
+		const file = (name: string) => ({
+			name,
+			mimeType: "image/png",
+			buffer: png,
+		});
+
+		await page
+			.locator("li", { hasText: "Cổng tam quan đền Bà Triệu" })
+			.getByRole("button", { name: "✎ Sửa" })
+			.click();
+		await page
+			.getByLabel("Ảnh (để trống = ảnh minh hoạ): tải ảnh lên")
+			.setInputFiles(file("a.png"));
+		const urlBox = page.getByRole("textbox", {
+			name: "Ảnh (để trống = ảnh minh hoạ): đường dẫn ảnh",
+		});
+		await expect(urlBox).toHaveValue(/^\/api\/uploads\/[a-f0-9]{24}\.jpg$/); // resized to JPEG in the browser
+		const first = await urlBox.inputValue();
+		await page.getByRole("button", { name: "Lưu", exact: true }).click();
+		await expect(page.getByRole("status")).toContainText("Đã lưu");
+
+		// Shown in the gallery and opens in the lightbox
+		await page.goto("/vi/gallery");
+		await expect(page.locator(`img[src="${first}"]`)).toBeVisible();
+		await page
+			.getByRole("button", { name: /Phóng to ảnh: Cổng tam quan/ })
+			.click();
+		await expect(page.locator("dialog[open] img")).toHaveAttribute(
+			"src",
+			first,
+		);
+		await page.keyboard.press("Escape");
+
+		// Replace it: the old file is deleted because nothing uses it any more
+		await page.goto("/admin?section=content&collection=gallery", {
+			waitUntil: "networkidle",
+		});
+		await page
+			.locator("li", { hasText: "Cổng tam quan đền Bà Triệu" })
+			.getByRole("button", { name: "✎ Sửa" })
+			.click();
+		await page
+			.getByLabel("Ảnh (để trống = ảnh minh hoạ): tải ảnh lên")
+			.setInputFiles(file("b.png"));
+		await expect(urlBox).not.toHaveValue(first);
+		const second = await urlBox.inputValue();
+		await page.getByRole("button", { name: "Lưu", exact: true }).click();
+		await expect(page.getByRole("status")).toContainText("Đã lưu");
+		expect((await request.get(first)).status()).toBe(404);
+		expect((await request.get(second)).status()).toBe(200);
+
+		// An upload that is never saved is removed by the clean-up button
+		await page
+			.locator("li", { hasText: "Lễ rước kiệu" })
+			.getByRole("button", { name: "✎ Sửa" })
+			.click();
+		await page
+			.getByLabel("Ảnh (để trống = ảnh minh hoạ): tải ảnh lên")
+			.setInputFiles(file("c.png"));
+		await expect(urlBox).toHaveValue(/\/api\/uploads\//);
+		const orphan = await urlBox.inputValue();
+		await page.getByRole("button", { name: "Huỷ" }).click();
+		await page.getByRole("button", { name: "🧹 Dọn ảnh không dùng" }).click();
+		await expect(page.getByRole("status")).toContainText(
+			"Đã xoá 1 ảnh không dùng",
+		);
+		expect((await request.get(orphan)).status()).toBe(404);
+		expect((await request.get(second)).status()).toBe(200);
+
+		// Place photos appear on the place card
+		await page.goto("/admin?section=content&collection=places", {
+			waitUntil: "networkidle",
+		});
+		await page
+			.locator("li", { hasText: "song-len" })
+			.getByRole("button", { name: "✎ Sửa" })
+			.click();
+		await page.getByLabel("Ảnh: tải ảnh lên").setInputFiles(file("d.png"));
+		await expect(
+			page.getByRole("textbox", { name: "Ảnh: đường dẫn ảnh" }),
+		).toHaveValue(/\/api\/uploads\//);
+		await page.getByRole("button", { name: "Lưu", exact: true }).click();
+		await expect(page.getByRole("status")).toContainText("Đã lưu");
+		await page.goto("/vi/places");
+		await expect(page.locator("#song-len img")).toBeVisible();
 	});
 });

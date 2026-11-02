@@ -10,7 +10,13 @@ import {
 	type JsonObject,
 } from "#/lib/content-schemas";
 import { fileContent } from "#/lib/content-store";
-import { isAdminConfigured, isAdminRequest, requireAdmin } from "./auth";
+import {
+	audit,
+	isAdminConfigured,
+	isAdminRequest,
+	requireAdmin,
+	requireOwner,
+} from "./auth";
 import {
 	ensureContentFresh,
 	getSnapshotCached,
@@ -19,6 +25,13 @@ import {
 	META,
 } from "./content-db";
 import { getDb, isDbConfigured } from "./db";
+import {
+	deleteImages,
+	imageUploadsAvailable,
+	imageUrlsIn,
+	listManagedImages,
+	storeImage,
+} from "./images";
 import { contentItems } from "./schema";
 
 /** Public: the current content snapshot (null = use the bundled files). */
@@ -43,6 +56,8 @@ export type ContentAdminState = {
 	imported: boolean;
 	/** Collections still waiting for their one-time import. */
 	missing: CollectionName[];
+	/** Whether photo uploads work (Vercel Blob, or LOCAL_UPLOADS=1). */
+	uploads: boolean;
 	items: JsonObject[];
 };
 
@@ -50,9 +65,16 @@ export const getContentAdmin = createServerFn({ method: "GET" })
 	.validator((input: unknown) => collectionInput.parse(input))
 	.handler(async ({ data }): Promise<ContentAdminState> => {
 		const configured = { db: isDbConfigured(), admin: isAdminConfigured() };
-		const authed = isAdminRequest();
+		const authed = await isAdminRequest();
 		if (!authed || !configured.db)
-			return { authed, configured, imported: false, missing: [], items: [] };
+			return {
+				authed,
+				configured,
+				imported: false,
+				missing: [],
+				uploads: false,
+				items: [],
+			};
 		const imported = await importedCollections();
 		const missing = COLLECTION_NAMES.filter((c) => !imported.includes(c));
 		if (!imported.includes(data.collection)) {
@@ -62,6 +84,7 @@ export const getContentAdmin = createServerFn({ method: "GET" })
 				configured,
 				imported: false,
 				missing,
+				uploads: imageUploadsAvailable(),
 				items: fileContent()[data.collection] as unknown as JsonObject[],
 			};
 		}
@@ -74,6 +97,7 @@ export const getContentAdmin = createServerFn({ method: "GET" })
 			configured,
 			imported: true,
 			missing,
+			uploads: imageUploadsAvailable(),
 			items: rows.map((r) => r.data as JsonObject),
 		};
 	});
@@ -84,7 +108,8 @@ export const getContentAdmin = createServerFn({ method: "GET" })
  */
 export const importContent = createServerFn({ method: "POST" }).handler(
 	async () => {
-		requireAdmin();
+		const me = await requireOwner();
+		await audit(me, "content_import");
 		const db = getDb();
 		const imported = await importedCollections();
 		const todo = COLLECTION_NAMES.filter((c) => !imported.includes(c));
@@ -139,7 +164,7 @@ export const saveContentItem = createServerFn({ method: "POST" })
 			.parse(input),
 	)
 	.handler(async ({ data }): Promise<SaveResult> => {
-		requireAdmin();
+		const me = await requireAdmin();
 		const parsed = COLLECTIONS[data.collection].safeParse(data.data);
 		if (!parsed.success) {
 			return {
@@ -152,6 +177,11 @@ export const saveContentItem = createServerFn({ method: "POST" })
 		}
 		const item = parsed.data as Record<string, unknown>;
 		const id = itemId(data.collection, item);
+		await audit(
+			me,
+			data.previousId ? "content_edit" : "content_create",
+			`${data.collection}/${id}`,
+		);
 		const db = getDb();
 		if (!(await importedCollections()).includes(data.collection)) {
 			return { ok: false, error: "not_imported" };
@@ -170,6 +200,9 @@ export const saveContentItem = createServerFn({ method: "POST" })
 				);
 			if (clash) return { ok: false, error: "duplicate" };
 		}
+		const before = data.previousId
+			? await itemData(data.collection, data.previousId)
+			: null;
 		await db.transaction(async (tx) => {
 			if (renamed && data.previousId) {
 				await tx
@@ -194,6 +227,9 @@ export const saveContentItem = createServerFn({ method: "POST" })
 					set: { data: item, updatedAt: new Date() },
 				});
 		});
+		await removeOrphanedImages(
+			imageUrlsIn(before).filter((u) => !imageUrlsIn(item).includes(u)),
+		);
 		invalidateContentCache();
 		await ensureContentFresh();
 		return { ok: true };
@@ -204,7 +240,9 @@ export const deleteContentItem = createServerFn({ method: "POST" })
 		collectionInput.extend({ id: z.string().max(120) }).parse(input),
 	)
 	.handler(async ({ data }) => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, "content_delete", `${data.collection}/${data.id}`);
+		const before = await itemData(data.collection, data.id);
 		await getDb()
 			.delete(contentItems)
 			.where(
@@ -213,15 +251,92 @@ export const deleteContentItem = createServerFn({ method: "POST" })
 					eq(contentItems.id, data.id),
 				),
 			);
+		await removeOrphanedImages(imageUrlsIn(before));
 		invalidateContentCache();
 		await ensureContentFresh();
 		return { ok: true as const };
 	});
 
+// ---------- Images ----------
+
+async function itemData(collection: string, id: string) {
+	const [row] = await getDb()
+		.select({ data: contentItems.data })
+		.from(contentItems)
+		.where(
+			and(eq(contentItems.collection, collection), eq(contentItems.id, id)),
+		);
+	return row?.data ?? null;
+}
+
+/** Every managed image URL still used by any content item. */
+async function referencedImages() {
+	const rows = await getDb()
+		.select({ data: contentItems.data })
+		.from(contentItems);
+	return new Set(rows.flatMap((r) => imageUrlsIn(r.data)));
+}
+
+/** Deletes images that no content item references any more (they may be shared between items). */
+async function removeOrphanedImages(candidates: string[]) {
+	if (candidates.length === 0) return;
+	try {
+		const used = await referencedImages();
+		await deleteImages(candidates.filter((u) => !used.has(u)));
+	} catch (err) {
+		console.error("image clean-up failed (content was saved)", err);
+	}
+}
+
+export type UploadResult =
+	| { ok: true; url: string }
+	| { ok: false; error: "unavailable" | "invalid" | "too_large" };
+
+const MAX_IMAGE = 2 * 1024 * 1024;
+
+export const uploadContentImage = createServerFn({ method: "POST" })
+	.validator((input: FormData) => {
+		if (!(input instanceof FormData)) return { invalid: true as const };
+		const file = input.get("file");
+		const collection = String(input.get("collection") ?? "");
+		if (
+			!(file instanceof File) ||
+			!(COLLECTION_NAMES as string[]).includes(collection)
+		) {
+			return { invalid: true as const };
+		}
+		return { file, collection };
+	})
+	.handler(async ({ data }): Promise<UploadResult> => {
+		await requireAdmin();
+		if ("invalid" in data) return { ok: false, error: "invalid" };
+		if (!imageUploadsAvailable()) return { ok: false, error: "unavailable" };
+		if (!["image/jpeg", "image/png", "image/webp"].includes(data.file.type))
+			return { ok: false, error: "invalid" };
+		if (data.file.size > MAX_IMAGE) return { ok: false, error: "too_large" };
+		return { ok: true, url: await storeImage(data.file, data.collection) };
+	});
+
+/** Removes uploaded images that no content item uses (e.g. uploaded, then the edit was cancelled). */
+export const cleanUpImages = createServerFn({ method: "POST" }).handler(
+	async () => {
+		const me = await requireOwner();
+		await audit(me, "images_cleanup");
+		const [all, used] = await Promise.all([
+			listManagedImages(),
+			referencedImages(),
+		]);
+		const unused = all.filter((u) => !used.has(u));
+		await deleteImages(unused);
+		return { ok: true as const, removed: unused.length };
+	},
+);
+
 /** Full JSON backup of the editable content. */
 export const exportContent = createServerFn({ method: "GET" }).handler(
 	async () => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, "content_export");
 		return (
 			(await getSnapshotCached()) ?? { version: "files", ...fileContent() }
 		);

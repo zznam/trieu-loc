@@ -33,6 +33,7 @@ import { Route as LangPeopleSlugRouteImport } from './routes/$lang/people/$slug'
 import { Route as LangVillagesIndexRouteImport } from './routes/$lang/villages/index'
 import { Route as LangVillagesIdRouteImport } from './routes/$lang/villages/$id'
 import { Route as ApiNewsletterUnsubscribeRouteImport } from './routes/api/newsletter/unsubscribe'
+import { Route as ApiUploadsNameRouteImport } from './routes/api/uploads/$name'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -156,6 +157,11 @@ const ApiNewsletterUnsubscribeRoute =
     path: '/api/newsletter/unsubscribe',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiUploadsNameRoute = ApiUploadsNameRouteImport.update({
+  id: '/api/uploads/$name',
+  path: '/api/uploads/$name',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/$lang/people/$slug': typeof LangPeopleSlugRoute
   '/$lang/villages/$id': typeof LangVillagesIdRoute
   '/api/newsletter/unsubscribe': typeof ApiNewsletterUnsubscribeRoute
+  '/api/uploads/$name': typeof ApiUploadsNameRoute
   '/$lang/news/': typeof LangNewsIndexRoute
   '/$lang/people/': typeof LangPeopleIndexRoute
   '/$lang/villages/': typeof LangVillagesIndexRoute
@@ -204,6 +211,7 @@ export interface FileRoutesByTo {
   '/$lang/people/$slug': typeof LangPeopleSlugRoute
   '/$lang/villages/$id': typeof LangVillagesIdRoute
   '/api/newsletter/unsubscribe': typeof ApiNewsletterUnsubscribeRoute
+  '/api/uploads/$name': typeof ApiUploadsNameRoute
   '/$lang/news': typeof LangNewsIndexRoute
   '/$lang/people': typeof LangPeopleIndexRoute
   '/$lang/villages': typeof LangVillagesIndexRoute
@@ -231,6 +239,7 @@ export interface FileRoutesById {
   '/$lang/people/$slug': typeof LangPeopleSlugRoute
   '/$lang/villages/$id': typeof LangVillagesIdRoute
   '/api/newsletter/unsubscribe': typeof ApiNewsletterUnsubscribeRoute
+  '/api/uploads/$name': typeof ApiUploadsNameRoute
   '/$lang/news/': typeof LangNewsIndexRoute
   '/$lang/people/': typeof LangPeopleIndexRoute
   '/$lang/villages/': typeof LangVillagesIndexRoute
@@ -259,6 +268,7 @@ export interface FileRouteTypes {
     | '/$lang/people/$slug'
     | '/$lang/villages/$id'
     | '/api/newsletter/unsubscribe'
+    | '/api/uploads/$name'
     | '/$lang/news/'
     | '/$lang/people/'
     | '/$lang/villages/'
@@ -284,6 +294,7 @@ export interface FileRouteTypes {
     | '/$lang/people/$slug'
     | '/$lang/villages/$id'
     | '/api/newsletter/unsubscribe'
+    | '/api/uploads/$name'
     | '/$lang/news'
     | '/$lang/people'
     | '/$lang/villages'
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '/$lang/people/$slug'
     | '/$lang/villages/$id'
     | '/api/newsletter/unsubscribe'
+    | '/api/uploads/$name'
     | '/$lang/news/'
     | '/$lang/people/'
     | '/$lang/villages/'
@@ -322,6 +334,7 @@ export interface RootRouteChildren {
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiNewsletterUnsubscribeRoute: typeof ApiNewsletterUnsubscribeRoute
+  ApiUploadsNameRoute: typeof ApiUploadsNameRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -494,6 +507,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiNewsletterUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/uploads/$name': {
+      id: '/api/uploads/$name'
+      path: '/api/uploads/$name'
+      fullPath: '/api/uploads/$name'
+      preLoaderRoute: typeof ApiUploadsNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -548,6 +568,7 @@ const rootRouteChildren: RootRouteChildren = {
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiNewsletterUnsubscribeRoute: ApiNewsletterUnsubscribeRoute,
+  ApiUploadsNameRoute: ApiUploadsNameRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,16 +1,19 @@
 import { createHash } from "node:crypto";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestIP } from "@tanstack/react-start/server";
-import { and, count, desc, eq, gte, isNotNull } from "drizzle-orm";
+import { and, count, desc, eq, gte, lte, sql } from "drizzle-orm";
 import { z } from "zod";
 import { LIMITS, type SubmitResult } from "#/lib/contribute";
+import { vnLocalToDate } from "#/lib/schedule";
 import {
-	checkPassword,
-	endSession,
+	audit,
+	currentAdmin,
 	isAdminConfigured,
 	isAdminRequest,
+	type LoginResult,
+	login,
+	logout,
 	requireAdmin,
-	startSession,
 } from "./auth";
 import { getDb, isDbConfigured } from "./db";
 import { isNotifyConfigured, notifyNewSubmission } from "./notify";
@@ -171,7 +174,7 @@ export const getCommunityPhotos = createServerFn({ method: "GET" }).handler(
 						eq(contributions.kind, "photo"),
 						eq(contributions.status, "approved"),
 						eq(contributions.consent, true),
-						isNotNull(contributions.publishedAt),
+						lte(contributions.publishedAt, sql`now()`),
 					),
 				)
 				.orderBy(desc(contributions.createdAt))
@@ -232,8 +235,9 @@ export const getAdminState = createServerFn({ method: "GET" })
 			notify: isNotifyConfigured(),
 		};
 		const counts = { pending: 0, approved: 0, rejected: 0 };
-		if (!isAdminRequest() || !configured.db) {
-			return { configured, authed: isAdminRequest(), counts, items: [] };
+		const authed = await isAdminRequest();
+		if (!authed || !configured.db) {
+			return { configured, authed, counts, items: [] };
 		}
 		const db = getDb();
 		const grouped = await db
@@ -260,22 +264,24 @@ export const getAdminState = createServerFn({ method: "GET" })
 		};
 	});
 
+/** Email + password sign-in (or the shared ADMIN_PASSWORD while no accounts exist). */
 export const adminLogin = createServerFn({ method: "POST" })
 	.validator((input: unknown) =>
-		z.object({ password: z.string().max(200) }).parse(input),
+		z
+			.object({
+				email: z.string().max(254).default(""),
+				password: z.string().max(200),
+			})
+			.parse(input),
 	)
-	.handler(async ({ data }) => {
-		if (!checkPassword(data.password)) {
-			await new Promise((r) => setTimeout(r, 800)); // slow down guessing
-			return { ok: false as const };
-		}
-		startSession();
-		return { ok: true as const };
-	});
+	.handler(
+		({ data }): Promise<LoginResult> => login(data.email, data.password),
+	);
 
 export const adminLogout = createServerFn({ method: "POST" }).handler(
 	async () => {
-		endSession();
+		await audit(await currentAdmin(), "logout");
+		await logout();
 		return { ok: true as const };
 	},
 );
@@ -291,7 +297,8 @@ export const reviewContribution = createServerFn({ method: "POST" })
 			.parse(input),
 	)
 	.handler(async ({ data }) => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, `contribution_${data.status}`, `#${data.id}`);
 		await getDb()
 			.update(contributions)
 			.set({
@@ -326,7 +333,8 @@ const editInput = z.object({
 export const updateContribution = createServerFn({ method: "POST" })
 	.validator((input: unknown) => editInput.parse(input))
 	.handler(async ({ data }) => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, "contribution_edit", `#${data.id}`);
 		const db = getDb();
 		const [row] = await db
 			.select({
@@ -369,14 +377,33 @@ export type PublishError =
 export const setPublished = createServerFn({ method: "POST" })
 	.validator((input: unknown) =>
 		z
-			.object({ id: z.number().int().positive(), publish: z.boolean() })
+			.object({
+				id: z.number().int().positive(),
+				publish: z.boolean(),
+				/** Optional scheduled time, Vietnam time "YYYY-MM-DDTHH:mm"; omitted = now. */
+				publishAt: z
+					.string()
+					.regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/)
+					.optional(),
+			})
 			.parse(input),
 	)
 	.handler(
 		async ({
 			data,
 		}): Promise<{ ok: true } | { ok: false; error: PublishError }> => {
-			requireAdmin();
+			const me = await requireAdmin();
+			const scheduled =
+				data.publish && data.publishAt ? vnLocalToDate(data.publishAt) : null;
+			await audit(
+				me,
+				data.publish
+					? scheduled
+						? "contribution_schedule"
+						: "contribution_publish"
+					: "contribution_unpublish",
+				scheduled ? `#${data.id} @ ${data.publishAt}` : `#${data.id}`,
+			);
 			const db = getDb();
 			if (!data.publish) {
 				await db
@@ -403,7 +430,8 @@ export const setPublished = createServerFn({ method: "POST" })
 				.set({
 					status: "approved",
 					reviewedAt: row.reviewedAt ?? new Date(),
-					publishedAt: new Date(),
+					// A future publishedAt means "scheduled": public queries only show items whose time has come.
+					publishedAt: scheduled ?? new Date(),
 				})
 				.where(eq(contributions.id, data.id));
 			return { ok: true };
@@ -415,7 +443,8 @@ export const deleteContribution = createServerFn({ method: "POST" })
 		z.object({ id: z.number().int().positive() }).parse(input),
 	)
 	.handler(async ({ data }) => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, "contribution_delete", `#${data.id}`);
 		const db = getDb();
 		const [row] = await db
 			.delete(contributions)
