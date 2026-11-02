@@ -5,7 +5,7 @@ import { getPerson, getPost } from "#/lib/content";
 import { STORY_PREFIX } from "#/lib/contribute";
 import { getVillage } from "#/lib/villages";
 import { looksLikeBot, requestIpHash, tooManyLinks } from "./abuse";
-import { isAdminConfigured, isAdminRequest, requireAdmin } from "./auth";
+import { audit, isAdminConfigured, isAdminRequest, requireAdmin } from "./auth";
 import { ensureContentFresh } from "./content-db";
 import { getDb, isDbConfigured } from "./db";
 import { notifyNewSubmission } from "./notify";
@@ -266,7 +266,7 @@ export const getMessagesAdmin = createServerFn({ method: "GET" })
 	.handler(async ({ data }): Promise<MessagesAdminState> => {
 		const configured = { db: isDbConfigured(), admin: isAdminConfigured() };
 		const counts = { pending: 0, approved: 0, rejected: 0 };
-		const authed = isAdminRequest();
+		const authed = await isAdminRequest();
 		if (!authed || !configured.db)
 			return { authed, configured, counts, items: [] };
 		const db = getDb();
@@ -312,7 +312,8 @@ export const moderateMessage = createServerFn({ method: "POST" })
 			.parse(input),
 	)
 	.handler(async ({ data }) => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, `message_${data.status}`, `#${data.id}`);
 		await getDb()
 			.update(messages)
 			.set({
@@ -328,7 +329,8 @@ export const deleteMessage = createServerFn({ method: "POST" })
 		z.object({ id: z.number().int().positive() }).parse(input),
 	)
 	.handler(async ({ data }) => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, "message_delete", `#${data.id}`);
 		await getDb().delete(messages).where(eq(messages.id, data.id));
 		return { ok: true as const };
 	});

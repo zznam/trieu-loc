@@ -7,7 +7,13 @@ import { STORY_PREFIX } from "#/lib/contribute";
 import { communityEvent, upcomingEvents } from "#/lib/events";
 import { type Lang, pick } from "#/lib/i18n";
 import { looksLikeBot, requestIpHash } from "./abuse";
-import { isAdminConfigured, isAdminRequest, requireAdmin } from "./auth";
+import {
+	audit,
+	isAdminConfigured,
+	isAdminRequest,
+	requireAdmin,
+	requireOwner,
+} from "./auth";
 import { ensureContentFresh } from "./content-db";
 import { getDb, isDbConfigured } from "./db";
 import { buildDigest, type Digest, UNSUBSCRIBE_PLACEHOLDER } from "./digest";
@@ -306,7 +312,7 @@ export const getNewsletterAdmin = createServerFn({ method: "GET" }).handler(
 			activeVi: 0,
 			activeEn: 0,
 		};
-		const authed = isAdminRequest();
+		const authed = await isAdminRequest();
 		if (!authed || !configured.db)
 			return { authed, configured, counts, sends: [], preview: null };
 		const db = getDb();
@@ -344,7 +350,8 @@ export const sendTestNewsletter = createServerFn({ method: "POST" })
 		z.object({ lang: z.enum(["vi", "en"]) }).parse(input),
 	)
 	.handler(async ({ data }) => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, "newsletter_test", data.lang);
 		const to = process.env.NOTIFY_EMAIL?.split(",")[0]?.trim();
 		if (!to || !isEmailConfigured())
 			return { ok: false as const, error: "not_configured" as const };
@@ -361,7 +368,8 @@ export const sendTestNewsletter = createServerFn({ method: "POST" })
 
 export const sendNewsletter = createServerFn({ method: "POST" }).handler(
 	async () => {
-		requireAdmin();
+		const me = await requireOwner(); // only owners send to every subscriber
+		await audit(me, "newsletter_send");
 		if (!isEmailConfigured())
 			return { ok: false as const, error: "not_configured" as const };
 		const db = getDb();

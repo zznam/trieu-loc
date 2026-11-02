@@ -97,7 +97,7 @@ Spam protection: a hidden honeypot field, a minimum fill time, and a limit of 5 
 
 1. **Database** — Vercel project → *Storage* → *Create* → **Neon** (Marketplace, free plan) → connect it to the project. This adds `DATABASE_URL`.
 2. **Photo storage** — *Storage* → *Create* → **Blob** → connect it. This adds `BLOB_READ_WRITE_TOKEN`. (Skip it and the form still works, without photos.)
-3. **Admin password** — *Settings* → *Environment Variables* → add `ADMIN_PASSWORD` (long and random). Changing it later signs everyone out.
+3. **Admin password** — *Settings* → *Environment Variables* → add `ADMIN_PASSWORD` (long and random). It is only used **once**: sign in to `/admin` with it, open **Tài khoản** and create your owner account. From then on everyone signs in with their own email + password and the shared password stops working.
 4. **Email alerts (optional)** — create a free account at [resend.com](https://resend.com), make an API key, then add `RESEND_API_KEY` and `NOTIFY_EMAIL` (comma-separate several addresses). Until you verify your own domain in Resend, emails can only go to your Resend account's address, so use that as `NOTIFY_EMAIL`; after verifying, set `NOTIFY_FROM` (e.g. `Triệu Lộc <thongbao@your-domain.vn>`). Each email has the submission details, reply-to set to the sender's email (if they gave one) and a button to `/admin`.
 5. **Create the table** — on your machine:
    ```bash
@@ -107,9 +107,18 @@ Spam protection: a hidden honeypot field, a minimum fill time, and a limit of 5 
    ```
 6. Redeploy, then open `https://<your-site>/admin`.
 
-See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`. **Whenever a PR adds a file to `drizzle/`, run `pnpm db:migrate` again after deploying** (latest: `0005_content.sql` for the content editor).
+See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`. **Whenever a PR adds a file to `drizzle/`, run `pnpm db:migrate` again after deploying** (latest: `0006_accounts.sql` for editor accounts).
 
 `pnpm build` ends with a check that fails if server-only code (database driver, crypto, Blob SDK) ends up in the browser bundle. If it trips, you imported a plain value from `src/server/*` into a route — import only server functions from there.
+
+## Editor accounts
+
+`/admin` → **Tài khoản** (owners only):
+
+- **Roles** — *Chủ sở hữu* (owner): everything, including accounts, sending the newsletter, the one-time content import and photo clean-up. *Biên tập viên* (editor): content, contributions, moderation, test newsletters.
+- Create accounts with a temporary password (≥10 characters) and send it to the person; anyone can change their own password under **Đổi mật khẩu của tôi**. Owners can reset passwords, change roles and lock accounts (locking or resetting signs that person out everywhere). The last active owner can't be demoted or locked.
+- **Nhật ký hoạt động** lists the last 200 actions (sign-ins, failed sign-ins, publishing, edits, deletions, newsletter sends, account changes) with who did them.
+- Passwords are hashed with scrypt; sessions are random tokens stored only as hashes and last 7 days. After 10 wrong passwords from one network within 15 minutes, sign-in is paused.
 
 ## Newsletter
 

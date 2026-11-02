@@ -10,7 +10,13 @@ import {
 	type JsonObject,
 } from "#/lib/content-schemas";
 import { fileContent } from "#/lib/content-store";
-import { isAdminConfigured, isAdminRequest, requireAdmin } from "./auth";
+import {
+	audit,
+	isAdminConfigured,
+	isAdminRequest,
+	requireAdmin,
+	requireOwner,
+} from "./auth";
 import {
 	ensureContentFresh,
 	getSnapshotCached,
@@ -59,7 +65,7 @@ export const getContentAdmin = createServerFn({ method: "GET" })
 	.validator((input: unknown) => collectionInput.parse(input))
 	.handler(async ({ data }): Promise<ContentAdminState> => {
 		const configured = { db: isDbConfigured(), admin: isAdminConfigured() };
-		const authed = isAdminRequest();
+		const authed = await isAdminRequest();
 		if (!authed || !configured.db)
 			return {
 				authed,
@@ -102,7 +108,8 @@ export const getContentAdmin = createServerFn({ method: "GET" })
  */
 export const importContent = createServerFn({ method: "POST" }).handler(
 	async () => {
-		requireAdmin();
+		const me = await requireOwner();
+		await audit(me, "content_import");
 		const db = getDb();
 		const imported = await importedCollections();
 		const todo = COLLECTION_NAMES.filter((c) => !imported.includes(c));
@@ -157,7 +164,7 @@ export const saveContentItem = createServerFn({ method: "POST" })
 			.parse(input),
 	)
 	.handler(async ({ data }): Promise<SaveResult> => {
-		requireAdmin();
+		const me = await requireAdmin();
 		const parsed = COLLECTIONS[data.collection].safeParse(data.data);
 		if (!parsed.success) {
 			return {
@@ -170,6 +177,11 @@ export const saveContentItem = createServerFn({ method: "POST" })
 		}
 		const item = parsed.data as Record<string, unknown>;
 		const id = itemId(data.collection, item);
+		await audit(
+			me,
+			data.previousId ? "content_edit" : "content_create",
+			`${data.collection}/${id}`,
+		);
 		const db = getDb();
 		if (!(await importedCollections()).includes(data.collection)) {
 			return { ok: false, error: "not_imported" };
@@ -228,7 +240,8 @@ export const deleteContentItem = createServerFn({ method: "POST" })
 		collectionInput.extend({ id: z.string().max(120) }).parse(input),
 	)
 	.handler(async ({ data }) => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, "content_delete", `${data.collection}/${data.id}`);
 		const before = await itemData(data.collection, data.id);
 		await getDb()
 			.delete(contentItems)
@@ -295,7 +308,7 @@ export const uploadContentImage = createServerFn({ method: "POST" })
 		return { file, collection };
 	})
 	.handler(async ({ data }): Promise<UploadResult> => {
-		requireAdmin();
+		await requireAdmin();
 		if ("invalid" in data) return { ok: false, error: "invalid" };
 		if (!imageUploadsAvailable()) return { ok: false, error: "unavailable" };
 		if (!["image/jpeg", "image/png", "image/webp"].includes(data.file.type))
@@ -307,7 +320,8 @@ export const uploadContentImage = createServerFn({ method: "POST" })
 /** Removes uploaded images that no content item uses (e.g. uploaded, then the edit was cancelled). */
 export const cleanUpImages = createServerFn({ method: "POST" }).handler(
 	async () => {
-		requireAdmin();
+		const me = await requireOwner();
+		await audit(me, "images_cleanup");
 		const [all, used] = await Promise.all([
 			listManagedImages(),
 			referencedImages(),
@@ -321,7 +335,8 @@ export const cleanUpImages = createServerFn({ method: "POST" }).handler(
 /** Full JSON backup of the editable content. */
 export const exportContent = createServerFn({ method: "GET" }).handler(
 	async () => {
-		requireAdmin();
+		const me = await requireAdmin();
+		await audit(me, "content_export");
 		return (
 			(await getSnapshotCached()) ?? { version: "files", ...fileContent() }
 		);

@@ -438,9 +438,12 @@ const SAVE_ERRORS: Record<string, string> = {
 export function ContentEditor({
 	collection,
 	state,
+	owner,
 }: {
 	collection: CollectionName;
 	state: ContentAdminState;
+	/** Import and photo clean-up are owner-only. */
+	owner: boolean;
 }) {
 	const router = useRouter();
 	const [editing, setEditing] = useState<{
@@ -529,7 +532,7 @@ export function ContentEditor({
 				>
 					⤓ Tải bản sao lưu (JSON)
 				</button>
-				{state.uploads && (
+				{owner && state.uploads && (
 					<button
 						type="button"
 						disabled={busy}
@@ -552,7 +555,7 @@ export function ContentEditor({
 				)}
 			</nav>
 
-			{state.missing.length > 0 && (
+			{owner && state.missing.length > 0 && (
 				<div className="rounded-2xl border border-earth-500/50 bg-earth-300/20 p-5">
 					<p className="font-semibold text-rice-900">
 						{state.missing.length === COLLECTION_NAMES.length
