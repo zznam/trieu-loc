@@ -18,3 +18,6 @@ todos.json
 # Test output
 test-results/
 playwright-report/
+
+# Local photo uploads (LOCAL_UPLOADS=1, dev/tests only)
+.data/

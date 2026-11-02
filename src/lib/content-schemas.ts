@@ -27,6 +27,7 @@ export const placeSchema = z.object({
 	approx: z.boolean(),
 	body: L(2000),
 	villageId: slug.optional(),
+	photo: text(500).optional(),
 });
 
 export const villageSchema = z.object({

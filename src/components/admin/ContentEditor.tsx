@@ -1,5 +1,5 @@
 import { useRouter } from "@tanstack/react-router";
-import { useState } from "react";
+import { createContext, useContext, useState } from "react";
 import {
 	COLLECTION_NAMES,
 	type CollectionName,
@@ -11,12 +11,22 @@ import { forceNextSync } from "#/lib/content-sync";
 import { villages } from "#/lib/villages";
 import {
 	type ContentAdminState,
+	cleanUpImages,
 	deleteContentItem,
 	exportContent,
 	importContent,
 	saveContentItem,
 } from "#/server/content";
 import { FIELDS, type Field, itemTitle, newItem } from "./fields";
+import { ImageField } from "./ImageField";
+
+const EditorContext = createContext<{
+	collection: CollectionName;
+	uploads: boolean;
+}>({
+	collection: "places",
+	uploads: false,
+});
 
 export const COLLECTION_LABELS: Record<CollectionName, string> = {
 	places: "Địa danh",
@@ -61,6 +71,7 @@ function FieldInput({
 	onChange: (next: Obj) => void;
 }) {
 	const set = (path: string, v: unknown) => onChange(setPath(item, path, v));
+	const ctx = useContext(EditorContext);
 
 	switch (field.kind) {
 		case "text": {
@@ -129,6 +140,19 @@ function FieldInput({
 				</fieldset>
 			);
 		}
+		case "image":
+			return (
+				<ImageField
+					label={field.label}
+					value={(getPath(item, field.path) as string | undefined) || undefined}
+					// Required image fields (gallery) store "" for "no photo".
+					onChange={(url) =>
+						set(field.path, url ?? (field.optional ? undefined : ""))
+					}
+					collection={ctx.collection}
+					uploads={ctx.uploads}
+				/>
+			);
 		case "list": {
 			const list = (getPath(item, field.path) as Obj[] | undefined) ?? [];
 			const write = (next: Obj[]) => set(field.path, next);
@@ -505,6 +529,27 @@ export function ContentEditor({
 				>
 					⤓ Tải bản sao lưu (JSON)
 				</button>
+				{state.uploads && (
+					<button
+						type="button"
+						disabled={busy}
+						onClick={async () => {
+							setBusy(true);
+							try {
+								const r = await cleanUpImages();
+								setMessage({
+									tone: "ok",
+									text: `Đã xoá ${r.removed} ảnh không dùng.`,
+								});
+							} finally {
+								setBusy(false);
+							}
+						}}
+						className="rounded-full border border-earth-300 px-4 py-2 text-sm font-semibold disabled:opacity-60"
+					>
+						🧹 Dọn ảnh không dùng
+					</button>
+				)}
 			</nav>
 
 			{state.missing.length > 0 && (
@@ -576,14 +621,18 @@ export function ContentEditor({
 							? `Sửa: ${itemTitle(collection, editing.item)}`
 							: `Thêm ${COLLECTION_LABELS[collection].toLowerCase()}`}
 					</h2>
-					{fields.map((f) => (
-						<FieldInput
-							key={f.kind === "lang" ? f.lang : f.path}
-							field={f}
-							item={editing.item}
-							onChange={(item) => setEditing({ ...editing, item })}
-						/>
-					))}
+					<EditorContext.Provider
+						value={{ collection, uploads: state.uploads }}
+					>
+						{fields.map((f) => (
+							<FieldInput
+								key={f.kind === "lang" ? f.lang : f.path}
+								field={f}
+								item={editing.item}
+								onChange={(item) => setEditing({ ...editing, item })}
+							/>
+						))}
+					</EditorContext.Provider>
 					<div className="flex gap-2">
 						<button
 							type="button"

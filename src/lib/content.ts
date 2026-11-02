@@ -20,6 +20,7 @@ export type Place = {
 	body: L;
 	/** Links the place to a village page (src/content/villages.json). */
 	villageId?: string;
+	photo?: string;
 };
 
 export type Specialty = {

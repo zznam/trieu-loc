@@ -48,6 +48,8 @@ export default defineConfig({
 				RESEND_API_URL: "http://localhost:4599/emails",
 				NOTIFY_EMAIL: "editor@example.test",
 				NOTIFY_FROM: "Triệu Lộc <thongbao@example.test>",
+				// Store editor photo uploads on disk (.data/uploads) instead of Vercel Blob.
+				LOCAL_UPLOADS: "1",
 			},
 		},
 	],

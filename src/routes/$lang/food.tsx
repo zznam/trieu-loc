@@ -81,18 +81,27 @@ function FoodPage() {
 							id={s.id}
 							className="scroll-mt-24 overflow-hidden rounded-2xl border border-earth-300/50 bg-card/70"
 						>
-							<div
-								className="h-28"
-								style={{
-									background: ["#c2543f", "#b5813f", "#3f5f23", "#e2c46e"][
-										i % 4
-									],
-									backgroundImage:
-										"radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.25) 1.5px, transparent 0)",
-									backgroundSize: "12px 12px",
-								}}
-								aria-hidden="true"
-							/>
+							{s.photo ? (
+								<img
+									src={s.photo}
+									alt={pick(lang, s.name)}
+									loading="lazy"
+									className="h-40 w-full object-cover"
+								/>
+							) : (
+								<div
+									className="h-28"
+									style={{
+										background: ["#c2543f", "#b5813f", "#3f5f23", "#e2c46e"][
+											i % 4
+										],
+										backgroundImage:
+											"radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.25) 1.5px, transparent 0)",
+										backgroundSize: "12px 12px",
+									}}
+									aria-hidden="true"
+								/>
+							)}
 							<div className="p-5">
 								<p className="text-xs font-semibold uppercase tracking-widest text-earth-700">
 									{pick(lang, s.tag)}

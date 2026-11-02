@@ -43,6 +43,8 @@ export type Field =
 			max?: number;
 	  }
 	| { kind: "checkbox"; path: string; label: string }
+	/** Photo upload (resized in the browser) with preview; stores the image URL at `path`. */
+	| { kind: "image"; path: string; label: string; optional?: boolean }
 	| { kind: "coords"; path: string; label: string; optional?: boolean }
 	| { kind: "lines"; path: string; label: string; hint: string }
 	| {
@@ -74,6 +76,7 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 		{ kind: "coords", path: "coords", label: "Toạ độ (vĩ độ, kinh độ)" },
 		{ kind: "checkbox", path: "approx", label: "Vị trí gần đúng" },
 		{ kind: "bilingual", path: "body", label: "Mô tả", rows: 4 },
+		{ kind: "image", path: "photo", label: "Ảnh", optional: true },
 	],
 	villages: [
 		{ kind: "text", path: "id", label: "Mã (id)", hint: ID_HINT },
@@ -101,7 +104,7 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 			label: "Toạ độ trung tâm thôn",
 			optional: true,
 		},
-		{ kind: "text", path: "photo", label: "Ảnh (đường dẫn)", optional: true },
+		{ kind: "image", path: "photo", label: "Ảnh thôn", optional: true },
 		{
 			kind: "checkbox",
 			path: "sample",
@@ -169,12 +172,7 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 			min: 0,
 		},
 		{ kind: "villageSelect", path: "villageId", label: "Gắn với trang thôn" },
-		{
-			kind: "text",
-			path: "photo",
-			label: "Ảnh chân dung (đường dẫn)",
-			optional: true,
-		},
+		{ kind: "image", path: "photo", label: "Ảnh chân dung", optional: true },
 		...(["vi", "en"] as const).map(
 			(lang): Field => ({
 				kind: "lang",
@@ -196,6 +194,7 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 		{ kind: "bilingual", path: "name", label: "Tên món / sản vật" },
 		{ kind: "bilingual", path: "tag", label: "Nhãn (vd: Đặc sản xứ Thanh)" },
 		{ kind: "bilingual", path: "body", label: "Mô tả", rows: 3 },
+		{ kind: "image", path: "photo", label: "Ảnh", optional: true },
 	],
 	businesses: [
 		{ kind: "text", path: "id", label: "Mã (id)", hint: ID_HINT },
@@ -219,11 +218,7 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 				["winter", "Đông"],
 			],
 		},
-		{
-			kind: "text",
-			path: "src",
-			label: "Ảnh (đường dẫn; để trống = ảnh minh hoạ)",
-		},
+		{ kind: "image", path: "src", label: "Ảnh (để trống = ảnh minh hoạ)" },
 	],
 	contacts: [
 		{ kind: "text", path: "id", label: "Mã (id)", hint: ID_HINT },
