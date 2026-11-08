@@ -16,7 +16,7 @@ A bilingual (Vietnamese / English) community website for **Xã Triệu Lộc, t�
 | `/:lang/villages` | The 17 villages; each page gathers its places, people and events with a map |
 | Comments & ❤️ | At the bottom of news posts, people profiles and village pages; comments are moderated in `/admin` → *Bình luận* |
 | `/:lang/guestbook` | Moderated guestbook: messages to the hometown, shown after approval |
-| `/:lang/info` | Live weather (Open-Meteo) and a phone directory |
+| `/:lang/info` | Live weather (Open-Meteo), lunar ↔ solar date converter and a phone directory |
 | `/:lang/contribute` | Form for photos, stories, businesses, events and corrections |
 | `/admin` | Password-protected review of contributions (Vietnamese) |
 | `/:lang/gallery` | Photo gallery by season |
@@ -133,6 +133,14 @@ Visitors subscribe from the footer. It is **double opt-in**: they get a confirma
 In `/admin` → **Bản tin** you see subscriber counts, a live preview of this month's digest in Vietnamese and English (news from the last 30 days, events in the next 2 months), **Gửi thử** (sends to the first `NOTIFY_EMAIL`), and **Gửi cho N người**. A second send within an hour is blocked. Each subscriber gets the edition in the language they signed up in.
 
 Needs `RESEND_API_KEY` and a **verified sending domain** in Resend with `NOTIFY_FROM` set (without one, Resend only delivers to your own account address). Sending is done in batches of 100.
+
+## Feeds, sharing & tools
+
+- **News RSS** — `/feeds/news-vi.xml` and `/feeds/news-en.xml` (repo posts + published community stories, newest 50). Every page advertises the feed for its language with `<link rel="alternate" type="application/rss+xml">`; the News page has a *Follow via RSS* link.
+- **Events calendar feed** — `/feeds/events-vi.ics` and `/feeds/events-en.ics` (iCalendar, all-day events from the last month to 18 months ahead, including published community events). Lunar festivals are converted to solar dates occurrence by occurrence, since calendar apps can't repeat on the lunar calendar. The Events page has *Subscribe* (`webcal://`), *Download .ics* and *Copy calendar URL*.
+- **Share buttons** on news posts, people profiles and village pages: the phone's share sheet (Zalo, Messenger, …) where supported, Facebook, and copy link.
+- **News articles** show an estimated reading time and up to three related articles (by shared words in title and summary, falling back to the newest).
+- **Lunar converter** on the Useful info page: today's lunar date, the next 1st and 15th of the lunar month, and two-way solar ↔ lunar conversion (with leap months, years 1800–2199).
 
 ## Installable app (PWA)
 

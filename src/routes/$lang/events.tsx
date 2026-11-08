@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { CalendarSubscribe } from "#/components/CalendarSubscribe";
 import { ContributeCta } from "#/components/ContributeCta";
 import { PageHeader } from "#/components/PageHeader";
 import {
@@ -240,6 +241,8 @@ function EventsPage() {
 						</ol>
 					</div>
 				))}
+
+				<CalendarSubscribe lang={lang} />
 
 				<ContributeCta
 					lang={lang}

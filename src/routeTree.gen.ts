@@ -24,6 +24,7 @@ import { Route as LangHistoryRouteImport } from './routes/$lang/history'
 import { Route as LangInfoRouteImport } from './routes/$lang/info'
 import { Route as LangPlacesRouteImport } from './routes/$lang/places'
 import { Route as LangSearchRouteImport } from './routes/$lang/search'
+import { Route as FeedsFileRouteImport } from './routes/feeds/$file'
 import { Route as LangNewsIndexRouteImport } from './routes/$lang/news/index'
 import { Route as LangNewsSlugRouteImport } from './routes/$lang/news/$slug'
 import { Route as LangNewsletterConfirmRouteImport } from './routes/$lang/newsletter/confirm'
@@ -110,6 +111,11 @@ const LangSearchRoute = LangSearchRouteImport.update({
   path: '/search',
   getParentRoute: () => LangRoute,
 } as any)
+const FeedsFileRoute = FeedsFileRouteImport.update({
+  id: '/feeds/$file',
+  path: '/feeds/$file',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LangNewsIndexRoute = LangNewsIndexRouteImport.update({
   id: '/news/',
   path: '/news/',
@@ -178,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/$lang/info': typeof LangInfoRoute
   '/$lang/places': typeof LangPlacesRoute
   '/$lang/search': typeof LangSearchRoute
+  '/feeds/$file': typeof FeedsFileRoute
   '/$lang/': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/newsletter/confirm': typeof LangNewsletterConfirmRoute
@@ -204,6 +211,7 @@ export interface FileRoutesByTo {
   '/$lang/info': typeof LangInfoRoute
   '/$lang/places': typeof LangPlacesRoute
   '/$lang/search': typeof LangSearchRoute
+  '/feeds/$file': typeof FeedsFileRoute
   '/$lang': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/newsletter/confirm': typeof LangNewsletterConfirmRoute
@@ -232,6 +240,7 @@ export interface FileRoutesById {
   '/$lang/info': typeof LangInfoRoute
   '/$lang/places': typeof LangPlacesRoute
   '/$lang/search': typeof LangSearchRoute
+  '/feeds/$file': typeof FeedsFileRoute
   '/$lang/': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/newsletter/confirm': typeof LangNewsletterConfirmRoute
@@ -261,6 +270,7 @@ export interface FileRouteTypes {
     | '/$lang/info'
     | '/$lang/places'
     | '/$lang/search'
+    | '/feeds/$file'
     | '/$lang/'
     | '/$lang/news/$slug'
     | '/$lang/newsletter/confirm'
@@ -287,6 +297,7 @@ export interface FileRouteTypes {
     | '/$lang/info'
     | '/$lang/places'
     | '/$lang/search'
+    | '/feeds/$file'
     | '/$lang'
     | '/$lang/news/$slug'
     | '/$lang/newsletter/confirm'
@@ -314,6 +325,7 @@ export interface FileRouteTypes {
     | '/$lang/info'
     | '/$lang/places'
     | '/$lang/search'
+    | '/feeds/$file'
     | '/$lang/'
     | '/$lang/news/$slug'
     | '/$lang/newsletter/confirm'
@@ -333,6 +345,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  FeedsFileRoute: typeof FeedsFileRoute
   ApiNewsletterUnsubscribeRoute: typeof ApiNewsletterUnsubscribeRoute
   ApiUploadsNameRoute: typeof ApiUploadsNameRoute
 }
@@ -443,6 +456,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$lang/search'
       preLoaderRoute: typeof LangSearchRouteImport
       parentRoute: typeof LangRoute
+    }
+    '/feeds/$file': {
+      id: '/feeds/$file'
+      path: '/feeds/$file'
+      fullPath: '/feeds/$file'
+      preLoaderRoute: typeof FeedsFileRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$lang/news/': {
       id: '/$lang/news/'
@@ -567,6 +587,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  FeedsFileRoute: FeedsFileRoute,
   ApiNewsletterUnsubscribeRoute: ApiNewsletterUnsubscribeRoute,
   ApiUploadsNameRoute: ApiUploadsNameRoute,
 }

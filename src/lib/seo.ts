@@ -1,3 +1,4 @@
+import { feedPath } from "./feeds";
 import { type L, LANGS, type Lang, pick } from "./i18n";
 
 export const SITE_URL = __SITE_URL__;
@@ -68,6 +69,13 @@ export function seo(
 				rel: "alternate",
 				hrefLang: "x-default",
 				href: `${SITE_URL}/vi${path}`,
+			},
+			// Feed autodiscovery (browsers and feed readers pick these up from any page).
+			{
+				rel: "alternate",
+				type: "application/rss+xml",
+				title: lang === "vi" ? "Tin tức Triệu Lộc" : "Triệu Lộc news",
+				href: `${SITE_URL}${feedPath("news", lang)}`,
 			},
 		],
 	};

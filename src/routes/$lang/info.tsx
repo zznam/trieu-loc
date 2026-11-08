@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { LunarConverter } from "#/components/LunarConverter";
 import { PageHeader, SampleNote } from "#/components/PageHeader";
 import { WeatherCard } from "#/components/Weather";
 import { contactsByGroup } from "#/lib/content";
@@ -31,6 +32,13 @@ function InfoPage() {
 					{t(lang, "info.weather")}
 				</h2>
 				<WeatherCard lang={lang} />
+			</section>
+			<section className="mx-auto max-w-5xl px-4 pb-10">
+				<h2 className="text-2xl font-semibold text-rice-900">
+					{t(lang, "lunar.title")}
+				</h2>
+				<p className="mt-1 mb-4 text-ink-soft">{t(lang, "lunar.lead")}</p>
+				<LunarConverter lang={lang} />
 			</section>
 			<section className="mx-auto max-w-5xl px-4 pb-6">
 				<div className="flex flex-wrap items-center justify-between gap-3">

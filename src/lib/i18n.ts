@@ -455,6 +455,51 @@ const dict = {
 		vi: "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",
 		en: "The page you're looking for doesn't exist or has moved.",
 	},
+	"feed.rss": { vi: "Theo dõi qua RSS", en: "Follow via RSS" },
+	"feed.subscribe": {
+		vi: "Đăng ký lịch vào điện thoại",
+		en: "Subscribe in your calendar app",
+	},
+	"feed.subscribeButton": { vi: "Đăng ký lịch", en: "Subscribe" },
+	"feed.download": { vi: "Tải tệp .ics", en: "Download .ics" },
+	"feed.subscribeHint": {
+		vi: "Lễ hội theo âm lịch được đổi sang ngày dương và tự cập nhật hằng ngày.",
+		en: "Lunar festivals are converted to solar dates and refresh daily.",
+	},
+	"feed.copyUrl": { vi: "Sao chép địa chỉ lịch", en: "Copy calendar URL" },
+	"share.title": { vi: "Chia sẻ", en: "Share" },
+	"share.native": { vi: "Chia sẻ…", en: "Share…" },
+	"share.copy": { vi: "Sao chép liên kết", en: "Copy link" },
+	"share.copied": { vi: "Đã sao chép!", en: "Copied!" },
+	"news.readingTime": { vi: "phút đọc", en: "min read" },
+	"news.related": { vi: "Bài viết liên quan", en: "Related articles" },
+	"lunar.title": {
+		vi: "Đổi ngày âm – dương lịch",
+		en: "Lunar ↔ solar date converter",
+	},
+	"lunar.lead": {
+		vi: "Tra ngày giỗ, ngày rằm, mùng một… theo lịch Việt Nam (múi giờ UTC+7).",
+		en: "Look up death anniversaries, full-moon and new-moon days on the Vietnamese calendar (UTC+7).",
+	},
+	"lunar.toLunar": { vi: "Dương → Âm", en: "Solar → Lunar" },
+	"lunar.toSolar": { vi: "Âm → Dương", en: "Lunar → Solar" },
+	"lunar.solarDate": { vi: "Ngày dương lịch", en: "Solar date" },
+	"lunar.day": { vi: "Ngày", en: "Day" },
+	"lunar.month": { vi: "Tháng", en: "Month" },
+	"lunar.year": { vi: "Năm", en: "Year" },
+	"lunar.leapMonth": { vi: "Tháng nhuận", en: "Leap month" },
+	"lunar.noLeap": {
+		vi: "Năm này không có tháng nhuận đó.",
+		en: "That year has no such leap month.",
+	},
+	"lunar.invalid": {
+		vi: "Ngày không hợp lệ (hỗ trợ năm 1800–2199).",
+		en: "Invalid date (years 1800–2199 supported).",
+	},
+	"lunar.result": { vi: "Kết quả", en: "Result" },
+	"lunar.today": { vi: "Hôm nay", en: "Today" },
+	"lunar.nextFull": { vi: "Rằm tới", en: "Next full moon (15th)" },
+	"lunar.nextNew": { vi: "Mùng một tới", en: "Next new moon (1st)" },
 } satisfies Record<string, L>;
 
 export type DictKey = keyof typeof dict;

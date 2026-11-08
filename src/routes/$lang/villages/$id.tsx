@@ -4,6 +4,7 @@ import { Avatar } from "#/components/Avatar";
 import { Comments } from "#/components/Comments";
 import { ContributeCta } from "#/components/ContributeCta";
 import { SampleNote } from "#/components/PageHeader";
+import { ShareButtons } from "#/components/ShareButtons";
 import { placeCategoryLabel, site } from "#/lib/content";
 import { eventCategoryLabel } from "#/lib/events";
 import { type Lang, pick, t } from "#/lib/i18n";
@@ -213,6 +214,11 @@ function VillagePage() {
 				)}
 			</section>
 			<section className="mx-auto max-w-3xl px-4">
+				<ShareButtons
+					lang={lang}
+					path={`/villages/${village.id}`}
+					title={pick(lang, village.name)}
+				/>
 				<Comments lang={lang} target={`villages:${village.id}`} />
 			</section>
 			<section className="mx-auto max-w-6xl px-4">

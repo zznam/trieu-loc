@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "#/components/PageHeader";
 import { getNews } from "#/lib/content";
 import { STORY_PREFIX } from "#/lib/contribute";
+import { feedPath } from "#/lib/feeds";
 import { formatDate, type Lang, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
 import { getPublishedStories } from "#/server/published";
@@ -55,6 +56,17 @@ function NewsIndex() {
 		<>
 			<PageHeader title={t(lang, "news.title")} lead={t(lang, "news.lead")} />
 			<section className="mx-auto max-w-3xl px-4 py-12">
+				<p className="mb-8 text-right">
+					<a
+						href={feedPath("news", lang)}
+						className="inline-flex items-center gap-1.5 text-sm font-semibold text-earth-700 hover:underline"
+					>
+						<span aria-hidden="true" className="text-orange-500">
+							◉
+						</span>
+						{t(lang, "feed.rss")}
+					</a>
+				</p>
 				<ul className="divide-y divide-earth-300/50">
 					{entries.map((post) => (
 						<li key={post.slug} className="py-8">

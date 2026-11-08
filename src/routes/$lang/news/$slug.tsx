@@ -1,11 +1,15 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Comments } from "#/components/Comments";
-import { getPost } from "#/lib/content";
+import { ShareButtons } from "#/components/ShareButtons";
+import { getNews, getPost } from "#/lib/content";
 import { STORY_PREFIX } from "#/lib/contribute";
 import { formatDate, type Lang, pick, t } from "#/lib/i18n";
+import { readingMinutes, relatedPosts } from "#/lib/reading";
 import { seo } from "#/lib/seo";
 import { getVillage } from "#/lib/villages";
 import { getPublishedStory } from "#/server/published";
+
+type Related = { slug: string; title: string; date: string; summary: string };
 
 type Article =
 	| { kind: "post"; title: string; date: string; summary: string; html: string }
@@ -20,7 +24,16 @@ type Article =
 	  };
 
 export const Route = createFileRoute("/$lang/news/$slug")({
-	loader: async ({ params }): Promise<{ article: Article }> => {
+	loader: async ({
+		params,
+	}): Promise<{ article: Article; minutes: number; related: Related[] }> => {
+		const lang = params.lang as Lang;
+		const brief = (p: Related): Related => ({
+			slug: p.slug,
+			title: p.title,
+			date: p.date,
+			summary: p.summary,
+		});
 		if (params.slug.startsWith(STORY_PREFIX)) {
 			const id = Number(params.slug.slice(STORY_PREFIX.length));
 			const story =
@@ -28,21 +41,29 @@ export const Route = createFileRoute("/$lang/news/$slug")({
 					? await getPublishedStory({ data: { id } })
 					: null;
 			if (!story) throw notFound();
+			const summary = story.message.replace(/\s+/g, " ").slice(0, 160);
 			return {
+				minutes: readingMinutes(story.message),
+				related: relatedPosts(
+					{ slug: params.slug, title: story.title, summary, date: "" },
+					getNews(lang),
+				).map(brief),
 				article: {
 					kind: "story",
 					title: story.title,
 					date: story.publishedAt.slice(0, 10),
-					summary: story.message.replace(/\s+/g, " ").slice(0, 160),
+					summary,
 					message: story.message,
 					byline: [story.name, story.village].filter(Boolean).join(" · "),
 					villageId: story.villageId,
 				},
 			};
 		}
-		const post = getPost(params.lang as Lang, params.slug);
+		const post = getPost(lang, params.slug);
 		if (!post) throw notFound();
 		return {
+			minutes: readingMinutes(post.markdown),
+			related: relatedPosts(post, getNews(lang)).map(brief),
 			article: {
 				kind: "post",
 				title: post.title,
@@ -68,7 +89,7 @@ export const Route = createFileRoute("/$lang/news/$slug")({
 function NewsPostPage() {
 	const params = Route.useParams();
 	const lang = params.lang as Lang;
-	const { article } = Route.useLoaderData();
+	const { article, minutes, related } = Route.useLoaderData();
 	const village =
 		article.kind === "story" && article.villageId
 			? getVillage(article.villageId)
@@ -84,6 +105,10 @@ function NewsPostPage() {
 			</Link>
 			<p className="mt-8 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-widest text-earth-700">
 				<time dateTime={article.date}>{formatDate(lang, article.date)}</time>
+				<span aria-hidden="true">·</span>
+				<span className="normal-case tracking-normal">
+					{minutes} {t(lang, "news.readingTime")}
+				</span>
 				{article.kind === "story" && (
 					<span className="rounded-full bg-rice-100 px-2 py-0.5 normal-case tracking-normal text-rice-900">
 						✍️ {t(lang, "news.community")}
@@ -132,6 +157,42 @@ function NewsPostPage() {
 						))}
 					</div>
 				</>
+			)}
+			<ShareButtons
+				lang={lang}
+				path={`/news/${params.slug}`}
+				title={article.title}
+			/>
+			{related.length > 0 && (
+				<aside className="mt-12" aria-labelledby="related-heading">
+					<h2
+						id="related-heading"
+						className="text-xl font-semibold text-rice-900"
+					>
+						{t(lang, "news.related")}
+					</h2>
+					<ul className="mt-4 grid gap-4 sm:grid-cols-3">
+						{related.map((p) => (
+							<li key={p.slug}>
+								<Link
+									to="/$lang/news/$slug"
+									params={{ lang, slug: p.slug }}
+									className="block h-full rounded-2xl border border-earth-300/50 bg-card/70 p-4 transition hover:border-rice-500"
+								>
+									<time
+										dateTime={p.date}
+										className="text-xs font-semibold uppercase tracking-widest text-earth-700"
+									>
+										{formatDate(lang, p.date)}
+									</time>
+									<p className="mt-1 font-semibold leading-snug text-rice-900">
+										{p.title}
+									</p>
+								</Link>
+							</li>
+						))}
+					</ul>
+				</aside>
 			)}
 			<Comments lang={lang} target={`news:${params.slug}`} />
 		</article>

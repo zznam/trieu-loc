@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Avatar } from "#/components/Avatar";
 import { Comments } from "#/components/Comments";
+import { ShareButtons } from "#/components/ShareButtons";
 import { getPerson, personCategoryLabel } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
@@ -58,6 +59,11 @@ function PersonPage() {
 				className="prose-news text-lg text-ink"
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: trusted Markdown committed to the repo, not user input
 				dangerouslySetInnerHTML={{ __html: person.html }}
+			/>
+			<ShareButtons
+				lang={lang}
+				path={`/people/${person.slug}`}
+				title={person.name}
 			/>
 			<Comments lang={lang} target={`people:${person.slug}`} />
 		</article>

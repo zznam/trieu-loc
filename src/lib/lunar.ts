@@ -241,3 +241,17 @@ const CHI = [
 /** Can–Chi name of a lunar year, e.g. 2026 → "Bính Ngọ". */
 export const yearName = (lunarYear: number) =>
 	`${CAN[(lunarYear + 6) % 10]} ${CHI[(lunarYear + 8) % 12]}`;
+
+/** The first solar date on or after `from` whose lunar day is `lunarDay` (1 = new moon, 15 = full moon). */
+export function nextLunarDay(from: SolarDate, lunarDay: number): SolarDate {
+	for (let i = 0; i < 31; i++) {
+		const d = new Date(Date.UTC(from.year, from.month - 1, from.day + i));
+		const solar = {
+			day: d.getUTCDate(),
+			month: d.getUTCMonth() + 1,
+			year: d.getUTCFullYear(),
+		};
+		if (solarToLunar(solar).day === lunarDay) return solar;
+	}
+	return from;
+}
