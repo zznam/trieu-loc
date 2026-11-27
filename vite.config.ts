@@ -17,10 +17,26 @@ const siteUrl = (
 		: "http://localhost:3000")
 ).replace(/\/$/, "");
 
+// Baseline security headers on every response (Vercel adds HSTS itself).
+// Leaflet tiles, Google Fonts, Open-Meteo and Vercel Blob images are all cross-origin,
+// so there is no Content-Security-Policy here; these headers are safe for all of them.
+const securityHeaders = {
+	"X-Content-Type-Options": "nosniff",
+	"Referrer-Policy": "strict-origin-when-cross-origin",
+	"X-Frame-Options": "SAMEORIGIN",
+	"Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+};
+
 const config = defineConfig({
 	define: { __SITE_URL__: JSON.stringify(siteUrl) },
 	resolve: { tsconfigPaths: true },
-	plugins: [devtools(), nitro(), tailwindcss(), tanstackStart(), viteReact()],
+	plugins: [
+		devtools(),
+		nitro({ routeRules: { "/**": { headers: securityHeaders } } }),
+		tailwindcss(),
+		tanstackStart(),
+		viteReact(),
+	],
 });
 
 export default config;

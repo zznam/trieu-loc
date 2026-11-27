@@ -24,7 +24,11 @@ export function Breadcrumbs({
 			<ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-earth-700">
 				{[home, ...crumbs].map((c) => (
 					<li key={c.path} className="flex items-center gap-1.5">
-						<Link to={c.path} className="font-semibold hover:underline">
+						<Link
+							to={c.path}
+							activeOptions={{ exact: true }}
+							className="font-semibold hover:underline"
+						>
 							{c.name}
 						</Link>
 						<span aria-hidden="true" className="text-earth-500">

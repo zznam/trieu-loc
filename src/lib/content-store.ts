@@ -159,9 +159,13 @@ function toPosts(items: NewsItem[]): NewsPost[] {
 					summary: l.summary,
 					markdown: l.body,
 					html: md(l.body),
-					publishAt: n.publishAt
-						? vnLocalToDate(n.publishAt)?.getTime()
-						: undefined,
+					// A draft is treated as scheduled for "never", so every place that hides
+					// scheduled posts (list, page, search, sitemap, comments, newsletter) hides it too.
+					publishAt: n.draft
+						? Number.POSITIVE_INFINITY
+						: n.publishAt
+							? vnLocalToDate(n.publishAt)?.getTime()
+							: undefined,
 				};
 			}),
 	);

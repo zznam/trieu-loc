@@ -26,6 +26,7 @@ import { Route as LangPlacesRouteImport } from './routes/$lang/places'
 import { Route as LangPrivacyRouteImport } from './routes/$lang/privacy'
 import { Route as LangSearchRouteImport } from './routes/$lang/search'
 import { Route as LangVisitRouteImport } from './routes/$lang/visit'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as LangNewsIndexRouteImport } from './routes/$lang/news/index'
 import { Route as LangNewsSlugRouteImport } from './routes/$lang/news/$slug'
 import { Route as LangNewsletterConfirmRouteImport } from './routes/$lang/newsletter/confirm'
@@ -122,6 +123,11 @@ const LangVisitRoute = LangVisitRouteImport.update({
   path: '/visit',
   getParentRoute: () => LangRoute,
 } as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LangNewsIndexRoute = LangNewsIndexRouteImport.update({
   id: '/news/',
   path: '/news/',
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/search': typeof LangSearchRoute
   '/$lang/visit': typeof LangVisitRoute
+  '/api/health': typeof ApiHealthRoute
   '/$lang/': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/newsletter/confirm': typeof LangNewsletterConfirmRoute
@@ -220,6 +227,7 @@ export interface FileRoutesByTo {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/search': typeof LangSearchRoute
   '/$lang/visit': typeof LangVisitRoute
+  '/api/health': typeof ApiHealthRoute
   '/$lang': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/newsletter/confirm': typeof LangNewsletterConfirmRoute
@@ -250,6 +258,7 @@ export interface FileRoutesById {
   '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/search': typeof LangSearchRoute
   '/$lang/visit': typeof LangVisitRoute
+  '/api/health': typeof ApiHealthRoute
   '/$lang/': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/newsletter/confirm': typeof LangNewsletterConfirmRoute
@@ -281,6 +290,7 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/search'
     | '/$lang/visit'
+    | '/api/health'
     | '/$lang/'
     | '/$lang/news/$slug'
     | '/$lang/newsletter/confirm'
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/search'
     | '/$lang/visit'
+    | '/api/health'
     | '/$lang'
     | '/$lang/news/$slug'
     | '/$lang/newsletter/confirm'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/$lang/privacy'
     | '/$lang/search'
     | '/$lang/visit'
+    | '/api/health'
     | '/$lang/'
     | '/$lang/news/$slug'
     | '/$lang/newsletter/confirm'
@@ -357,6 +369,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiHealthRoute: typeof ApiHealthRoute
   ApiNewsletterUnsubscribeRoute: typeof ApiNewsletterUnsubscribeRoute
   ApiUploadsNameRoute: typeof ApiUploadsNameRoute
 }
@@ -481,6 +494,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$lang/visit'
       preLoaderRoute: typeof LangVisitRouteImport
       parentRoute: typeof LangRoute
+    }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$lang/news/': {
       id: '/$lang/news/'
@@ -609,9 +629,19 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiHealthRoute: ApiHealthRoute,
   ApiNewsletterUnsubscribeRoute: ApiNewsletterUnsubscribeRoute,
   ApiUploadsNameRoute: ApiUploadsNameRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
