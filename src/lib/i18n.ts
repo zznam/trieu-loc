@@ -76,6 +76,10 @@ const dict = {
 	"countdown.addToCalendar": { vi: "Thêm vào lịch", en: "Add to calendar" },
 	"common.readMore": { vi: "Đọc tiếp", en: "Read more" },
 	"common.back": { vi: "Quay lại", en: "Back" },
+	"share.title": { vi: "Chia sẻ", en: "Share" },
+	"share.native": { vi: "Chia sẻ…", en: "Share…" },
+	"share.copy": { vi: "Sao chép liên kết", en: "Copy link" },
+	"share.copied": { vi: "Đã sao chép", en: "Copied" },
 	"common.sample": {
 		vi: "Nội dung mẫu — cần được bổ sung và kiểm chứng.",
 		en: "Sample content — to be completed and verified.",

@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Comments } from "#/components/Comments";
+import { ShareButtons } from "#/components/ShareButtons";
 import { getPost } from "#/lib/content";
 import { STORY_PREFIX } from "#/lib/contribute";
 import { formatDate, type Lang, pick, t } from "#/lib/i18n";
@@ -133,6 +134,11 @@ function NewsPostPage() {
 					</div>
 				</>
 			)}
+			<ShareButtons
+				lang={lang}
+				path={`/${lang}/news/${params.slug}`}
+				title={article.title}
+			/>
 			<Comments lang={lang} target={`news:${params.slug}`} />
 		</article>
 	);
