@@ -38,6 +38,8 @@ export type Business = {
 	village: L;
 	phone: string;
 	body: L;
+	/** Placeholder listing; hidden once "hide sample content" is switched on. */
+	sample?: boolean;
 };
 export type GalleryItem = {
 	id: string;
@@ -58,6 +60,8 @@ export type Site = {
 	};
 	contact: { email: string; facebook: string; address: L };
 	highlights: { title: L; body: L; to: "places" | "history" | "food" }[];
+	/** Launch switch: hide everything marked as sample/placeholder from the public site. */
+	hideSamples?: boolean;
 };
 
 export type History = {
@@ -74,6 +78,18 @@ export const places = placesData as Place[];
 export const specialties = foodData as Specialty[];
 export const businesses = businessesData as Business[];
 export const gallery = galleryData as GalleryItem[];
+
+// ---------- Sample (placeholder) content ----------
+
+/**
+ * Starter content marked `sample: true` is shown with a "sample" note until an editor
+ * turns on `site.hideSamples` (/admin → Nội dung → Thông tin chung). From then on it is
+ * left out of every public page, the search, the sitemap and comment targets.
+ */
+export const isPublic = (item: { sample?: boolean }) =>
+	!(item.sample && site.hideSamples);
+
+export const publicBusinesses = () => businesses.filter(isPublic);
 
 // ---------- Contacts (Useful info page) ----------
 
@@ -115,7 +131,7 @@ export const contactsByGroup = () =>
 	CONTACT_GROUPS.map((group) => ({
 		group,
 		items: contacts
-			.filter((c) => c.group === group)
+			.filter((c) => c.group === group && isPublic(c))
 			.sort((a, b) => a.order - b.order),
 	})).filter((g) => g.items.length > 0);
 
@@ -262,6 +278,8 @@ export type Person = {
 	photo: string;
 	order: number;
 	villageId?: string;
+	/** Placeholder profile; hidden once "hide sample content" is switched on. */
+	sample?: boolean;
 	/** Markdown source (kept for the content editor). */
 	markdown: string;
 	html: string;
@@ -288,16 +306,18 @@ export const allPeople: Person[] = loadCollection(
 	photo: d.data.photo ?? "",
 	order: Number(d.data.order ?? 100),
 	villageId: d.data.villageId || undefined,
+	sample: d.data.sample === "true" || undefined,
 	markdown: d.markdown,
 	html: d.html,
 }));
 
 export function getPeople(lang: Lang): Person[] {
-	return localized(allPeople, lang).sort(
-		(a, b) => a.order - b.order || a.name.localeCompare(b.name, "vi"),
-	);
+	return localized(allPeople, lang)
+		.filter(isPublic)
+		.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, "vi"));
 }
 
 export function getPerson(lang: Lang, slug: string): Person | undefined {
-	return findDoc(allPeople, lang, slug);
+	const person = findDoc(allPeople, lang, slug);
+	return person && isPublic(person) ? person : undefined;
 }

@@ -101,6 +101,7 @@ function peopleFromFiles(list: Person[]): PersonItem[] {
 			order: any.order,
 			villageId: any.villageId,
 			photo: any.photo || undefined,
+			...(any.sample ? { sample: true } : {}),
 			vi: vi ?? {
 				name: slug,
 				years: "",
@@ -178,6 +179,7 @@ function toPeople(items: PersonItem[]): Person[] {
 					category: p.category,
 					order: p.order,
 					villageId: p.villageId,
+					sample: p.sample,
 					photo: p.photo ?? "",
 					name: l.name,
 					years: l.years,

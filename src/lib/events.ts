@@ -1,4 +1,5 @@
 import eventsData from "#/content/events.json";
+import { isPublic } from "./content";
 import type { L } from "./i18n";
 import {
 	type LunarDate,
@@ -28,6 +29,8 @@ export type EventDef = {
 	};
 	/** Links the event to a village page. */
 	villageId?: string;
+	/** Placeholder event; hidden once "hide sample content" is switched on. */
+	sample?: boolean;
 };
 
 export type Occurrence = {
@@ -83,7 +86,7 @@ export function upcomingEvents(
 	const today = todayInVietnam(now);
 	const limit = vnMidnight(addDays(today, Math.round(months * 30.5)));
 	const out: Occurrence[] = [];
-	for (const event of [...events, ...extra]) {
+	for (const event of [...events.filter(isPublic), ...extra]) {
 		const years = event.date.year
 			? [event.date.year]
 			: [today.year - 1, today.year, today.year + 1];

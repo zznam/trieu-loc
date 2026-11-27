@@ -5,8 +5,8 @@ import { seo } from "#/lib/seo";
 import {
 	FORMER_ORDER,
 	formerCommuneLabel,
+	publicVillages,
 	villageLinks,
-	villages,
 } from "#/lib/villages";
 
 export const Route = createFileRoute("/$lang/villages/")({
@@ -33,7 +33,8 @@ function VillagesPage() {
 			/>
 			<section className="mx-auto max-w-6xl space-y-12 px-4 py-10">
 				{FORMER_ORDER.map((former) => {
-					const list = villages.filter((v) => v.former === former);
+					const list = publicVillages().filter((v) => v.former === former);
+					if (list.length === 0) return null;
 					return (
 						<div key={former}>
 							<h2 className="flex items-baseline gap-3 text-2xl font-semibold text-rice-900">

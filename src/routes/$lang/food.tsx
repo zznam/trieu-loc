@@ -2,11 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ContributeCta } from "#/components/ContributeCta";
 import { PageHeader, SampleNote } from "#/components/PageHeader";
-import {
-	type Business,
-	businesses as fileBusinesses,
-	specialties,
-} from "#/lib/content";
+import { type Business, publicBusinesses, specialties } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
 import { fold } from "#/lib/text";
@@ -33,7 +29,7 @@ function FoodPage() {
 	// Directory = businesses from the content file + ones published from community submissions.
 	const businesses: (Business & { community?: boolean })[] = useMemo(
 		() => [
-			...fileBusinesses,
+			...publicBusinesses(),
 			...published.map((b) => {
 				const village = b.villageId ? getVillage(b.villageId)?.name : undefined;
 				const text = (s: string) => ({ vi: s, en: s });
@@ -125,9 +121,11 @@ function FoodPage() {
 							<h2 className="text-3xl font-semibold text-rice-900">
 								{t(lang, "food.directory")}
 							</h2>
-							<div className="mt-3">
-								<SampleNote>{t(lang, "common.sample")}</SampleNote>
-							</div>
+							{businesses.some((b) => b.sample) && (
+								<div className="mt-3">
+									<SampleNote>{t(lang, "common.sample")}</SampleNote>
+								</div>
+							)}
 						</div>
 						<div className="flex w-full flex-wrap gap-2 sm:w-auto">
 							<input

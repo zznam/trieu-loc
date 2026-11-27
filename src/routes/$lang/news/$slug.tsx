@@ -5,7 +5,7 @@ import { getPost } from "#/lib/content";
 import { STORY_PREFIX } from "#/lib/contribute";
 import { formatDate, type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
-import { getVillage } from "#/lib/villages";
+import { getPublicVillage } from "#/lib/villages";
 import { getPublishedStory } from "#/server/published";
 
 type Article =
@@ -72,7 +72,7 @@ function NewsPostPage() {
 	const { article } = Route.useLoaderData();
 	const village =
 		article.kind === "story" && article.villageId
-			? getVillage(article.villageId)
+			? getPublicVillage(article.villageId)
 			: undefined;
 	return (
 		<article className="mx-auto max-w-3xl px-4 py-12">

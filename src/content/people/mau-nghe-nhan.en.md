@@ -1,4 +1,5 @@
 ---
+sample: true
 name: Sample artisan
 category: notable
 years: Born 1950

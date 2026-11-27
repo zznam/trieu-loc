@@ -1,4 +1,5 @@
 ---
+sample: true
 name: Living far from home (sample)
 category: diaspora
 years: Born 1985

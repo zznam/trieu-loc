@@ -3,7 +3,7 @@ import { and, asc, count, desc, eq, gte } from "drizzle-orm";
 import { z } from "zod";
 import { getPerson, getPost } from "#/lib/content";
 import { STORY_PREFIX } from "#/lib/contribute";
-import { getVillage } from "#/lib/villages";
+import { getPublicVillage } from "#/lib/villages";
 import { looksLikeBot, requestIpHash, tooManyLinks } from "./abuse";
 import { audit, isAdminConfigured, isAdminRequest, requireAdmin } from "./auth";
 import { ensureContentFresh } from "./content-db";
@@ -29,7 +29,7 @@ async function targetExists(target: string) {
 	await ensureContentFresh();
 	const [type, slug] = target.split(":");
 	if (type === "people") return Boolean(getPerson("vi", slug));
-	if (type === "villages") return Boolean(getVillage(slug));
+	if (type === "villages") return Boolean(getPublicVillage(slug));
 	if (type === "news") {
 		if (!slug.startsWith(STORY_PREFIX)) return Boolean(getPost("vi", slug));
 		const id = Number(slug.slice(STORY_PREFIX.length));

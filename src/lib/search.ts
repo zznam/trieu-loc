@@ -3,6 +3,7 @@ import {
 	businesses,
 	getPeople,
 	history,
+	isPublic,
 	personCategoryLabel,
 	placeCategoryLabel,
 	places,
@@ -97,7 +98,7 @@ function buildIndex(lang: Lang) {
 			params: { lang },
 			hash: s.id,
 		})),
-		...businesses.map((b) => ({
+		...businesses.filter(isPublic).map((b) => ({
 			kind: "business" as const,
 			title: b.name,
 			text: `${pick(lang, b.body)} · ${pick(lang, b.village)}`,
@@ -106,7 +107,7 @@ function buildIndex(lang: Lang) {
 			params: { lang },
 			hash: b.id,
 		})),
-		...events.map((e) => ({
+		...events.filter(isPublic).map((e) => ({
 			kind: "event" as const,
 			title: pick(lang, e.title),
 			text: `${pick(lang, e.body)} · ${pick(lang, e.location)}`,

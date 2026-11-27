@@ -2,6 +2,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { AccountsPanel, ChangePasswordForm } from "#/components/admin/Accounts";
 import { ContentEditor } from "#/components/admin/ContentEditor";
+import { LaunchPanel } from "#/components/admin/Launch";
 import { COLLECTION_NAMES, type CollectionName } from "#/lib/content-schemas";
 import { type Kind, kindLabel } from "#/lib/contribute";
 import { dateToVnLocal, formatVnDateTime } from "#/lib/schedule";
@@ -19,6 +20,7 @@ import {
 	setPublished,
 	updateContribution,
 } from "#/server/contributions";
+import { getLaunchState } from "#/server/launch";
 import {
 	type AdminMessage,
 	deleteMessage,
@@ -45,6 +47,7 @@ const SECTIONS = [
 	{ value: "comment", label: "Bình luận" },
 	{ value: "newsletter", label: "Bản tin" },
 	{ value: "content", label: "Nội dung" },
+	{ value: "launch", label: "🚀 Ra mắt" },
 	{ value: "accounts", label: "Tài khoản" },
 ] as const;
 type Section = (typeof SECTIONS)[number]["value"];
@@ -82,6 +85,7 @@ export const Route = createFileRoute("/admin")({
 			news: null,
 			content: null,
 			accounts: null,
+			launch: null,
 		};
 		// Nothing else is loaded until someone is signed in.
 		if (!session.me) return none;
@@ -101,6 +105,8 @@ export const Route = createFileRoute("/admin")({
 				}),
 			};
 		}
+		if (deps.section === "launch")
+			return { ...none, launch: await getLaunchState() };
 		if (deps.section === "accounts") {
 			return {
 				...none,
@@ -124,7 +130,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
-	const { session, contrib, msgs, news, content, accounts } =
+	const { session, contrib, msgs, news, content, accounts, launch } =
 		Route.useLoaderData();
 	const me = session.me;
 	const {
@@ -224,6 +230,8 @@ function AdminPage() {
 							Chỉ chủ sở hữu quản lý tài khoản.
 						</p>
 					)
+				) : launch ? (
+					<LaunchPanel state={launch} />
 				) : news ? (
 					<NewsletterPanel state={news} owner={me.role === "owner"} />
 				) : content ? (

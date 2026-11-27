@@ -18,7 +18,7 @@ A bilingual (Vietnamese / English) community website for **Xã Triệu Lộc, t�
 | `/:lang/guestbook` | Moderated guestbook: messages to the hometown, shown after approval |
 | `/:lang/info` | Live weather (Open-Meteo) and a phone directory |
 | `/:lang/contribute` | Form for photos, stories, businesses, events and corrections |
-| `/admin` | Password-protected review of contributions (Vietnamese) |
+| `/admin` | Password-protected review of contributions, content editor and launch checklist (Vietnamese) |
 | `/:lang/gallery` | Photo gallery by season |
 
 `/` redirects to `/vi`. The language toggle keeps you on the same page.
@@ -110,6 +110,13 @@ Spam protection: a hidden honeypot field, a minimum fill time, and a limit of 5 
 See `.env.example` for all variables. When the schema changes: edit `src/server/schema.ts`, run `pnpm db:generate`, commit the new file in `drizzle/`, and run `pnpm db:migrate`. **Whenever a PR adds a file to `drizzle/`, run `pnpm db:migrate` again after deploying** (latest: `0006_accounts.sql` for editor accounts).
 
 `pnpm build` ends with a check that fails if server-only code (database driver, crypto, Blob SDK) ends up in the browser bundle. If it trips, you imported a plain value from `src/server/*` into a route — import only server functions from there.
+
+## Launch checklist & sample content
+
+The starter content includes placeholders marked `"sample": true` (businesses, events, contacts, the 16 placeholder villages) or `sample: true` in a person's frontmatter. Until launch they are shown with a "mẫu / sample" note.
+
+- **`/admin` → 🚀 Ra mắt** lists what still stands between the site and a public launch, re-checked each time you open it. **Required**: a database, a personal owner account, sample content replaced or hidden, and a real contact email. **Recommended**: content imported into the database, photo storage, email alerts, a verified newsletter sender, a custom domain (`SITE_URL`), and content fixes (remaining sample items, "(Nội dung mẫu…)" text, approximate map coordinates, missing phone numbers, gallery tiles without photos). Each item links to the place to fix it.
+- **Hide sample content**: `/admin` → Nội dung → Thông tin chung → **🚀 Ẩn mọi nội dung mẫu**. Everything marked as sample then disappears from public pages (sample people and village pages return 404), search, the sitemap, village pages and comment targets. Untick an item's **Thông tin mẫu** box once it has real content and it shows up again. Without a database, set `"hideSamples": true` in `src/content/site.json`.
 
 ## Scheduled publishing
 

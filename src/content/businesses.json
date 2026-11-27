@@ -1,6 +1,7 @@
 [
 	{
 		"id": "htx-nong-nghiep",
+		"sample": true,
 		"name": "HTX Nông nghiệp (mẫu)",
 		"category": { "vi": "Nông sản", "en": "Farm produce" },
 		"village": { "vi": "Thôn mẫu A", "en": "Sample village A" },
@@ -12,6 +13,7 @@
 	},
 	{
 		"id": "nem-chua-gia-dinh",
+		"sample": true,
 		"name": "Nem chua gia truyền (mẫu)",
 		"category": { "vi": "Ẩm thực", "en": "Food" },
 		"village": { "vi": "Thôn mẫu B", "en": "Sample village B" },
@@ -23,6 +25,7 @@
 	},
 	{
 		"id": "nha-nghi",
+		"sample": true,
 		"name": "Nhà nghỉ gần đền (mẫu)",
 		"category": { "vi": "Lưu trú", "en": "Accommodation" },
 		"village": { "vi": "Thôn Phú Điền", "en": "Phú Điền village" },
@@ -34,6 +37,7 @@
 	},
 	{
 		"id": "xuong-moc",
+		"sample": true,
 		"name": "Xưởng mộc dân dụng (mẫu)",
 		"category": { "vi": "Thủ công", "en": "Crafts" },
 		"village": { "vi": "Thôn mẫu C", "en": "Sample village C" },
