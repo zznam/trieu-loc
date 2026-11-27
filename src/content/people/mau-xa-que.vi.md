@@ -1,4 +1,5 @@
 ---
+sample: true
 name: Người con xa quê (mẫu)
 category: diaspora
 years: Sinh năm 1985

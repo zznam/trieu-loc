@@ -1,5 +1,5 @@
 import villagesData from "#/content/villages.json";
-import { getPeople, places } from "./content";
+import { getPeople, isPublic, places } from "./content";
 import { events } from "./events";
 import type { L, Lang } from "./i18n";
 
@@ -34,11 +34,18 @@ export const FORMER_ORDER: FormerCommune[] = [
 
 export const getVillage = (id: string) => villages.find((v) => v.id === id);
 
+/** Villages shown on the public site (placeholders drop out once samples are hidden). */
+export const publicVillages = () => villages.filter(isPublic);
+export const getPublicVillage = (id: string) => {
+	const v = getVillage(id);
+	return v && isPublic(v) ? v : undefined;
+};
+
 /** Everything on the site that is tagged with this village. */
 export function villageLinks(id: string, lang: Lang) {
 	return {
 		places: places.filter((p) => p.villageId === id),
 		people: getPeople(lang).filter((p) => p.villageId === id),
-		events: events.filter((e) => e.villageId === id),
+		events: events.filter((e) => e.villageId === id && isPublic(e)),
 	};
 }

@@ -9,13 +9,17 @@ import { placeCategoryLabel, site } from "#/lib/content";
 import { eventCategoryLabel } from "#/lib/events";
 import { type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
-import { formerCommuneLabel, getVillage, villageLinks } from "#/lib/villages";
+import {
+	formerCommuneLabel,
+	getPublicVillage,
+	villageLinks,
+} from "#/lib/villages";
 
 const PlacesMap = lazy(() => import("#/components/PlacesMap"));
 
 export const Route = createFileRoute("/$lang/villages/$id")({
 	loader: ({ params }) => {
-		const village = getVillage(params.id);
+		const village = getPublicVillage(params.id);
 		if (!village) throw notFound();
 		return { village };
 	},

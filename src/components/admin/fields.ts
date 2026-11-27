@@ -56,6 +56,9 @@ export type Field =
 			fields: { key: string; label: string; rows?: number }[];
 	  };
 
+const SAMPLE_LABEL =
+	"Thông tin mẫu (hiện kèm ghi chú “mẫu”; bị ẩn khi bật chế độ ra mắt)";
+
 export const ID_HINT =
 	"Chữ thường không dấu, số, gạch ngang — dùng trong đường dẫn, vd: den-ba-trieu";
 
@@ -110,7 +113,7 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 		{
 			kind: "checkbox",
 			path: "sample",
-			label: "Thông tin mẫu (ẩn khỏi tìm kiếm & sitemap)",
+			label: `${SAMPLE_LABEL} — luôn ẩn khỏi tìm kiếm & sitemap`,
 		},
 	],
 	events: [
@@ -154,6 +157,7 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 			max: 30,
 		},
 		{ kind: "villageSelect", path: "villageId", label: "Gắn với trang thôn" },
+		{ kind: "checkbox", path: "sample", label: SAMPLE_LABEL },
 	],
 	people: [
 		{ kind: "text", path: "slug", label: "Đường dẫn (slug)", hint: ID_HINT },
@@ -175,6 +179,7 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 		},
 		{ kind: "villageSelect", path: "villageId", label: "Gắn với trang thôn" },
 		{ kind: "image", path: "photo", label: "Ảnh chân dung", optional: true },
+		{ kind: "checkbox", path: "sample", label: SAMPLE_LABEL },
 		...(["vi", "en"] as const).map(
 			(lang): Field => ({
 				kind: "lang",
@@ -205,6 +210,7 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 		{ kind: "bilingual", path: "village", label: "Thôn / địa chỉ" },
 		{ kind: "text", path: "phone", label: "Số điện thoại" },
 		{ kind: "bilingual", path: "body", label: "Giới thiệu", rows: 3 },
+		{ kind: "checkbox", path: "sample", label: SAMPLE_LABEL },
 	],
 	gallery: [
 		{ kind: "text", path: "id", label: "Mã (id)", hint: ID_HINT },
@@ -249,9 +255,15 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 		},
 		{ kind: "bilingual", path: "address", label: "Địa chỉ", optional: true },
 		{ kind: "bilingual", path: "hours", label: "Giờ làm việc", optional: true },
-		{ kind: "checkbox", path: "sample", label: "Thông tin mẫu" },
+		{ kind: "checkbox", path: "sample", label: SAMPLE_LABEL },
 	],
 	site: [
+		{
+			kind: "checkbox",
+			path: "hideSamples",
+			label:
+				"🚀 Ẩn mọi nội dung mẫu khỏi trang công khai (bật khi ra mắt — xem mục Ra mắt)",
+		},
 		{ kind: "bilingual", path: "name", label: "Tên trang" },
 		{ kind: "bilingual", path: "province", label: "Tỉnh" },
 		{ kind: "coords", path: "center", label: "Tâm bản đồ (vĩ độ, kinh độ)" },

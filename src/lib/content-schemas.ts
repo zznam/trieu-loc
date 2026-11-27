@@ -56,6 +56,7 @@ export const eventSchema = z
 			days: z.number().int().min(1).max(30).optional(),
 		}),
 		villageId: slug.optional(),
+		sample: z.boolean().optional(),
 	})
 	.refine((e) => e.date.calendar === "solar" || e.date.day <= 30, {
 		message: "Ngày âm lịch tối đa là 30",
@@ -77,6 +78,7 @@ export const personSchema = z.object({
 	order: z.number().int().min(0).max(10000),
 	villageId: slug.optional(),
 	photo: text(300).optional(),
+	sample: z.boolean().optional(),
 	vi: personLang,
 	en: personLang.optional(),
 });
@@ -117,6 +119,7 @@ export const businessSchema = z.object({
 	village: L(150),
 	phone: text(40),
 	body: L(1000),
+	sample: z.boolean().optional(),
 });
 
 export const galleryItemSchema = z.object({
@@ -164,6 +167,7 @@ export const siteSchema = z.object({
 			}),
 		)
 		.max(6),
+	hideSamples: z.boolean().optional(),
 });
 
 /** Single item (id "main"): the History & Culture page. */

@@ -1,4 +1,5 @@
 ---
+sample: true
 name: Nghệ nhân mẫu
 category: notable
 years: Sinh năm 1950
