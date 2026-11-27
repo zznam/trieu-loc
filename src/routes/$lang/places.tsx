@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { PageHeader } from "#/components/PageHeader";
+import { SuggestEdit } from "#/components/SuggestEdit";
 import {
 	type PlaceCategory,
 	placeCategoryLabel,
@@ -8,6 +9,7 @@ import {
 	site,
 } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
+import { GETTING_HERE } from "#/lib/pages";
 import { seo } from "#/lib/seo";
 
 const PlacesMap = lazy(() => import("#/components/PlacesMap"));
@@ -32,19 +34,6 @@ const CATEGORIES: (PlaceCategory | "all")[] = [
 	"nature",
 	"public",
 ];
-
-const GETTING_HERE = {
-	vi: [
-		"Từ TP Thanh Hoá: đi theo Quốc lộ 1 về phía bắc khoảng 18 km, Quốc lộ 1 chạy qua địa bàn xã.",
-		"Từ Hà Nội: khoảng 137 km theo cao tốc Bắc – Nam hoặc Quốc lộ 1, khoảng 2,5 – 3 giờ đi xe.",
-		"Gần nhất có ga Thanh Hoá và sân bay Thọ Xuân; từ đó đi taxi hoặc xe khách về Triệu Lộc.",
-	],
-	en: [
-		"From Thanh Hóa city: head north on National Highway 1 for about 18 km — the highway runs through the commune.",
-		"From Hanoi: about 137 km via the North–South expressway or Highway 1, roughly 2.5–3 hours by car.",
-		"The nearest rail station is Thanh Hóa, and the nearest airport is Thọ Xuân; take a taxi or bus from there.",
-	],
-};
 
 function PlacesPage() {
 	const lang = Route.useParams().lang as Lang;
@@ -152,11 +141,20 @@ function PlacesPage() {
 								>
 									{t(lang, "places.openMap")} ↗
 								</a>
+								<a
+									href={`https://www.google.com/maps/dir/?api=1&destination=${p.coords[0]},${p.coords[1]}`}
+									target="_blank"
+									rel="noreferrer"
+									className="font-semibold text-earth-700 hover:underline"
+								>
+									🧭 {t(lang, "places.directions")} ↗
+								</a>
 								{p.approx && (
 									<span className="text-xs italic text-ink-soft">
 										({t(lang, "common.approxLocation")})
 									</span>
 								)}
+								<SuggestEdit lang={lang} about={pick(lang, p.name)} />
 							</div>
 						</article>
 					))}
@@ -169,13 +167,20 @@ function PlacesPage() {
 						{t(lang, "places.howToGet")}
 					</h2>
 					<ul className="mt-4 space-y-3 text-ink-soft">
-						{GETTING_HERE[lang].map((line) => (
+						{GETTING_HERE.map((l) => pick(lang, l)).map((line) => (
 							<li key={line} className="flex gap-3">
 								<span className="text-earth-500">◆</span>
 								{line}
 							</li>
 						))}
 					</ul>
+					<Link
+						to="/$lang/visit"
+						params={{ lang }}
+						className="mt-5 inline-block text-sm font-semibold text-rice-700 hover:underline"
+					>
+						{t(lang, "nav.visit")} →
+					</Link>
 				</div>
 			</section>
 		</>

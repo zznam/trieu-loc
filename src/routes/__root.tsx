@@ -50,8 +50,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang={lang} suppressHydrationWarning>
 			<head>
-				{/* biome-ignore lint/security/noDangerouslySetInnerHtml: static theme bootstrap, no user input */}
 				<script
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: static theme/text-size bootstrap, no user input
 					dangerouslySetInnerHTML={{
 						__html: themeInitScript + textSizeInitScript,
 					}}

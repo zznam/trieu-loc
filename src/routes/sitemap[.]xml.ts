@@ -19,6 +19,8 @@ const PAGES = [
 	"/guestbook",
 	"/info",
 	"/contribute",
+	"/visit",
+	"/privacy",
 ];
 
 function entry(path: string, lastmod?: string) {

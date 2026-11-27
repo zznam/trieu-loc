@@ -20,26 +20,23 @@ export function NotFound() {
 			</h1>
 			<p className="mt-2 text-ink-soft">{t(lang, "notFound.body")}</p>
 			{/* Plain GET form: works before hydration and without JavaScript. */}
-			<form
-				action={`/${lang}/search`}
-				method="get"
-				role="search"
-				className="mx-auto mt-8 flex max-w-md gap-2"
-			>
-				<input
-					type="search"
-					name="q"
-					aria-label={t(lang, "notFound.search")}
-					placeholder={t(lang, "notFound.search")}
-					className="min-w-0 flex-1 rounded-full border border-earth-300 bg-card px-4 py-2 text-sm"
-				/>
-				<button
-					type="submit"
-					className="rounded-full bg-rice-700 px-4 py-2 text-sm font-semibold text-paper"
-				>
-					{t(lang, "search.title")}
-				</button>
-			</form>
+			<search className="mx-auto mt-8 block max-w-md">
+				<form action={`/${lang}/search`} method="get" className="flex gap-2">
+					<input
+						type="search"
+						name="q"
+						aria-label={t(lang, "notFound.search")}
+						placeholder={t(lang, "notFound.search")}
+						className="min-w-0 flex-1 rounded-full border border-earth-300 bg-card px-4 py-2 text-sm"
+					/>
+					<button
+						type="submit"
+						className="rounded-full bg-rice-700 px-4 py-2 text-sm font-semibold text-paper"
+					>
+						{t(lang, "search.title")}
+					</button>
+				</form>
+			</search>
 			<p className="mt-8 text-sm font-semibold text-earth-700">
 				{t(lang, "notFound.popular")}
 			</p>

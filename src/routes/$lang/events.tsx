@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ContributeCta } from "#/components/ContributeCta";
 import { JsonLd } from "#/components/JsonLd";
 import { PageHeader } from "#/components/PageHeader";
+import { SuggestEdit } from "#/components/SuggestEdit";
 import {
 	communityEvent,
 	type EventCategory,
@@ -237,6 +238,10 @@ function EventsPage() {
 												>
 													📅 {t(lang, "events.add")}
 												</a>
+												<SuggestEdit
+													lang={lang}
+													about={pick(lang, o.event.title)}
+												/>
 											</div>
 										</div>
 									</li>

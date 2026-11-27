@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ContributeCta } from "#/components/ContributeCta";
 import { PageHeader, SampleNote } from "#/components/PageHeader";
+import { SuggestEdit } from "#/components/SuggestEdit";
 import { type Business, publicBusinesses, specialties } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
@@ -185,6 +186,13 @@ function FoodPage() {
 									>
 										☎ {b.phone}
 									</a>
+								)}
+								{!b.community && (
+									<SuggestEdit
+										lang={lang}
+										about={b.name}
+										className="mt-3 ml-4"
+									/>
 								)}
 							</article>
 						))}

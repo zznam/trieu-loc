@@ -64,6 +64,13 @@ export function SiteFooter({ lang }: { lang: Lang }) {
 						{t(lang, "nav.info")}
 					</Link>
 					<Link
+						to="/$lang/visit"
+						params={{ lang }}
+						className="mt-1 block text-sm underline-offset-4 hover:underline"
+					>
+						{t(lang, "nav.visit")}
+					</Link>
+					<Link
 						to="/$lang/contribute"
 						params={{ lang }}
 						className="mt-4 inline-block rounded-full bg-paper px-4 py-2 text-sm font-semibold text-rice-900 hover:bg-rice-100"
@@ -75,7 +82,15 @@ export function SiteFooter({ lang }: { lang: Lang }) {
 			<div className="border-t border-rice-700/60">
 				<p className="mx-auto max-w-6xl px-4 py-4 text-xs text-rice-300">
 					© {new Date().getFullYear()} {pick(lang, site.name)} ·{" "}
-					{t(lang, "footer.note")} · Map data © OpenStreetMap contributors
+					{t(lang, "footer.note")} ·{" "}
+					<Link
+						to="/$lang/privacy"
+						params={{ lang }}
+						className="underline-offset-4 hover:underline"
+					>
+						{t(lang, "nav.privacy")}
+					</Link>{" "}
+					· Map data © OpenStreetMap contributors
 				</p>
 			</div>
 		</footer>

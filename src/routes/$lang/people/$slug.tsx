@@ -4,6 +4,7 @@ import { Breadcrumbs } from "#/components/Breadcrumbs";
 import { Comments } from "#/components/Comments";
 import { JsonLd } from "#/components/JsonLd";
 import { ShareButtons } from "#/components/ShareButtons";
+import { SuggestEdit } from "#/components/SuggestEdit";
 import { getPerson, personCategoryLabel } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
@@ -68,6 +69,7 @@ function PersonPage() {
 				path={`/${lang}/people/${person.slug}`}
 				title={person.name}
 			/>
+			<SuggestEdit lang={lang} about={person.name} className="mt-4" />
 			<Comments lang={lang} target={`people:${person.slug}`} />
 		</article>
 	);

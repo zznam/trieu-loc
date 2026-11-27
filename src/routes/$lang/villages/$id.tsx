@@ -6,6 +6,7 @@ import { Comments } from "#/components/Comments";
 import { ContributeCta } from "#/components/ContributeCta";
 import { SampleNote } from "#/components/PageHeader";
 import { ShareButtons } from "#/components/ShareButtons";
+import { SuggestEdit } from "#/components/SuggestEdit";
 import { placeCategoryLabel, site } from "#/lib/content";
 import { eventCategoryLabel } from "#/lib/events";
 import { type Lang, pick, t } from "#/lib/i18n";
@@ -224,6 +225,11 @@ function VillagePage() {
 					lang={lang}
 					path={`/${lang}/villages/${village.id}`}
 					title={pick(lang, village.name)}
+				/>
+				<SuggestEdit
+					lang={lang}
+					about={pick(lang, village.name)}
+					className="mt-4"
 				/>
 				<Comments lang={lang} target={`villages:${village.id}`} />
 			</section>
