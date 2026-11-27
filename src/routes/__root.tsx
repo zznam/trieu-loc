@@ -8,7 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { useEffect } from "react";
 import { registerServiceWorker } from "#/lib/pwa";
-import { themeInitScript } from "#/lib/theme";
+import { textSizeInitScript, themeInitScript } from "#/lib/theme";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -51,7 +51,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 		<html lang={lang} suppressHydrationWarning>
 			<head>
 				{/* biome-ignore lint/security/noDangerouslySetInnerHtml: static theme bootstrap, no user input */}
-				<script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+				<script
+					dangerouslySetInnerHTML={{
+						__html: themeInitScript + textSizeInitScript,
+					}}
+				/>
 				<HeadContent />
 			</head>
 			<body>

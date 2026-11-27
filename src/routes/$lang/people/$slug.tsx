@@ -1,10 +1,13 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { Avatar } from "#/components/Avatar";
+import { Breadcrumbs } from "#/components/Breadcrumbs";
 import { Comments } from "#/components/Comments";
+import { JsonLd } from "#/components/JsonLd";
 import { ShareButtons } from "#/components/ShareButtons";
 import { getPerson, personCategoryLabel } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
+import { personLd } from "#/lib/structured-data";
 
 export const Route = createFileRoute("/$lang/people/$slug")({
 	loader: ({ params }) => {
@@ -30,13 +33,13 @@ function PersonPage() {
 	const { person } = Route.useLoaderData();
 	return (
 		<article className="mx-auto max-w-3xl px-4 py-12">
-			<Link
-				to="/$lang/people"
-				params={{ lang }}
-				className="text-sm font-semibold text-earth-700 hover:underline"
-			>
-				← {t(lang, "common.back")}
-			</Link>
+			<Breadcrumbs
+				lang={lang}
+				crumbs={[{ name: t(lang, "nav.people"), path: `/${lang}/people` }]}
+				current={person.name}
+				currentPath={`/${lang}/people/${person.slug}`}
+			/>
+			<JsonLd data={personLd(person, `/${lang}/people/${person.slug}`)} />
 			<header className="mt-8 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
 				<Avatar name={person.name} photo={person.photo} size={112} />
 				<div>

@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { type DictKey, type Lang, t } from "#/lib/i18n";
 import { SearchButton } from "./SearchButton";
+import { TextSizeToggle } from "./TextSizeToggle";
 import { ThemeToggle } from "./ThemeToggle";
 
 const NAV: { to: string; key: DictKey }[] = [
@@ -58,6 +59,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
 				</nav>
 				<div className="flex shrink-0 items-center gap-2">
 					<SearchButton lang={lang} />
+					<TextSizeToggle lang={lang} />
 					<ThemeToggle lang={lang} />
 					<Link
 						to="."

@@ -1,10 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { Breadcrumbs } from "#/components/Breadcrumbs";
 import { Comments } from "#/components/Comments";
+import { JsonLd } from "#/components/JsonLd";
 import { ShareButtons } from "#/components/ShareButtons";
-import { getPost } from "#/lib/content";
+import { getPost, site } from "#/lib/content";
 import { STORY_PREFIX } from "#/lib/contribute";
 import { formatDate, type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
+import { articleLd } from "#/lib/structured-data";
 import { getPublicVillage } from "#/lib/villages";
 import { getPublishedStory } from "#/server/published";
 
@@ -76,13 +79,23 @@ function NewsPostPage() {
 			: undefined;
 	return (
 		<article className="mx-auto max-w-3xl px-4 py-12">
-			<Link
-				to="/$lang/news"
-				params={{ lang }}
-				className="text-sm font-semibold text-earth-700 hover:underline"
-			>
-				← {t(lang, "common.back")}
-			</Link>
+			<Breadcrumbs
+				lang={lang}
+				crumbs={[{ name: t(lang, "nav.news"), path: `/${lang}/news` }]}
+				current={article.title}
+				currentPath={`/${lang}/news/${params.slug}`}
+			/>
+			<JsonLd
+				data={articleLd({
+					lang,
+					path: `/${lang}/news/${params.slug}`,
+					title: article.title,
+					summary: article.summary,
+					date: article.date,
+					author: article.kind === "story" ? article.byline : undefined,
+					publisher: pick(lang, site.name),
+				})}
+			/>
 			<p className="mt-8 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-widest text-earth-700">
 				<time dateTime={article.date}>{formatDate(lang, article.date)}</time>
 				{article.kind === "story" && (

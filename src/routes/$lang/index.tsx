@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FestivalCountdown } from "#/components/FestivalCountdown";
 import { HeroArt } from "#/components/HeroArt";
+import { JsonLd } from "#/components/JsonLd";
 import { WeatherChip } from "#/components/Weather";
 import { getNews, site } from "#/lib/content";
 import { type DictKey, formatDate, type Lang, pick, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
+import { websiteLd } from "#/lib/structured-data";
 
 export const Route = createFileRoute("/$lang/")({
 	head: ({ params }) =>
@@ -43,6 +45,7 @@ function Home() {
 
 	return (
 		<>
+			<JsonLd data={websiteLd(lang, site)} />
 			<section className="relative overflow-hidden">
 				<HeroArt className="absolute inset-0 h-full w-full dark:opacity-40" />
 				<div className="absolute inset-0 bg-gradient-to-r from-paper via-paper/80 to-transparent" />

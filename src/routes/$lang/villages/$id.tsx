@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Avatar } from "#/components/Avatar";
+import { Breadcrumbs } from "#/components/Breadcrumbs";
 import { Comments } from "#/components/Comments";
 import { ContributeCta } from "#/components/ContributeCta";
 import { SampleNote } from "#/components/PageHeader";
@@ -71,13 +72,14 @@ function VillagePage() {
 			)}
 			<header className="grain border-b border-earth-300/40 bg-paper-2">
 				<div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
-					<Link
-						to="/$lang/villages"
-						params={{ lang }}
-						className="text-sm font-semibold text-earth-700 hover:underline"
-					>
-						← {t(lang, "villages.all")}
-					</Link>
+					<Breadcrumbs
+						lang={lang}
+						crumbs={[
+							{ name: t(lang, "nav.villages"), path: `/${lang}/villages` },
+						]}
+						current={pick(lang, village.name)}
+						currentPath={`/${lang}/villages/${village.id}`}
+					/>
 					<p className="mt-6 text-sm font-semibold uppercase tracking-widest text-earth-700">
 						{pick(lang, formerCommuneLabel[village.former])}
 					</p>
