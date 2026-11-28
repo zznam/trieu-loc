@@ -76,6 +76,7 @@ const dict = {
 	"countdown.addToCalendar": { vi: "Thêm vào lịch", en: "Add to calendar" },
 	"common.readMore": { vi: "Đọc tiếp", en: "Read more" },
 	"common.back": { vi: "Quay lại", en: "Back" },
+	"common.backToTop": { vi: "Lên đầu trang", en: "Back to top" },
 	"news.readingTime": { vi: "{n} phút đọc", en: "{n} min read" },
 	"news.newer": { vi: "Bài mới hơn", en: "Newer post" },
 	"news.older": { vi: "Bài cũ hơn", en: "Older post" },

@@ -1,4 +1,5 @@
 import { createFileRoute, notFound, Outlet } from "@tanstack/react-router";
+import { BackToTop } from "#/components/BackToTop";
 import { NotFound } from "#/components/NotFound";
 import { SiteFooter } from "#/components/SiteFooter";
 import { SiteHeader } from "#/components/SiteHeader";
@@ -28,10 +29,11 @@ function LangLayout() {
 	return (
 		<div className="flex min-h-screen flex-col">
 			<SiteHeader lang={lang} />
-			<main className="flex-1">
+			<main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
 				<Outlet />
 			</main>
 			<SiteFooter lang={lang} />
+			<BackToTop lang={lang} />
 		</div>
 	);
 }
