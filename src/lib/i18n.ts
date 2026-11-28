@@ -465,6 +465,73 @@ const dict = {
 		vi: "Trang bạn tìm không tồn tại hoặc đã được di chuyển.",
 		en: "The page you're looking for doesn't exist or has moved.",
 	},
+	"a11y.skip": { vi: "Bỏ qua, tới nội dung chính", en: "Skip to main content" },
+	"a11y.textSize": { vi: "Cỡ chữ", en: "Text size" },
+	"a11y.textSize.md": {
+		vi: "vừa (bấm để phóng to)",
+		en: "normal (press to enlarge)",
+	},
+	"a11y.textSize.lg": {
+		vi: "lớn (bấm để phóng to hơn)",
+		en: "large (press to enlarge more)",
+	},
+	"a11y.textSize.xl": {
+		vi: "rất lớn (bấm để trở về cỡ vừa)",
+		en: "extra large (press for normal)",
+	},
+	"breadcrumb.label": { vi: "Bạn đang ở", en: "You are here" },
+	"notFound.search": { vi: "Tìm trên trang…", en: "Search the site…" },
+	"notFound.popular": {
+		vi: "Hoặc xem các trang được quan tâm:",
+		en: "Or try one of these pages:",
+	},
+	"error.title": { vi: "Đã có lỗi xảy ra", en: "Something went wrong" },
+	"error.body": {
+		vi: "Trang chưa tải được. Có thể do mạng chập chờn — hãy thử lại sau giây lát.",
+		en: "This page couldn't load. It may be a network hiccup — please try again in a moment.",
+	},
+	"error.retry": { vi: "Thử lại", en: "Try again" },
+	"places.directions": { vi: "Chỉ đường", en: "Directions" },
+	"edit.suggest": { vi: "Góp ý sửa thông tin", en: "Suggest an edit" },
+	"edit.prefill": { vi: "Góp ý về", en: "Correction for" },
+	"nav.visit": { vi: "Cẩm nang du khách", en: "Visitor guide" },
+	"visit.title": { vi: "Cẩm nang du khách", en: "Visitor guide" },
+	"visit.lead": {
+		vi: "Đường đi, thời điểm nên đến, lễ hội, ăn nghỉ và vài lưu ý khi về thăm Triệu Lộc.",
+		en: "Getting here, when to come, the festival, food and places to stay — and a few tips for your visit.",
+	},
+	"visit.next": {
+		vi: "Lễ hội đền Bà Triệu sắp tới",
+		en: "Next Bà Triệu festival",
+	},
+	"visit.seeAlso": { vi: "Xem thêm", en: "See also" },
+	"nav.privacy": { vi: "Quyền riêng tư", en: "Privacy" },
+	"privacy.title": {
+		vi: "Quyền riêng tư & nội quy",
+		en: "Privacy & community rules",
+	},
+	"privacy.lead": {
+		vi: "Trang này thu thập gì, dùng vào việc gì, và những điều cần giữ khi viết lên trang.",
+		en: "What this site collects, what it is used for, and the rules for posting.",
+	},
+	"privacy.updated": { vi: "Cập nhật lần cuối", en: "Last updated" },
+	"guidelines.note": {
+		vi: "Lời nhắn được ban biên tập duyệt trước khi hiện. Xin giữ lời lẽ tôn trọng, không quảng cáo, không đăng thông tin cá nhân của người khác.",
+		en: "Messages are reviewed before they appear. Please be respectful, no advertising, and don't post other people's personal details.",
+	},
+	"guidelines.link": { vi: "Nội quy & quyền riêng tư", en: "Rules & privacy" },
+	"news.filter.all": { vi: "Tất cả", en: "All" },
+	"news.filter.official": { vi: "Tin của xã", en: "Commune news" },
+	"news.filter.community": { vi: "Bà con kể", en: "Community stories" },
+	"news.year": { vi: "Năm", en: "Year" },
+	"people.search": {
+		vi: "Tìm theo tên, quê, vai trò…",
+		en: "Search by name, village, role…",
+	},
+	"people.none": {
+		vi: "Không có ai khớp với tìm kiếm.",
+		en: "Nobody matches your search.",
+	},
 } satisfies Record<string, L>;
 
 export type DictKey = keyof typeof dict;

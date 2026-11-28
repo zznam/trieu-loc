@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, asc, count, desc, eq, gte } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { getPerson, getPost } from "#/lib/content";
 import { STORY_PREFIX } from "#/lib/contribute";
@@ -333,4 +333,32 @@ export const deleteMessage = createServerFn({ method: "POST" })
 		await audit(me, "message_delete", `#${data.id}`);
 		await getDb().delete(messages).where(eq(messages.id, data.id));
 		return { ok: true as const };
+	});
+
+/** Approve, hide or return to pending several messages at once. */
+export const moderateMessages = createServerFn({ method: "POST" })
+	.validator((input: unknown) =>
+		z
+			.object({
+				ids: z.array(z.number().int().positive()).min(1).max(300),
+				status: z.enum(CONTRIBUTION_STATUSES),
+			})
+			.parse(input),
+	)
+	.handler(async ({ data }) => {
+		const me = await requireAdmin();
+		await audit(
+			me,
+			`message_${data.status}`,
+			data.ids.map((id) => `#${id}`).join(", "),
+		);
+		const rows = await getDb()
+			.update(messages)
+			.set({
+				status: data.status,
+				reviewedAt: data.status === "pending" ? null : new Date(),
+			})
+			.where(inArray(messages.id, data.ids))
+			.returning({ id: messages.id });
+		return { ok: true as const, count: rows.length };
 	});

@@ -20,8 +20,12 @@ A bilingual (Vietnamese / English) community website for **Xã Triệu Lộc, t�
 | `/:lang/contribute` | Form for photos, stories, businesses, events and corrections |
 | `/admin` | Password-protected review of contributions, content editor and launch checklist (Vietnamese) |
 | `/:lang/gallery` | Photo gallery by season |
+| `/:lang/visit` | Visitor guide: getting here, when to come, temple etiquette, food, help numbers |
+| `/:lang/privacy` | What the site collects and the community rules (linked from every public form) |
 
 `/` redirects to `/vi`. The language toggle keeps you on the same page.
+
+Every page has a skip-to-content link, a text-size button (**A / A+ / A++**, remembered per device), a back-to-top button and a print stylesheet. Places, businesses, events, people and villages have a **✎ Suggest an edit** link that opens the contribution form as a correction with the item named in the title. News can be filtered by commune news vs community stories and is grouped by year; People has a search box.
 
 ## Editing content
 
@@ -82,6 +86,8 @@ pnpm test:e2e   # end-to-end tests (Playwright) — run `pnpm build` first
 
 ## SEO & sharing
 
+- Structured data (JSON-LD): `WebSite` with a site-search action and the commune as a `Place` on the home page, `NewsArticle` on posts, `Person` on profiles, `Event` for the upcoming calendar, and `BreadcrumbList` on detail pages (which also show visible breadcrumbs).
+
 - `/sitemap.xml` and `/robots.txt` are generated from the content files.
 - Every page has a canonical URL, `hreflang` alternates (vi/en) and Open Graph / Twitter tags.
 - Absolute URLs use the `SITE_URL` env var (e.g. `https://trieuloc.vn`). If it's unset on Vercel, the production `*.vercel.app` URL is used.
@@ -123,6 +129,18 @@ The starter content includes placeholders marked `"sample": true` (businesses, e
 - **News** (`/admin` → Nội dung → Tin tức): set **Lên lịch đăng** (Vietnam time). Until then the post is hidden from the news list, its page (404), search, the sitemap, comments and the newsletter; the editor list shows ⏰.
 - **Community stories, events, businesses and photos** (`/admin` → Đóng góp): pick a time next to **⏰ Lên lịch đăng**. Scheduled items show "⏰ Lên lịch: …" and can be cancelled with **⤓ Huỷ lịch đăng**.
 - No cron job is needed: visibility is decided on every request, to the minute.
+
+## Admin tools
+
+- **Pending badges** on the Đóng góp, Sổ lưu bút and Bình luận tabs.
+- **Bulk moderation**: tick messages (or *Chọn tất cả*) and approve or hide them in one go.
+- **CSV exports** (UTF-8 with BOM, opens correctly in Excel): all contributions (Đóng góp tab, includes contact details) and, for owners, newsletter subscribers (Bản tin tab). Exports are recorded in the activity log.
+- **News drafts**: tick **📝 Bản nháp** on a news post to save it without publishing; it stays hidden everywhere (list, page, search, sitemap, newsletter) until unticked.
+
+## Operations
+
+- **`/api/health`** returns `{"ok":true,"db":"ok"|"unconfigured"}` (503 with `"db":"error"` when the database is configured but unreachable). Point an uptime monitor at it.
+- **Security headers** on every response (`X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy`) are set via Nitro route rules in `vite.config.ts`.
 
 ## Editor accounts
 

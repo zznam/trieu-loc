@@ -9,6 +9,7 @@ import {
 	personCategoryLabel,
 } from "#/lib/content";
 import { type Lang, pick, t } from "#/lib/i18n";
+import { matchesQuery } from "#/lib/listing";
 import { seo } from "#/lib/seo";
 
 export const Route = createFileRoute("/$lang/people/")({
@@ -35,8 +36,11 @@ const CATEGORIES: (PersonCategory | "all")[] = [
 function PeoplePage() {
 	const lang = Route.useParams().lang as Lang;
 	const [cat, setCat] = useState<PersonCategory | "all">("all");
+	const [query, setQuery] = useState("");
 	const people = getPeople(lang).filter(
-		(p) => cat === "all" || p.category === cat,
+		(p) =>
+			(cat === "all" || p.category === cat) &&
+			matchesQuery(query, p.name, p.village, p.role, p.years, p.summary),
 	);
 
 	return (
@@ -46,7 +50,15 @@ function PeoplePage() {
 				lead={t(lang, "people.lead")}
 			/>
 			<section className="mx-auto max-w-6xl px-4 py-10">
-				<div className="mb-8 flex flex-wrap gap-2">
+				<div className="mb-8 flex flex-wrap items-center gap-2">
+					<input
+						type="search"
+						value={query}
+						onChange={(e) => setQuery(e.target.value)}
+						placeholder={t(lang, "people.search")}
+						aria-label={t(lang, "people.search")}
+						className="w-full rounded-full border border-earth-300 bg-card px-4 py-2 text-sm sm:mr-2 sm:w-72"
+					/>
 					{CATEGORIES.map((c) => (
 						<button
 							key={c}
@@ -66,6 +78,9 @@ function PeoplePage() {
 					))}
 				</div>
 
+				{people.length === 0 && (
+					<p className="text-ink-soft">{t(lang, "people.none")}</p>
+				)}
 				<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 					{people.map((p) => (
 						<Link

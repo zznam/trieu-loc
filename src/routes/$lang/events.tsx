@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ContributeCta } from "#/components/ContributeCta";
+import { JsonLd } from "#/components/JsonLd";
 import { PageHeader } from "#/components/PageHeader";
+import { SuggestEdit } from "#/components/SuggestEdit";
 import {
 	communityEvent,
 	type EventCategory,
@@ -13,6 +15,7 @@ import {
 import { type Lang, pick, t } from "#/lib/i18n";
 import { solarToLunar, todayInVietnam, yearName } from "#/lib/lunar";
 import { seo } from "#/lib/seo";
+import { eventsLd } from "#/lib/structured-data";
 import { getPublishedEvents } from "#/server/published";
 
 export const Route = createFileRoute("/$lang/events")({
@@ -117,6 +120,9 @@ function EventsPage() {
 			<PageHeader
 				title={t(lang, "events.title")}
 				lead={t(lang, "events.lead")}
+			/>
+			<JsonLd
+				data={eventsLd(lang, occurrences.slice(0, 20), `/${lang}/events`)}
 			/>
 			<section className="mx-auto max-w-4xl px-4 py-10">
 				<p className="mb-6 inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl bg-paper-2 px-4 py-3 text-sm text-ink-soft">
@@ -232,6 +238,10 @@ function EventsPage() {
 												>
 													📅 {t(lang, "events.add")}
 												</a>
+												<SuggestEdit
+													lang={lang}
+													about={pick(lang, o.event.title)}
+												/>
 											</div>
 										</div>
 									</li>

@@ -5,7 +5,7 @@ import { SiteFooter } from "#/components/SiteFooter";
 import { SiteHeader } from "#/components/SiteHeader";
 import { applySnapshot } from "#/lib/content-store";
 import { syncContent } from "#/lib/content-sync";
-import { isLang } from "#/lib/i18n";
+import { isLang, t } from "#/lib/i18n";
 import { useLang } from "#/lib/useLang";
 
 export const Route = createFileRoute("/$lang")({
@@ -28,6 +28,9 @@ function LangLayout() {
 	if (snapshot !== undefined) applySnapshot(snapshot);
 	return (
 		<div className="flex min-h-screen flex-col">
+			<a href="#main" className="skip-link">
+				{t(lang, "a11y.skip")}
+			</a>
 			<SiteHeader lang={lang} />
 			<main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
 				<Outlet />

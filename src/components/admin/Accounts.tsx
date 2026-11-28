@@ -44,6 +44,8 @@ const ACTIONS: Record<string, string> = {
 	content_delete: "Xoá nội dung",
 	content_export: "Tải bản sao lưu",
 	images_cleanup: "Dọn ảnh",
+	export_contributions: "Tải CSV đóng góp",
+	export_subscribers: "Tải danh sách email bản tin",
 };
 
 function useAction() {

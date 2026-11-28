@@ -720,7 +720,9 @@ export function ContentEditor({
 										<p className="text-xs text-ink-soft">
 											{id}
 											{collection === "news" && ` · ${String(it.date)}`}
+											{collection === "news" && it.draft ? " · 📝 nháp" : ""}
 											{collection === "news" &&
+												!it.draft &&
 												typeof it.publishAt === "string" &&
 												(vnLocalToDate(it.publishAt)?.getTime() ?? 0) >
 													Date.now() &&

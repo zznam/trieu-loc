@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { type DictKey, type Lang, t } from "#/lib/i18n";
 import { type PostError, postMessage } from "#/server/messages";
+import { RulesNote } from "./RulesNote";
 
 const ERRORS: Record<PostError, DictKey> = {
 	not_configured: "contribute.err.notConfigured",
@@ -132,6 +133,7 @@ export function MessageForm({
 			>
 				<input type="text" name="website" tabIndex={-1} autoComplete="off" />
 			</div>
+			<RulesNote lang={lang} />
 			{error && (
 				<p
 					role="alert"

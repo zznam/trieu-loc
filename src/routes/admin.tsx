@@ -2,12 +2,18 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { AccountsPanel, ChangePasswordForm } from "#/components/admin/Accounts";
 import { ContentEditor } from "#/components/admin/ContentEditor";
+import { CsvButton } from "#/components/admin/CsvButton";
 import { LaunchPanel } from "#/components/admin/Launch";
 import { COLLECTION_NAMES, type CollectionName } from "#/lib/content-schemas";
 import { type Kind, kindLabel } from "#/lib/contribute";
 import { dateToVnLocal, formatVnDateTime } from "#/lib/schedule";
 import { getVillage, villages } from "#/lib/villages";
 import { getAccountsAdmin, getAdminSession } from "#/server/accounts";
+import {
+	exportContributionsCsv,
+	exportSubscribersCsv,
+	getAdminBadges,
+} from "#/server/admin-tools";
 import { getContentAdmin } from "#/server/content";
 import {
 	type AdminContribution,
@@ -26,6 +32,7 @@ import {
 	deleteMessage,
 	getMessagesAdmin,
 	moderateMessage,
+	moderateMessages,
 } from "#/server/messages";
 import {
 	getNewsletterAdmin,
@@ -80,6 +87,7 @@ export const Route = createFileRoute("/admin")({
 		const session = await getAdminSession();
 		const none = {
 			session,
+			badges: null as Awaited<ReturnType<typeof getAdminBadges>> | null,
 			contrib: null,
 			msgs: null,
 			news: null,
@@ -89,6 +97,7 @@ export const Route = createFileRoute("/admin")({
 		};
 		// Nothing else is loaded until someone is signed in.
 		if (!session.me) return none;
+		none.badges = await getAdminBadges();
 		if (deps.section === "contributions") {
 			return {
 				...none,
@@ -130,7 +139,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminPage() {
-	const { session, contrib, msgs, news, content, accounts, launch } =
+	const { session, contrib, msgs, news, content, accounts, launch, badges } =
 		Route.useLoaderData();
 	const me = session.me;
 	const {
@@ -195,6 +204,12 @@ function AdminPage() {
 								}`}
 							>
 								{s.label}
+								{badges && badgeFor(badges, s.value) > 0 && (
+									<span className="ml-1.5 rounded-full bg-lotus px-1.5 py-0.5 text-[11px] font-bold text-paper">
+										{badgeFor(badges, s.value)}
+										<span className="sr-only"> mục chờ duyệt</span>
+									</span>
+								)}
 							</Link>
 						))}
 					</nav>
@@ -262,6 +277,14 @@ function AdminPage() {
 								</Link>
 							))}
 						</nav>
+						{contrib && (
+							<div className="-mt-3 mb-6">
+								<CsvButton
+									label="Tải tất cả đóng góp (CSV)"
+									load={() => exportContributionsCsv()}
+								/>
+							</div>
+						)}
 						{count === 0 ? (
 							<p className="rounded-2xl bg-paper-2 p-8 text-center text-ink-soft">
 								Không có mục nào ở đây.
@@ -273,11 +296,7 @@ function AdminPage() {
 								))}
 							</ul>
 						) : (
-							<ul className="space-y-3">
-								{msgs?.items.map((m) => (
-									<MessageCard key={m.id} item={m} />
-								))}
-							</ul>
+							<MessageList items={msgs?.items ?? []} status={status} />
 						)}
 					</>
 				)}
@@ -286,10 +305,113 @@ function AdminPage() {
 	);
 }
 
+function badgeFor(
+	b: { contributions: number; guestbook: number; comment: number },
+	section: string,
+) {
+	return section === "contributions"
+		? b.contributions
+		: section === "guestbook"
+			? b.guestbook
+			: section === "comment"
+				? b.comment
+				: 0;
+}
+
+/** Messages with checkboxes for approving or hiding several at once. */
+function MessageList({
+	items,
+	status,
+}: {
+	items: AdminMessage[];
+	status: ContributionStatus;
+}) {
+	const router = useRouter();
+	const [selected, setSelected] = useState<Set<number>>(new Set());
+	const [busy, setBusy] = useState(false);
+	const ids = items.map((m) => m.id).filter((id) => selected.has(id));
+	const all = items.length > 0 && ids.length === items.length;
+	async function bulk(next: ContributionStatus) {
+		setBusy(true);
+		try {
+			await moderateMessages({ data: { ids, status: next } });
+			setSelected(new Set());
+			await router.invalidate();
+		} finally {
+			setBusy(false);
+		}
+	}
+	const btn =
+		"rounded-full border border-earth-300 px-3 py-1.5 text-sm font-semibold text-ink disabled:opacity-50";
+	return (
+		<>
+			<div className="mb-3 flex flex-wrap items-center gap-2 rounded-2xl bg-paper-2 px-4 py-2 text-sm">
+				<label className="mr-2 flex items-center gap-2">
+					<input
+						type="checkbox"
+						checked={all}
+						onChange={() =>
+							setSelected(all ? new Set() : new Set(items.map((m) => m.id)))
+						}
+						className="h-4 w-4 accent-rice-700"
+					/>
+					Chọn tất cả
+				</label>
+				<span className="text-ink-soft">Đã chọn {ids.length}</span>
+				{status !== "approved" && (
+					<button
+						type="button"
+						disabled={busy || ids.length === 0}
+						onClick={() => void bulk("approved")}
+						className="rounded-full bg-rice-700 px-3 py-1.5 text-sm font-semibold text-paper disabled:opacity-50"
+					>
+						✓ Duyệt {ids.length || ""} mục
+					</button>
+				)}
+				{status !== "rejected" && (
+					<button
+						type="button"
+						disabled={busy || ids.length === 0}
+						onClick={() => void bulk("rejected")}
+						className={btn}
+					>
+						{status === "approved" ? "Ẩn" : "✕ Từ chối"} {ids.length || ""} mục
+					</button>
+				)}
+			</div>
+			<ul className="space-y-3">
+				{items.map((m) => (
+					<MessageCard
+						key={m.id}
+						item={m}
+						selected={selected.has(m.id)}
+						onToggle={() =>
+							setSelected((prev) => {
+								const next = new Set(prev);
+								if (next.has(m.id)) next.delete(m.id);
+								else next.add(m.id);
+								return next;
+							})
+						}
+					/>
+				))}
+			</ul>
+		</>
+	);
+}
+
 /** "news:slug" → "/vi/news/slug" (comment targets map 1:1 onto Vietnamese page URLs). */
 const targetUrl = (target: string) => `/vi/${target.replace(":", "/")}`;
 
-function MessageCard({ item }: { item: AdminMessage }) {
+function MessageCard({
+	item,
+	selected,
+	onToggle,
+}: {
+	item: AdminMessage;
+	selected: boolean;
+	onToggle: () => void;
+}) {
 	const router = useRouter();
 	const [busy, setBusy] = useState(false);
 	async function act(fn: () => Promise<unknown>) {
@@ -305,7 +427,14 @@ function MessageCard({ item }: { item: AdminMessage }) {
 		"rounded-full border border-earth-300 px-3 py-1.5 text-sm font-semibold text-ink disabled:opacity-60";
 	return (
 		<li className="rounded-2xl border border-earth-300/50 bg-card p-4">
-			<p className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-widest text-earth-700">
+			<p className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-widest text-earth-700">
+				<input
+					type="checkbox"
+					checked={selected}
+					onChange={onToggle}
+					aria-label={`Chọn lời nhắn #${item.id}`}
+					className="h-4 w-4 accent-rice-700"
+				/>
 				<span>#{item.id}</span>
 				<span>·</span>
 				<time dateTime={item.createdAt}>
@@ -1073,6 +1202,19 @@ function NewsletterPanel({
 				</div>
 			)}
 
+			{owner && (
+				<div className="flex flex-wrap gap-2">
+					<CsvButton
+						label="Tải danh sách đang nhận (CSV)"
+						disabled={counts.active === 0}
+						load={() => exportSubscribersCsv({ data: { all: false } })}
+					/>
+					<CsvButton
+						label="Tải tất cả (CSV)"
+						load={() => exportSubscribersCsv({ data: { all: true } })}
+					/>
+				</div>
+			)}
 			<dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 				{[
 					["Đang nhận", counts.active],

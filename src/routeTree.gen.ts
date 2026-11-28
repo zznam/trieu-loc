@@ -23,7 +23,10 @@ import { Route as LangGuestbookRouteImport } from './routes/$lang/guestbook'
 import { Route as LangHistoryRouteImport } from './routes/$lang/history'
 import { Route as LangInfoRouteImport } from './routes/$lang/info'
 import { Route as LangPlacesRouteImport } from './routes/$lang/places'
+import { Route as LangPrivacyRouteImport } from './routes/$lang/privacy'
 import { Route as LangSearchRouteImport } from './routes/$lang/search'
+import { Route as LangVisitRouteImport } from './routes/$lang/visit'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as LangNewsIndexRouteImport } from './routes/$lang/news/index'
 import { Route as LangNewsSlugRouteImport } from './routes/$lang/news/$slug'
 import { Route as LangNewsletterConfirmRouteImport } from './routes/$lang/newsletter/confirm'
@@ -105,10 +108,25 @@ const LangPlacesRoute = LangPlacesRouteImport.update({
   path: '/places',
   getParentRoute: () => LangRoute,
 } as any)
+const LangPrivacyRoute = LangPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => LangRoute,
+} as any)
 const LangSearchRoute = LangSearchRouteImport.update({
   id: '/search',
   path: '/search',
   getParentRoute: () => LangRoute,
+} as any)
+const LangVisitRoute = LangVisitRouteImport.update({
+  id: '/visit',
+  path: '/visit',
+  getParentRoute: () => LangRoute,
+} as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LangNewsIndexRoute = LangNewsIndexRouteImport.update({
   id: '/news/',
@@ -177,7 +195,10 @@ export interface FileRoutesByFullPath {
   '/$lang/history': typeof LangHistoryRoute
   '/$lang/info': typeof LangInfoRoute
   '/$lang/places': typeof LangPlacesRoute
+  '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/search': typeof LangSearchRoute
+  '/$lang/visit': typeof LangVisitRoute
+  '/api/health': typeof ApiHealthRoute
   '/$lang/': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/newsletter/confirm': typeof LangNewsletterConfirmRoute
@@ -203,7 +224,10 @@ export interface FileRoutesByTo {
   '/$lang/history': typeof LangHistoryRoute
   '/$lang/info': typeof LangInfoRoute
   '/$lang/places': typeof LangPlacesRoute
+  '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/search': typeof LangSearchRoute
+  '/$lang/visit': typeof LangVisitRoute
+  '/api/health': typeof ApiHealthRoute
   '/$lang': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/newsletter/confirm': typeof LangNewsletterConfirmRoute
@@ -231,7 +255,10 @@ export interface FileRoutesById {
   '/$lang/history': typeof LangHistoryRoute
   '/$lang/info': typeof LangInfoRoute
   '/$lang/places': typeof LangPlacesRoute
+  '/$lang/privacy': typeof LangPrivacyRoute
   '/$lang/search': typeof LangSearchRoute
+  '/$lang/visit': typeof LangVisitRoute
+  '/api/health': typeof ApiHealthRoute
   '/$lang/': typeof LangIndexRoute
   '/$lang/news/$slug': typeof LangNewsSlugRoute
   '/$lang/newsletter/confirm': typeof LangNewsletterConfirmRoute
@@ -260,7 +287,10 @@ export interface FileRouteTypes {
     | '/$lang/history'
     | '/$lang/info'
     | '/$lang/places'
+    | '/$lang/privacy'
     | '/$lang/search'
+    | '/$lang/visit'
+    | '/api/health'
     | '/$lang/'
     | '/$lang/news/$slug'
     | '/$lang/newsletter/confirm'
@@ -286,7 +316,10 @@ export interface FileRouteTypes {
     | '/$lang/history'
     | '/$lang/info'
     | '/$lang/places'
+    | '/$lang/privacy'
     | '/$lang/search'
+    | '/$lang/visit'
+    | '/api/health'
     | '/$lang'
     | '/$lang/news/$slug'
     | '/$lang/newsletter/confirm'
@@ -313,7 +346,10 @@ export interface FileRouteTypes {
     | '/$lang/history'
     | '/$lang/info'
     | '/$lang/places'
+    | '/$lang/privacy'
     | '/$lang/search'
+    | '/$lang/visit'
+    | '/api/health'
     | '/$lang/'
     | '/$lang/news/$slug'
     | '/$lang/newsletter/confirm'
@@ -333,6 +369,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiHealthRoute: typeof ApiHealthRoute
   ApiNewsletterUnsubscribeRoute: typeof ApiNewsletterUnsubscribeRoute
   ApiUploadsNameRoute: typeof ApiUploadsNameRoute
 }
@@ -437,12 +474,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangPlacesRouteImport
       parentRoute: typeof LangRoute
     }
+    '/$lang/privacy': {
+      id: '/$lang/privacy'
+      path: '/privacy'
+      fullPath: '/$lang/privacy'
+      preLoaderRoute: typeof LangPrivacyRouteImport
+      parentRoute: typeof LangRoute
+    }
     '/$lang/search': {
       id: '/$lang/search'
       path: '/search'
       fullPath: '/$lang/search'
       preLoaderRoute: typeof LangSearchRouteImport
       parentRoute: typeof LangRoute
+    }
+    '/$lang/visit': {
+      id: '/$lang/visit'
+      path: '/visit'
+      fullPath: '/$lang/visit'
+      preLoaderRoute: typeof LangVisitRouteImport
+      parentRoute: typeof LangRoute
+    }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$lang/news/': {
       id: '/$lang/news/'
@@ -526,7 +584,9 @@ interface LangRouteChildren {
   LangHistoryRoute: typeof LangHistoryRoute
   LangInfoRoute: typeof LangInfoRoute
   LangPlacesRoute: typeof LangPlacesRoute
+  LangPrivacyRoute: typeof LangPrivacyRoute
   LangSearchRoute: typeof LangSearchRoute
+  LangVisitRoute: typeof LangVisitRoute
   LangIndexRoute: typeof LangIndexRoute
   LangNewsSlugRoute: typeof LangNewsSlugRoute
   LangNewsletterConfirmRoute: typeof LangNewsletterConfirmRoute
@@ -547,7 +607,9 @@ const LangRouteChildren: LangRouteChildren = {
   LangHistoryRoute: LangHistoryRoute,
   LangInfoRoute: LangInfoRoute,
   LangPlacesRoute: LangPlacesRoute,
+  LangPrivacyRoute: LangPrivacyRoute,
   LangSearchRoute: LangSearchRoute,
+  LangVisitRoute: LangVisitRoute,
   LangIndexRoute: LangIndexRoute,
   LangNewsSlugRoute: LangNewsSlugRoute,
   LangNewsletterConfirmRoute: LangNewsletterConfirmRoute,
@@ -567,6 +629,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiHealthRoute: ApiHealthRoute,
   ApiNewsletterUnsubscribeRoute: ApiNewsletterUnsubscribeRoute,
   ApiUploadsNameRoute: ApiUploadsNameRoute,
 }

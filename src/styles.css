@@ -143,3 +143,63 @@ h3 {
 		box-shadow: 0 0 0 3px transparent;
 	}
 }
+
+/* ---------- Text size toggle (header "A" button) ---------- */
+html[data-text-size="lg"] {
+	font-size: 112.5%;
+}
+html[data-text-size="xl"] {
+	font-size: 125%;
+}
+
+/* ---------- Skip link: visible only when focused ---------- */
+.skip-link {
+	position: absolute;
+	left: 1rem;
+	top: -4rem;
+	z-index: 2000;
+	border-radius: 9999px;
+	background: var(--color-rice-700);
+	color: var(--color-paper);
+	padding: 0.5rem 1rem;
+	font-weight: 600;
+	transition: top 0.15s;
+}
+.skip-link:focus {
+	top: 0.75rem;
+}
+#main:focus {
+	outline: none;
+}
+
+/* ---------- Print: content only, readable on paper ---------- */
+@media print {
+	header,
+	footer,
+	nav,
+	.no-print,
+	.leaflet-container,
+	button {
+		display: none !important;
+	}
+	html,
+	body,
+	[data-theme="dark"] {
+		--color-paper: #fff;
+		--color-paper-2: #fff;
+		--color-card: #fff;
+		--color-ink: #000;
+		--color-ink-soft: #333;
+		background: #fff !important;
+		color: #000 !important;
+	}
+	main a[href^="http"]::after {
+		content: " (" attr(href) ")";
+		font-size: 0.8em;
+		word-break: break-all;
+	}
+	article,
+	li {
+		break-inside: avoid;
+	}
+}

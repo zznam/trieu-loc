@@ -97,6 +97,8 @@ export const newsSchema = z.object({
 		.string()
 		.regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/)
 		.optional(),
+	/** Draft: saved but hidden everywhere until unticked. */
+	draft: z.boolean().optional(),
 	vi: newsLang,
 	en: newsLang.optional(),
 });

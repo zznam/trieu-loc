@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { PageHeader } from "#/components/PageHeader";
+import { RulesNote } from "#/components/RulesNote";
 import {
 	errorKey,
 	KINDS,
@@ -14,8 +15,15 @@ import { seo } from "#/lib/seo";
 import { submitContribution } from "#/server/contributions";
 
 export const Route = createFileRoute("/$lang/contribute")({
-	validateSearch: (s: Record<string, unknown>): { kind?: Kind } =>
-		KINDS.includes(s.kind as Kind) ? { kind: s.kind as Kind } : {},
+	validateSearch: (
+		s: Record<string, unknown>,
+	): { kind?: Kind; about?: string } => ({
+		...(KINDS.includes(s.kind as Kind) ? { kind: s.kind as Kind } : {}),
+		// "Suggest an edit" links say which page or item the correction is about.
+		...(typeof s.about === "string" && s.about.trim()
+			? { about: s.about.trim().slice(0, 150) }
+			: {}),
+	}),
 	head: ({ params }) => {
 		const lang = params.lang as Lang;
 		return seo(
@@ -253,6 +261,11 @@ function ContributePage() {
 							id="title"
 							name="title"
 							required
+							defaultValue={
+								search.about
+									? `${t(lang, "edit.prefill")}: ${search.about}`
+									: ""
+							}
 							maxLength={200}
 							className={input}
 						/>
@@ -350,6 +363,7 @@ function ContributePage() {
 						/>
 						<span>{t(lang, "contribute.consent")}</span>
 					</label>
+					<RulesNote lang={lang} />
 
 					{error && (
 						<p

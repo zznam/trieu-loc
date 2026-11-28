@@ -346,6 +346,11 @@ export const FIELDS: Record<CollectionName, Field[]> = {
 		},
 		{ kind: "text", path: "date", label: "Ngày đăng (YYYY-MM-DD)" },
 		{
+			kind: "checkbox",
+			path: "draft",
+			label: "📝 Bản nháp — lưu lại nhưng chưa hiển thị ở đâu cả",
+		},
+		{
 			kind: "datetime",
 			path: "publishAt",
 			label: "Lên lịch đăng (giờ Việt Nam)",
