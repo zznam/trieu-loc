@@ -13,3 +13,22 @@ export function fold(s: string): string {
 	}
 	return out;
 }
+
+/** Average adult reading speed used for the "min read" label, in words per minute. */
+export const WORDS_PER_MINUTE = 200;
+
+/**
+ * Estimated reading time in whole minutes (at least 1) for Markdown or plain text.
+ * Code, images, link targets, HTML tags and Markdown punctuation are not counted as words.
+ */
+export function readingMinutes(text: string): number {
+	const words = text
+		.replace(/```[\s\S]*?```/g, " ")
+		.replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+		.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+		.replace(/<[^>]+>/g, " ")
+		.replace(/[#>*_`~|-]+/g, " ")
+		.split(/\s+/)
+		.filter((w) => /[\p{L}\p{N}]/u.test(w)).length;
+	return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE));
+}

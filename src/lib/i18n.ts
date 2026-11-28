@@ -76,6 +76,7 @@ const dict = {
 	"countdown.addToCalendar": { vi: "Thêm vào lịch", en: "Add to calendar" },
 	"common.readMore": { vi: "Đọc tiếp", en: "Read more" },
 	"common.back": { vi: "Quay lại", en: "Back" },
+	"news.readingTime": { vi: "{n} phút đọc", en: "{n} min read" },
 	"share.title": { vi: "Chia sẻ", en: "Share" },
 	"share.native": { vi: "Chia sẻ…", en: "Share…" },
 	"share.copy": { vi: "Sao chép liên kết", en: "Copy link" },
@@ -465,6 +466,11 @@ export type DictKey = keyof typeof dict;
 
 export function t(lang: Lang, key: DictKey): string {
 	return dict[key][lang];
+}
+
+/** "5 phút đọc" / "5 min read". */
+export function readingTimeLabel(lang: Lang, minutes: number): string {
+	return t(lang, "news.readingTime").replace("{n}", String(minutes));
 }
 
 export function formatDate(lang: Lang, iso: string): string {

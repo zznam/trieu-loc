@@ -3,8 +3,9 @@ import { Comments } from "#/components/Comments";
 import { ShareButtons } from "#/components/ShareButtons";
 import { getPost } from "#/lib/content";
 import { STORY_PREFIX } from "#/lib/contribute";
-import { formatDate, type Lang, pick, t } from "#/lib/i18n";
+import { formatDate, type Lang, pick, readingTimeLabel, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
+import { readingMinutes } from "#/lib/text";
 import { getPublicVillage } from "#/lib/villages";
 import { getPublishedStory } from "#/server/published";
 
@@ -85,6 +86,15 @@ function NewsPostPage() {
 			</Link>
 			<p className="mt-8 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-widest text-earth-700">
 				<time dateTime={article.date}>{formatDate(lang, article.date)}</time>
+				<span aria-hidden="true">·</span>
+				<span className="normal-case tracking-normal">
+					{readingTimeLabel(
+						lang,
+						readingMinutes(
+							article.kind === "post" ? article.html : article.message,
+						),
+					)}
+				</span>
 				{article.kind === "story" && (
 					<span className="rounded-full bg-rice-100 px-2 py-0.5 normal-case tracking-normal text-rice-900">
 						✍️ {t(lang, "news.community")}
