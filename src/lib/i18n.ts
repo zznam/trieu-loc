@@ -283,6 +283,8 @@ const dict = {
 	"lightbox.next": { vi: "Ảnh sau", en: "Next photo" },
 	"lightbox.swipe": { vi: "Vuốt để xem ảnh khác", en: "Swipe for more photos" },
 	"lightbox.open": { vi: "Phóng to ảnh", en: "View larger" },
+	"lightbox.play": { vi: "Trình chiếu", en: "Slideshow" },
+	"lightbox.pause": { vi: "Tạm dừng", en: "Pause" },
 	"nav.info": { vi: "Thông tin hữu ích", en: "Useful info" },
 	"info.title": {
 		vi: "Thời tiết & Thông tin hữu ích",
