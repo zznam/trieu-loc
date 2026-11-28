@@ -32,7 +32,7 @@ function LangLayout() {
 				{t(lang, "a11y.skip")}
 			</a>
 			<SiteHeader lang={lang} />
-			<main id="main" tabIndex={-1} className="flex-1">
+			<main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
 				<Outlet />
 			</main>
 			<SiteFooter lang={lang} />

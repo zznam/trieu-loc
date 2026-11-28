@@ -255,6 +255,25 @@ export function getPost(
 	return post && isLive(post.publishAt, now) ? post : undefined;
 }
 
+export type PostLink = { slug: string; title: string; date: string };
+
+/**
+ * The published posts either side of `slug` in news order (newest first): `newer` is the
+ * next more recent post, `older` the next earlier one. Scheduled posts are skipped.
+ */
+export function adjacentPosts(
+	lang: Lang,
+	slug: string,
+	now = Date.now(),
+): { newer?: PostLink; older?: PostLink } {
+	const posts = getNews(lang, now);
+	const index = posts.findIndex((p) => p.slug === slug);
+	if (index === -1) return {};
+	const link = (p: NewsPost | undefined): PostLink | undefined =>
+		p && { slug: p.slug, title: p.title, date: p.date };
+	return { newer: link(posts[index - 1]), older: link(posts[index + 1]) };
+}
+
 // ---------- People ----------
 
 export type PersonCategory = "history" | "notable" | "diaspora";

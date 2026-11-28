@@ -3,11 +3,12 @@ import { Breadcrumbs } from "#/components/Breadcrumbs";
 import { Comments } from "#/components/Comments";
 import { JsonLd } from "#/components/JsonLd";
 import { ShareButtons } from "#/components/ShareButtons";
-import { getPost, site } from "#/lib/content";
+import { adjacentPosts, getPost, site } from "#/lib/content";
 import { STORY_PREFIX } from "#/lib/contribute";
-import { formatDate, type Lang, pick, t } from "#/lib/i18n";
+import { formatDate, type Lang, pick, readingTimeLabel, t } from "#/lib/i18n";
 import { seo } from "#/lib/seo";
 import { articleLd } from "#/lib/structured-data";
+import { readingMinutes } from "#/lib/text";
 import { getPublicVillage } from "#/lib/villages";
 import { getPublishedStory } from "#/server/published";
 
@@ -69,6 +70,52 @@ export const Route = createFileRoute("/$lang/news/$slug")({
 	component: NewsPostPage,
 });
 
+function PostNavigation({ lang, slug }: { lang: Lang; slug: string }) {
+	const { newer, older } = adjacentPosts(lang, slug);
+	if (!newer && !older) return null;
+	const card =
+		"block rounded-xl border border-earth-300/60 p-4 hover:border-rice-700 hover:bg-rice-50";
+	return (
+		<nav
+			aria-label={`${t(lang, "news.older")} / ${t(lang, "news.newer")}`}
+			className="mt-12 grid gap-3 sm:grid-cols-2"
+		>
+			{older ? (
+				<Link
+					to="/$lang/news/$slug"
+					params={{ lang, slug: older.slug }}
+					className={card}
+					rel="prev"
+				>
+					<span className="text-xs font-semibold uppercase tracking-widest text-earth-700">
+						← {t(lang, "news.older")}
+					</span>
+					<span className="mt-1 block font-semibold text-rice-900">
+						{older.title}
+					</span>
+				</Link>
+			) : (
+				<span />
+			)}
+			{newer && (
+				<Link
+					to="/$lang/news/$slug"
+					params={{ lang, slug: newer.slug }}
+					className={`${card} sm:text-right`}
+					rel="next"
+				>
+					<span className="text-xs font-semibold uppercase tracking-widest text-earth-700">
+						{t(lang, "news.newer")} →
+					</span>
+					<span className="mt-1 block font-semibold text-rice-900">
+						{newer.title}
+					</span>
+				</Link>
+			)}
+		</nav>
+	);
+}
+
 function NewsPostPage() {
 	const params = Route.useParams();
 	const lang = params.lang as Lang;
@@ -101,6 +148,15 @@ function NewsPostPage() {
 				/>
 				<p className="mt-8 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-widest text-earth-700">
 					<time dateTime={article.date}>{formatDate(lang, article.date)}</time>
+					<span aria-hidden="true">·</span>
+					<span className="normal-case tracking-normal">
+						{readingTimeLabel(
+							lang,
+							readingMinutes(
+								article.kind === "post" ? article.html : article.message,
+							),
+						)}
+					</span>
 					{article.kind === "story" && (
 						<span className="rounded-full bg-rice-100 px-2 py-0.5 normal-case tracking-normal text-rice-900">
 							✍️ {t(lang, "news.community")}
@@ -149,6 +205,9 @@ function NewsPostPage() {
 							))}
 						</div>
 					</>
+				)}
+				{article.kind === "post" && (
+					<PostNavigation lang={lang} slug={params.slug} />
 				)}
 				<ShareButtons
 					lang={lang}

@@ -76,6 +76,10 @@ const dict = {
 	"countdown.addToCalendar": { vi: "Thêm vào lịch", en: "Add to calendar" },
 	"common.readMore": { vi: "Đọc tiếp", en: "Read more" },
 	"common.back": { vi: "Quay lại", en: "Back" },
+	"common.backToTop": { vi: "Lên đầu trang", en: "Back to top" },
+	"news.readingTime": { vi: "{n} phút đọc", en: "{n} min read" },
+	"news.newer": { vi: "Bài mới hơn", en: "Newer post" },
+	"news.older": { vi: "Bài cũ hơn", en: "Older post" },
 	"share.title": { vi: "Chia sẻ", en: "Share" },
 	"share.native": { vi: "Chia sẻ…", en: "Share…" },
 	"share.copy": { vi: "Sao chép liên kết", en: "Copy link" },
@@ -280,6 +284,8 @@ const dict = {
 	"lightbox.next": { vi: "Ảnh sau", en: "Next photo" },
 	"lightbox.swipe": { vi: "Vuốt để xem ảnh khác", en: "Swipe for more photos" },
 	"lightbox.open": { vi: "Phóng to ảnh", en: "View larger" },
+	"lightbox.play": { vi: "Trình chiếu", en: "Slideshow" },
+	"lightbox.pause": { vi: "Tạm dừng", en: "Pause" },
 	"nav.info": { vi: "Thông tin hữu ích", en: "Useful info" },
 	"info.title": {
 		vi: "Thời tiết & Thông tin hữu ích",
@@ -473,7 +479,6 @@ const dict = {
 		vi: "rất lớn (bấm để trở về cỡ vừa)",
 		en: "extra large (press for normal)",
 	},
-	"a11y.backToTop": { vi: "Lên đầu trang", en: "Back to top" },
 	"breadcrumb.label": { vi: "Bạn đang ở", en: "You are here" },
 	"notFound.search": { vi: "Tìm trên trang…", en: "Search the site…" },
 	"notFound.popular": {
@@ -533,6 +538,11 @@ export type DictKey = keyof typeof dict;
 
 export function t(lang: Lang, key: DictKey): string {
 	return dict[key][lang];
+}
+
+/** "5 phút đọc" / "5 min read". */
+export function readingTimeLabel(lang: Lang, minutes: number): string {
+	return t(lang, "news.readingTime").replace("{n}", String(minutes));
 }
 
 export function formatDate(lang: Lang, iso: string): string {

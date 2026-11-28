@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type Lang, t } from "#/lib/i18n";
 
 export type Slide = {
@@ -13,7 +13,11 @@ export type Slide = {
 /**
  * Full-screen photo viewer built on <dialog> (native focus trap, Esc to close).
  * Arrow keys / swipe to move between photos; neighbours are preloaded.
+ * The slideshow advances every SLIDESHOW_MS and stops as soon as the viewer navigates manually.
  */
+/** Time each photo stays on screen during a slideshow. */
+export const SLIDESHOW_MS = 4000;
+
 export function Lightbox({
 	lang,
 	slides,
@@ -31,8 +35,25 @@ export function Lightbox({
 	const touchX = useRef<number | null>(null);
 	const open = index !== null && slides.length > 0;
 	const count = slides.length;
-	const go = (delta: number) =>
+	const [playing, setPlaying] = useState(false);
+	const advance = (delta: number) =>
 		index !== null && onIndex((index + delta + count) % count);
+	// Manual navigation takes over from the slideshow.
+	const go = (delta: number) => {
+		setPlaying(false);
+		advance(delta);
+	};
+
+	// Each photo gets the full interval, restarting whenever the photo changes.
+	useEffect(() => {
+		if (!playing || !open || count < 2) return;
+		const timer = setTimeout(() => advance(1), SLIDESHOW_MS);
+		return () => clearTimeout(timer);
+	});
+
+	useEffect(() => {
+		if (!open) setPlaying(false);
+	}, [open]);
 
 	useEffect(() => {
 		const d = dialog.current;
@@ -92,6 +113,18 @@ export function Lightbox({
 						<span aria-live="polite" className="tabular-nums text-white/80">
 							{(index ?? 0) + 1} / {count}
 						</span>
+						{count > 1 && (
+							<button
+								type="button"
+								onClick={() => setPlaying((p) => !p)}
+								aria-pressed={playing}
+								className="ml-auto rounded-full bg-white/10 px-4 py-2 hover:bg-white/20"
+							>
+								{playing
+									? `⏸ ${t(lang, "lightbox.pause")}`
+									: `▶ ${t(lang, "lightbox.play")}`}
+							</button>
+						)}
 						<button
 							type="button"
 							onClick={onClose}

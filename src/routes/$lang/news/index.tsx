@@ -3,9 +3,10 @@ import { useState } from "react";
 import { PageHeader } from "#/components/PageHeader";
 import { getNews } from "#/lib/content";
 import { STORY_PREFIX } from "#/lib/contribute";
-import { formatDate, type Lang, t } from "#/lib/i18n";
+import { formatDate, type Lang, readingTimeLabel, t } from "#/lib/i18n";
 import { groupByYear } from "#/lib/listing";
 import { seo } from "#/lib/seo";
+import { readingMinutes } from "#/lib/text";
 import { getPublishedStories } from "#/server/published";
 
 export const Route = createFileRoute("/$lang/news/")({
@@ -28,6 +29,7 @@ type Entry = {
 	title: string;
 	date: string;
 	summary: string;
+	minutes: number;
 	byline?: string;
 };
 
@@ -46,12 +48,14 @@ function NewsIndex() {
 			title: p.title,
 			date: p.date,
 			summary: p.summary,
+			minutes: readingMinutes(p.markdown),
 		})),
 		...stories.map((s) => ({
 			slug: `${STORY_PREFIX}${s.id}`,
 			title: s.title,
 			date: s.publishedAt.slice(0, 10),
 			summary: excerpt(s.message.replace(/\s+/g, " ")),
+			minutes: readingMinutes(s.message),
 			byline: [s.name, s.village].filter(Boolean).join(" · "),
 		})),
 	].sort((a, b) => b.date.localeCompare(a.date));
@@ -120,6 +124,10 @@ function NewsIndex() {
 										<time dateTime={post.date}>
 											{formatDate(lang, post.date)}
 										</time>
+										<span aria-hidden="true">·</span>
+										<span className="normal-case tracking-normal">
+											{readingTimeLabel(lang, post.minutes)}
+										</span>
 										{post.byline && (
 											<span className="rounded-full bg-rice-100 px-2 py-0.5 normal-case tracking-normal text-rice-900">
 												✍️ {t(lang, "news.community")}
