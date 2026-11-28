@@ -77,6 +77,8 @@ const dict = {
 	"common.readMore": { vi: "Đọc tiếp", en: "Read more" },
 	"common.back": { vi: "Quay lại", en: "Back" },
 	"news.readingTime": { vi: "{n} phút đọc", en: "{n} min read" },
+	"news.newer": { vi: "Bài mới hơn", en: "Newer post" },
+	"news.older": { vi: "Bài cũ hơn", en: "Older post" },
 	"share.title": { vi: "Chia sẻ", en: "Share" },
 	"share.native": { vi: "Chia sẻ…", en: "Share…" },
 	"share.copy": { vi: "Sao chép liên kết", en: "Copy link" },

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+	adjacentPosts,
 	businesses,
 	gallery,
 	getNews,
@@ -88,5 +89,20 @@ describe("content integrity", () => {
 				.map((p) => p.slug)
 				.sort(),
 		);
+	});
+});
+
+describe("adjacentPosts", () => {
+	it("links each post to its newer and older neighbours in news order", () => {
+		const posts = getNews("vi");
+		expect(posts.length).toBeGreaterThanOrEqual(3);
+		const [newest, middle, oldest] = [posts[0], posts[1], posts.at(-1)];
+		expect(adjacentPosts("vi", newest.slug).newer).toBeUndefined();
+		expect(adjacentPosts("vi", newest.slug).older?.slug).toBe(middle.slug);
+		expect(adjacentPosts("vi", middle.slug).newer?.slug).toBe(newest.slug);
+		expect(adjacentPosts("vi", oldest?.slug ?? "").older).toBeUndefined();
+	});
+	it("returns nothing for unknown slugs", () => {
+		expect(adjacentPosts("en", "no-such-post")).toEqual({});
 	});
 });
